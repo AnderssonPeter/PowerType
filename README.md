@@ -6,3 +6,5 @@ Autocomplete for Powershell
 [![Coverage Status](https://coveralls.io/repos/github/AnderssonPeter/PowerType/badge.svg)](https://coveralls.io/github/AnderssonPeter/PowerType)
 
 This project is far from done but has the aim to provide autocomplete for common cli tools like git, docker, dotnet, node, npm and many more.
+
+This is heavily inspired by [Fish shell](https://fishshell.com/) and [fig autocomplete](https://github.com/withfig/autocomplete)
