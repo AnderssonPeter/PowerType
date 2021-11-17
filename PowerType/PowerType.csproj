@@ -33,7 +33,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <DocumentationFile>$(OutputPath)\PowerType.xml</DocumentationFile>
+        <DocumentationFile Condition="'$(Configuration)'=='Release'>$(OutputPath)\PowerType.xml"</DocumentationFile>
         <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
         <Company />
         <PackageReadmeFile>README.md</PackageReadmeFile>
