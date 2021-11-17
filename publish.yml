@@ -1,0 +1,36 @@
+name: build
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  pack:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup .NET 6
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    
+    - name: Install dependencies
+      run: dotnet restore --verbosity normal
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore /property:Version=${{ github.event.release.tag_name }}
+
+    - name: Change PowerShell module version
+      shell: pwsh
+      run: |
+        $file = 'artifacts\PowerType\PowerType.psd1'
+        $regex = "^ModuleVersion = '\d+\.\d+\.\d+'$"
+        (Get-Content $file) -replace $regex, "ModuleVersion = '${{ github.event.release.tag_name }}'" | Set-Content $file
+    
+    - name: Publish and upload artifacts
+      shell: pwsh
+      run: |
+        Publish-Module -Path 'artifacts\PowerType' -NuGetApiKey ' ${{ secrets.POWERSHELL_GALLERY_API_KEY }}'

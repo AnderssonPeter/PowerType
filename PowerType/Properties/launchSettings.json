@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "PowerShell": {
+      "commandName": "Executable",
+      "executablePath": "pwsh.exe",
+      "commandLineArgs": "-NoExit -command \"$DebugPreference = 'Continue'\nImport-Module $(TargetDir)$(TargetFileName)\nEnable-PowerType -PassThru\""
+    }
+  }
+}

@@ -1,0 +1,87 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        
+        <Authors>Peter Andersson</Authors>
+
+
+        <PackageId>PowerType</PackageId>
+        
+        <Product></Product>
+        <Description>Autocomplete for Powershell</Description>
+        <PackageProjectUrl>https://github.com/AnderssonPeter/PowerType</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/AnderssonPeter/PowerType</RepositoryUrl>
+        <PackageReleaseNotes>1.0.0 Initial release</PackageReleaseNotes>
+
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    </PropertyGroup>
+
+
+    <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DocumentationFile>$(OutputPath)\PowerType.xml</DocumentationFile>
+        <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+        <Company />
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>PowerShell;AutoComplete;Prediction;Recommendation;Predictor</PackageTags>
+        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <OutputPath>..\artifacts\PowerType\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Include="PowerType.psd1" CopyToOutputDirectory="PreserveNewest" />
+      <None Include="..\LICENSE.md">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
+      <None Include="..\README.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.0" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="System.Management.Automation" Version="7.2.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+        <PackageReference Include="Roslynator.Analyzers" Version="3.2.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <None Update="Dictionaries\*.ps1">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>
