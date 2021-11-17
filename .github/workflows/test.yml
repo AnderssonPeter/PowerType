@@ -9,22 +9,28 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Setup .NET6
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.x
+
     - name: Install dependencies
       run: dotnet restore --verbosity normal
+
     - name: Build
       run: dotnet build --configuration Release --no-restore
+
     - name: Test
       run: dotnet test --configuration Release --no-restore --no-build --verbosity normal --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+
     - name: Find lcov file path
       id: find-lcov-file-path
       shell: pwsh
       run: |
         $FilePath = (Get-ChildItem LoggerHealthCheck.Tests\TestResults\* | Select-Object -First 1 | Get-ChildItem).FullName
         Write-Host ::set-output name=path::$FilePath
+
     - name: Publish coverage report to coveralls.io
       uses: coverallsapp/github-action@master
       with:
