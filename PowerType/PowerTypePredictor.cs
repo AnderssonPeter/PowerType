@@ -30,7 +30,6 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     public SuggestionPackage GetSuggestion(PredictionClient client, PredictionContext context, CancellationToken cancellationToken)
     {
-
         var relatedAsts = context.RelatedAsts;
         CommandAst? commandAst = null;
 
@@ -49,8 +48,9 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         }
 
         var commandName = commandAst.GetCommandName();
+        var temp = commandAst.CommandElements.Select(x => new { str = x.ToString(), value = (x as StringConstantExpressionAst)?.Value }).ToList();
         var arguments = commandAst.CommandElements.Select(x => x.ToString()).ToList();
-        //arguments.Insert(0, commandName);
+        
         var dictionaryParsingContext = new DictionaryParsingContext(arguments);
         var result = GetSuggestions(dictionaryParsingContext).ToList();
         if (result.Count == 0)

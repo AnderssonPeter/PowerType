@@ -32,8 +32,9 @@ Copyright = 'Peter Andersson. All rights reserved.'
 Description = 'Module providing recommendations for common tools - This module requires PowerShell 7.2 and PSReadLine 2.2.0.
 
 Suggestions must be activated:
-- Enable-PowerType:  Activate the suggestions
-- Disable-PowerType: Disable the suggestions
+- Enable-PowerType:        Activate the suggestions
+- Disable-PowerType:       Disable the suggestions
+- Add-PowerTypeDictionary: Adds a power type dictionary
 
 For more information on PowerType, please visit the following: https://github.com/AnderssonPeter/PowerType'
 
@@ -45,7 +46,7 @@ PowerShellVersion = '7.2'
 
 NestedModules = @("PowerType.dll")
 
-CmdletsToExport = @("Enable-PowerType", "Disable-PowerType")
+CmdletsToExport = @("Enable-PowerType", "Disable-PowerType", "Add-PowerTypeDictionary")
 
 # Format files (.ps1xml) to be loaded when importing this module
 

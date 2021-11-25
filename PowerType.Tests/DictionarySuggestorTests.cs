@@ -117,10 +117,11 @@ public class DictionarySuggestorTests
     [InlineData(new string[] { "git", "commit" }, new[] { "git commit --message", "git commit --verbose", "git commit --squash", "git commit --cleanup", "git commit --help" })]
     [InlineData(new string[] { "git", "commit", "--me" }, new[] { "git commit --message" })]
     [InlineData(new string[] { "git", "commit", "--message" }, new string[] { })]
-    [InlineData(new string[] { "git", "commit", "--message=\"test" }, new string [] { })]
-    
+    [InlineData(new string[] { "git", "commit", "--message=\"test" }, new string[] { })]
+
     [InlineData(new string[] { "git", "commit", "-m" }, new string[] { })]
     [InlineData(new string[] { "git", "commit", "-m=\"test" }, new string [] { })]
+    [InlineData(new string[] { "git", "commit", "-m=\"test\"" }, new string[] { "git commit -m=\"test\" --verbose", "git commit -m=\"test\" --squash", "git commit -m=\"test\" --cleanup", "git commit -m=\"test\" --help" })]
     [InlineData(new string[] { "git", "commit", "-m", "\"test" }, new string [] { })]
     [InlineData(new string[] { "git", "commit", "-m", "\"test\"" }, new[] { "git commit -m \"test\" --verbose", "git commit -m \"test\" --squash", "git commit -m \"test\" --cleanup", "git commit -m \"test\" --help" })]
     [InlineData(new string[] { "git", "commit", "-m", "\"test\"", "-" }, new[] { "git commit -m \"test\" --verbose", "git commit -m \"test\" --squash", "git commit -m \"test\" --cleanup", "git commit -m \"test\" --help" })]
@@ -128,6 +129,8 @@ public class DictionarySuggestorTests
     [InlineData(new string[] { "git", "commit", "--cleanup" }, new string[] { "git commit --cleanup strip", "git commit --cleanup default" })]
     [InlineData(new string[] { "git", "commit", "--cleanup", "s" }, new string[] { "git commit --cleanup strip" })]
     [InlineData(new string[] { "git", "commit", "--cleanup=s" }, new string[] { "git commit --cleanup=strip" })]
+    [InlineData(new string[] { "git", "commit", "--cleanup=\"strip" }, new string[] { "git commit --cleanup=\"strip\"" })]
+    [InlineData(new string[] { "git", "commit", "--cleanup='strip" }, new string[] { "git commit --cleanup='strip'" })]
 
     [InlineData(new string[] { "git", "checkout" }, new string[] { "git checkout --quite", "git checkout First", "git checkout Second", "git checkout --help" })]
     [InlineData(new string[] { "git", "checkout", "F" }, new string[] { "git checkout First" })]
