@@ -3,7 +3,7 @@ name: unit tests
 on: [push, pull_request]
 
 jobs:
-  build:
+  Unit-Test:
 
     runs-on: windows-latest
 
