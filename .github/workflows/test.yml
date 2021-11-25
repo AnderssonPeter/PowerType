@@ -22,6 +22,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Test
+      continue-on-error: true
       run: dotnet test --configuration Release --no-restore --no-build --verbosity normal --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
 
     - name: Find lcov file path
