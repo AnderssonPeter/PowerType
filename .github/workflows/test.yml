@@ -29,7 +29,7 @@ jobs:
       id: find-lcov-file-path
       shell: pwsh
       run: |
-        $FilePath = (Get-ChildItem LoggerHealthCheck.Tests\TestResults\* | Select-Object -First 1 | Get-ChildItem).FullName
+        $FilePath = (Get-ChildItem PowerType.Tests\TestResults\* | Select-Object -First 1 | Get-ChildItem).FullName
         Write-Host ::set-output name=path::$FilePath
 
     - name: Publish coverage report to coveralls.io
