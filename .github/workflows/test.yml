@@ -22,11 +22,11 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Test
-      continue-on-error: true
       run: dotnet test --configuration Release --no-restore --no-build --verbosity normal --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
 
     - name: Find lcov file path
       id: find-lcov-file-path
+      if: always()
       shell: pwsh
       run: |
         $FilePath = (Get-ChildItem PowerType.Tests\TestResults\* | Select-Object -First 1 | Get-ChildItem).FullName
@@ -34,6 +34,7 @@ jobs:
 
     - name: Publish coverage report to coveralls.io
       uses: coverallsapp/github-action@master
+      if: always()
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: ${{ steps.find-lcov-file-path.outputs.path }}
