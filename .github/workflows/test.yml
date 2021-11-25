@@ -26,7 +26,7 @@ jobs:
 
     - name: Find lcov file path
       id: find-lcov-file-path
-      if: always()
+      if: always() && ${{ github.event_name == 'push' }}
       shell: pwsh
       run: |
         $FilePath = (Get-ChildItem PowerType.Tests\TestResults\* | Select-Object -First 1 | Get-ChildItem).FullName
@@ -34,7 +34,7 @@ jobs:
 
     - name: Publish coverage report to coveralls.io
       uses: coverallsapp/github-action@master
-      if: always()
+      if: always() && ${{ github.event_name == 'push' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: ${{ steps.find-lcov-file-path.outputs.path }}
