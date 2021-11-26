@@ -3,7 +3,7 @@ name: unit tests
 on: [push, pull_request]
 
 jobs:
-  build:
+  Unit-Test:
 
     runs-on: windows-latest
 
@@ -26,13 +26,15 @@ jobs:
 
     - name: Find lcov file path
       id: find-lcov-file-path
+      if: ${{ always() && github.event_name == 'push' }}
       shell: pwsh
       run: |
-        $FilePath = (Get-ChildItem LoggerHealthCheck.Tests\TestResults\* | Select-Object -First 1 | Get-ChildItem).FullName
+        $FilePath = (Get-ChildItem PowerType.Tests\TestResults\* | Select-Object -First 1 | Get-ChildItem).FullName
         Write-Host ::set-output name=path::$FilePath
 
     - name: Publish coverage report to coveralls.io
       uses: coverallsapp/github-action@master
+      if: ${{ always() && github.event_name == 'push' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: ${{ steps.find-lcov-file-path.outputs.path }}
