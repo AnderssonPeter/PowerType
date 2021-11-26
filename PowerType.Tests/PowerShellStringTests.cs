@@ -69,6 +69,20 @@ public class PowerShellStringTests
     }
 
     [Theory]
+    [InlineData(StringConstantType.BareWord, "`“", "“")]
+    [InlineData(StringConstantType.BareWord, "``", "`")]
+    [InlineData(StringConstantType.BareWord, "$t`'`\"` `t`n```{`}abc", "$t'\" \t\n`{}abc")]
+    [InlineData(StringConstantType.DoubleQuoted, "$t'`\" `t`n``{}abc", "$t'\" \t\n`{}abc")]
+    [InlineData(StringConstantType.DoubleQuotedHereString, "$t'`\" `t\n``{}abc", "$t'\" \t\n`{}abc")]
+    [InlineData(StringConstantType.SingleQuoted, "$t''\" \t\n`{}abc", "$t'\" \t\n`{}abc")]
+    [InlineData(StringConstantType.SingleQuotedHereString, "$t'\" \t\n`{}abc", "$t'\" \t\n`{}abc")]
+    //[InlineData(StringConstantType.DoubleQuoted, "$([char]0x2665)", "$♥", Skip = "Not implemented yet")] //skip is not supported yet, but should be added in the next release
+    public void Unescape(StringConstantType type, string value, string expected)
+    {
+        PowerShellString.Unescape(type, value).Should().Be(expected);
+    }
+
+    [Theory]
     [InlineData(StringConstantType.BareWord, "test", true)]
     [InlineData(StringConstantType.DoubleQuoted, "\"test\"", true)]
     [InlineData(StringConstantType.DoubleQuoted, "\"test`\"", true)]
@@ -83,7 +97,7 @@ public class PowerShellStringTests
     //todo: Add SingleQuoted and SingleQuotedHereString tests
     public void IsEscapedOpened(StringConstantType type, string value, bool expected)
     {
-        var powerShellString = new PowerShellString(type, value, "");
+        var powerShellString = PowerShellString.FromEscaped(type, value);
         powerShellString.IsEscapedOpened().Should().Be(expected);
     }
 
@@ -105,7 +119,7 @@ public class PowerShellStringTests
     [InlineData(StringConstantType.SingleQuotedHereString, "test", false)]
     public void IsEscapedClosed(StringConstantType type, string escapedValue, bool expected)
     {
-        var powerShellString = new PowerShellString(type, escapedValue, "");
+        var powerShellString = PowerShellString.FromEscaped(type, escapedValue);
         powerShellString.IsEscapedClosed().Should().Be(expected);
     }
 
@@ -126,18 +140,21 @@ public class PowerShellStringTests
     [InlineData(StringConstantType.SingleQuotedHereString, "test`\n'@", "test`\n'@")]
     public void EnsureEscapedIsClosed(StringConstantType type, string escapedValue, string expected)
     {
-        var powerShellString = new PowerShellString(type, escapedValue, "");
+        var powerShellString = PowerShellString.FromEscaped(type, escapedValue);
         powerShellString.EnsureEscapedIsClosed().EscapedValue.Should().Be(expected);
     }
 
     [Theory]
     [InlineData(StringConstantType.BareWord, "test", "test", "testtest")]
     [InlineData(StringConstantType.DoubleQuoted, "\"test\"", "test", "\"testtest\"")]
+    [InlineData(StringConstantType.DoubleQuoted, "\"test", "test", "\"testtest\"")]
+    [InlineData(StringConstantType.DoubleQuoted, "\"test`\"", "test", "\"test`\"test\"")]
+    [InlineData(StringConstantType.DoubleQuoted, "\"test`\"\"", "test", "\"test`\"test\"")]
     //todo: add many more tests as this is the most important function!!
     public void Append(StringConstantType type, string escapedValue, string escapedValueToAppend, string expectedEscapedValue)
     {
         var powerShellString = new PowerShellString(type, escapedValue, "");
-        var powerShellStringToAppend = new PowerShellString(type, escapedValueToAppend, "");
+        var powerShellStringToAppend = PowerShellString.FromEscaped(type, escapedValueToAppend);
         powerShellString.Append(powerShellStringToAppend).EscapedValue.Should().Be(expectedEscapedValue);
     }
 }
