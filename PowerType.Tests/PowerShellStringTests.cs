@@ -94,7 +94,6 @@ public class PowerShellStringTests
     [InlineData(StringConstantType.SingleQuoted, "test", false)]
     [InlineData(StringConstantType.SingleQuotedHereString, "@\'\ntest\"", true)]
     [InlineData(StringConstantType.SingleQuotedHereString, "test", false)]
-    //todo: Add SingleQuoted and SingleQuotedHereString tests
     public void IsEscapedOpened(StringConstantType type, string value, bool expected)
     {
         var powerShellString = PowerShellString.FromEscaped(type, value);
@@ -157,4 +156,6 @@ public class PowerShellStringTests
         var powerShellStringToAppend = PowerShellString.FromEscaped(type, escapedValueToAppend);
         powerShellString.Append(powerShellStringToAppend).EscapedValue.Should().Be(expectedEscapedValue);
     }
+
+    //todo: add unit tests for FromRaw, RemoveClosingFromEscaped, RemoveOpeningFromEscaped, Convert, EnsureEscapedIsOpened, Normalize
 }

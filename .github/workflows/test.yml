@@ -15,6 +15,10 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
+    - uses: testspace-com/setup-testspace@v1
+      with:
+        domain: ${{github.repository_owner}}
+
     - name: Install dependencies
       run: dotnet restore --verbosity normal
 
@@ -22,14 +26,14 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test --configuration Release --no-restore --no-build --verbosity normal --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+      run: dotnet test --configuration Release --no-restore --no-build --verbosity normal --logger "trx;logfilename=tests.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
 
     - name: Find lcov file path
       id: find-lcov-file-path
       if: ${{ always() && github.event_name == 'push' }}
       shell: pwsh
       run: |
-        $FilePath = (Get-ChildItem PowerType.Tests\TestResults\* | Select-Object -First 1 | Get-ChildItem).FullName
+        $FilePath = (Get-ChildItem PowerType.Tests\TestResults\* | Where { $_.Name -match("^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$") } | Select-Object -First 1 | Get-ChildItem).FullName
         Write-Host ::set-output name=path::$FilePath
 
     - name: Publish coverage report to coveralls.io
@@ -38,3 +42,7 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: ${{ steps.find-lcov-file-path.outputs.path }}
+
+    - name: Publish Results to Testspace
+      if: ${{ always() && github.event_name == 'push' }}
+      run: testspace PowerType.Tests\TestResults\tests.trx
