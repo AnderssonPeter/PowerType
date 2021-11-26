@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		dependabot.yml = dependabot.yml
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -23,8 +24,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{CCD5A220-E10E-4D77-B753-E6423B9718E2}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
-		.github\workflows\test.yml = .github\workflows\test.yml
+		.github\workflows\powershell-analysis.yml = .github\workflows\powershell-analysis.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml
+		.github\workflows\test.yml = .github\workflows\test.yml
 	EndProjectSection
 EndProject
 Global

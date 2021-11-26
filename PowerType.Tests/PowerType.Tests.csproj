@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <IsPackable>false</IsPackable>
+      
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <ItemGroup>

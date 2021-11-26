@@ -17,8 +17,16 @@ jobs:
       with:
         dotnet-version: 6.0.x
     
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
     - name: Install dependencies
-      run: dotnet restore --verbosity normal
+      run: dotnet restore --verbosity normal -–locked-mode
     
     - name: Build
       run: dotnet build --configuration Release --no-restore /property:Version=${{ github.event.release.tag_name }}
