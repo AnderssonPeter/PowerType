@@ -10,6 +10,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+
+    - name: get repo name
+      id: get-repository-name
+      shell: pwsh
+      run: |
+        Write-Host ${{ github.event.repository.name }}
+        Write-Host ::set-output name=value::${{ github.event.repository.name }}
+
     - name: Setup .NET6
       uses: actions/setup-dotnet@v1
       with:
