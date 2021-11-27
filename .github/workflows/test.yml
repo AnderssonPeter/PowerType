@@ -4,16 +4,13 @@ on: [push, pull_request]
 
 jobs:
   Unit-Test:
+    env:
+      REPOSITORY_NAME: ${{ github.event.repository.name }}
 
     runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: set repository name environment variable
-      shell: pwsh
-      run: |
-        Write-Host ::set-env name=REPOSITORY_NAME::${{ github.event.repository.name }} 
 
     - name: Setup .NET6
       uses: actions/setup-dotnet@v1
