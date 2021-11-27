@@ -10,7 +10,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - shell: pwsh
+    - name: set repository name environment variable
+      shell: pwsh
       run: |
         Write-Host ::set-env name=REPOSITORY_NAME::${{ github.event.repository.name }} 
 
