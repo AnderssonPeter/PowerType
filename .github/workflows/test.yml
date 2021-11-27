@@ -10,13 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-
-    - name: get repo name
-      id: get-repository-name
-      shell: pwsh
+    - shell: pwsh
       run: |
-        Write-Host ${{ github.event.repository.name }}
-        Write-Host ::set-output name=value::${{ github.event.repository.name }}
+        Write-Host ::set-env name=REPOSITORY_NAME::${{ github.event.repository.name }} 
 
     - name: Setup .NET6
       uses: actions/setup-dotnet@v1
@@ -49,7 +45,7 @@ jobs:
       if: ${{ always() && github.event_name == 'push' }}
       shell: pwsh
       run: |
-        $FilePath = (Get-ChildItem PowerType.Tests\TestResults\* | Where { $_.Name -match("^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$") } | Select-Object -First 1 | Get-ChildItem).FullName
+        $FilePath = (Get-ChildItem ${{ env.REPOSITORY_NAME }}.Tests\TestResults\* | Where { $_.Name -match("^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$") } | Select-Object -First 1 | Get-ChildItem).FullName
         Write-Host ::set-output name=path::$FilePath
 
     - name: Publish coverage report to coveralls.io
@@ -61,4 +57,4 @@ jobs:
 
     - name: Publish Results to Testspace
       if: ${{ always() && github.event_name == 'push' }}
-      run: testspace PowerType.Tests\TestResults\tests.trx
+      run: testspace ${{ env.REPOSITORY_NAME }}.Tests\TestResults\tests.trx
