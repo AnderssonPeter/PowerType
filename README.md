@@ -10,9 +10,9 @@ Autocomplete for Powershell
 [![Coverage Status](https://coveralls.io/repos/github/AnderssonPeter/PowerType/badge.svg)](https://coveralls.io/github/AnderssonPeter/PowerType)
 
 ## Progress
-![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/1) 
-![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/2)
-![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/3)
+[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/1)](https://github.com/AnderssonPeter/PowerType/milestone/1)
+[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/2)](https://github.com/AnderssonPeter/PowerType/milestone/2)
+[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/3)](https://github.com/AnderssonPeter/PowerType/milestone/3)
 
 This project is far from done but has the aim to provide autocomplete for common cli tools like git, docker, dotnet, node, npm and many more while using powershell. 
 
