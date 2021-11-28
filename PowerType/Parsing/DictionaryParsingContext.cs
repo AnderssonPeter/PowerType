@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace PowerType.Parsing;
 
 public class DictionaryParsingContext
 {
-    public DictionaryParsingContext(List<string> arguments)
+    private readonly string prefix;
+
+    public DictionaryParsingContext(string prefix, List<string> arguments)
     {
-        var indexOfSeperator = arguments.LastIndexOf("&&");
-        if (indexOfSeperator != -1)
-        {
-            arguments.RemoveRange(0, indexOfSeperator + 1);
-        }
+        this.prefix = prefix;
         this.Arguments = arguments;
     }
 
@@ -36,7 +30,7 @@ public class DictionaryParsingContext
 
     public string Reconstruct(string? argument = null)
     {
-        var builder = new StringBuilder();
+        var builder = new StringBuilder(prefix ?? string.Empty);
         if (Command != null)
         {
             builder.Append(Command.Key);

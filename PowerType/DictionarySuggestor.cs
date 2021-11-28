@@ -37,7 +37,7 @@ internal class DictionarySuggestor : ISuggestor
     {
         var repeat = (Parameter perfectMatch) =>
             Parse(parameters.Where(parameter => parameter != perfectMatch), context, additionalParameters);
-        
+
         var allParameters = parameters.Union(additionalParameters);
         if (!context.HasValue)
         {
@@ -57,8 +57,7 @@ internal class DictionarySuggestor : ISuggestor
             }
             else if (perfectMatch is ValueParameter valueParameter)
             {
-                string value;
-                if (valueParameter.TryGetKeyAndValue(currentArgument, out var key, out value))
+                if (valueParameter.TryGetKeyAndValue(currentArgument, out var key, out string value))
                 {
                     context.Parameters.Add(new ParameterWithValue(key, perfectMatch)
                     {

@@ -28,6 +28,15 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         return true;
     }
 
+    private string ConstructCommandPrefix(CommandAst commandAst)
+    {
+        if (commandAst?.Parent?.Parent is PipelineChainAst pipelineChainAst && pipelineChainAst.Operator == TokenKind.AndAnd)
+        {
+            return pipelineChainAst.LhsPipelineChain.ToString() + " && ";
+        }
+        return string.Empty;
+    }
+
     public SuggestionPackage GetSuggestion(PredictionClient client, PredictionContext context, CancellationToken cancellationToken)
     {
         var relatedAsts = context.RelatedAsts;
@@ -50,8 +59,8 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         var commandName = commandAst.GetCommandName();
         var temp = commandAst.CommandElements.Select(x => new { str = x.ToString(), value = (x as StringConstantExpressionAst)?.Value }).ToList();
         var arguments = commandAst.CommandElements.Select(x => x.ToString()).ToList();
-        
-        var dictionaryParsingContext = new DictionaryParsingContext(arguments);
+        var prefix = ConstructCommandPrefix(commandAst);
+        var dictionaryParsingContext = new DictionaryParsingContext(prefix, arguments);
         var result = GetSuggestions(dictionaryParsingContext).ToList();
         if (result.Count == 0)
         {

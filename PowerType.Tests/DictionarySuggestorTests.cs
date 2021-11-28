@@ -134,7 +134,7 @@ public class DictionarySuggestorTests
     [InlineData(new string[] { "git", "checkout", "i" }, new string[] { "git checkout --quite", "git checkout First" })]
     public void TestParsing(string[] input, string[] expectedOutput)
     {
-        var context = new Parsing.DictionaryParsingContext(new List<string> (input));
+        var context = new Parsing.DictionaryParsingContext("", new List<string> (input));
         context.Command = new Parsing.Command("git", null!);
         var result = dictionarySuggestor.GetPredictions(context).Select(x => x.SuggestionText);
         result.Should().BeEquivalentTo(expectedOutput);

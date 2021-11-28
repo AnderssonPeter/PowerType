@@ -9,18 +9,18 @@ public class DictionaryParsingContextTests
     [Fact]
     public void MultiCommand()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("echo 1 && ", new List<string>
         {
-            "echo", "1", "&&", "pause"
+            "pause"
         });
-
-        dictionaryParsingContext.CurrentArgument.Should().Be("pause");
+        dictionaryParsingContext.Command = new Command("pause", null!);
+        dictionaryParsingContext.Reconstruct().Should().Be("echo 1 && pause");
     }
 
     [Fact]
     public void CommandSize()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {
             "git", "pull", "feature/one"
         });
@@ -37,7 +37,7 @@ public class DictionaryParsingContextTests
     [Fact]
     public void IsLast()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {
             "git", "pull", "feature/one"
         });
@@ -58,7 +58,7 @@ public class DictionaryParsingContextTests
     [Fact]
     public void HasThreeOrMoreLeft()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {
             "git", "pull", "feature/one", "--quiet", "--commit"
         });
@@ -85,7 +85,7 @@ public class DictionaryParsingContextTests
     [Fact]
     public void HasValue()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {
             "git", "pull", "feature/one"
         });
@@ -104,7 +104,7 @@ public class DictionaryParsingContextTests
     [Fact]
     public void CurrentArgument()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {
             "git", "pull", "feature/one"
         });
@@ -120,7 +120,7 @@ public class DictionaryParsingContextTests
     [Fact]
     public void NextArgument()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {
             "git", "pull", "feature/one"
         });
@@ -134,7 +134,7 @@ public class DictionaryParsingContextTests
     [Fact]
     public void Reconstruct()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {
             "git", "pull", "feature/one"
         });
@@ -150,7 +150,7 @@ public class DictionaryParsingContextTests
     [Fact]
     public void ReconstructWithEqualSignWithValue()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {
             "git", "commit", "--cleanup"
         });
@@ -168,7 +168,7 @@ public class DictionaryParsingContextTests
     [Fact]
     public void ReconstructWithEqualSignWithProvidedValue()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {
             "git", "commit", "--cleanup"
         });
@@ -185,7 +185,7 @@ public class DictionaryParsingContextTests
     [Fact]
     public void ReconstructWithValue()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {
             "git", "commit", "--cleanup"
         });
@@ -202,7 +202,7 @@ public class DictionaryParsingContextTests
     [Fact]
     public void ReconstructWithValue2()
     {
-        var dictionaryParsingContext = new DictionaryParsingContext(new List<string>
+        var dictionaryParsingContext = new DictionaryParsingContext("", new List<string>
         {});
 
         dictionaryParsingContext.Command = new Command("git", null!);
