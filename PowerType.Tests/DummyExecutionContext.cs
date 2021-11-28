@@ -9,8 +9,8 @@ class DummyExecutionContext : IExecutionContext
 
     }
 
-    Dictionary<Type, IEnumerable<object>> query = new();
-    Dictionary<Type, object?> value = new();
+    readonly Dictionary<Type, IEnumerable<object>> query = new();
+    readonly Dictionary<Type, object?> value = new();
 
     public void SetQuery<T>(IEnumerable<T> values)
     {

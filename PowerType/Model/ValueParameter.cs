@@ -1,4 +1,6 @@
-﻿namespace PowerType.Model;
+﻿using PowerType.Parsing;
+
+namespace PowerType.Model;
 
 public class ValueParameter : Parameter
 {
@@ -28,26 +30,28 @@ public class ValueParameter : Parameter
         }
     }
 
-    internal override bool IsPerfectKeyMatch(string value)
+    internal override bool IsPerfectKeyMatch(PowerShellString value)
     {
         if (!HasKeys)
         {
             return false;
         }
-        if (value.Contains("="))
-        {            
-            return Keys.Any(key => value.StartsWith(key + "=", StringComparison.Ordinal));
+        if (value.RawValue.Contains('='))
+        {
+            return Keys.Any(key => value.RawValue.StartsWith(key + "=", StringComparison.Ordinal));
         }
         return !RequiresEqualSign && base.IsPerfectKeyMatch(value);
     }
 
-    internal bool TryGetKeyAndValue(string argument, out string key, out string value)
+    internal bool TryGetKeyAndValue(PowerShellString argument, out string key, out PowerShellString value)
     {
-        var index = argument.IndexOf("=");
+        var index = argument.RawValue.IndexOf("=");
         if (index != -1)
         {
-            key = argument.Substring(0, index);
-            value = argument.Substring(index + 1);
+            key = argument.RawValue.Substring(0, index);
+            var rawValue = argument.RawValue.Substring(index + 1);
+            //Ugly hack to ensure that we capture the correct type!
+            value = PowerShellString.FromEscapedSmart(rawValue);
             return true;
         }
         key = null!;

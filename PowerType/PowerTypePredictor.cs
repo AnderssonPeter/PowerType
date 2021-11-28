@@ -10,17 +10,15 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     public Guid Id => Identifier;
 
-    internal static readonly Guid Identifier = new Guid("599d1760-4ee1-4ed2-806e-f2a1b1a0ba4d");
+    internal static readonly Guid Identifier = new("599d1760-4ee1-4ed2-806e-f2a1b1a0ba4d");
 
     public string Name => "PowerType";
 
-    private readonly List<ISuggestor> suggestors;
-
-    public List<ISuggestor> Suggestors => suggestors;
+    public List<ISuggestor> Suggestors { get; }
 
     public PowerTypePredictor(IEnumerable<ISuggestor> suggestors)
     {
-        this.suggestors = suggestors.ToList();
+        this.Suggestors = suggestors.ToList();
     }
 
     public bool CanAcceptFeedback(PredictionClient client, PredictorFeedbackKind feedback)
@@ -28,7 +26,7 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         return true;
     }
 
-    private string ConstructCommandPrefix(CommandAst commandAst)
+    private static string ConstructCommandPrefix(CommandAst commandAst)
     {
         if (commandAst?.Parent?.Parent is PipelineChainAst pipelineChainAst && pipelineChainAst.Operator == TokenKind.AndAnd)
         {
@@ -57,8 +55,8 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         }
 
         var commandName = commandAst.GetCommandName();
-        var temp = commandAst.CommandElements.Select(x => new { str = x.ToString(), value = (x as StringConstantExpressionAst)?.Value }).ToList();
-        var arguments = commandAst.CommandElements.Select(x => x.ToString()).ToList();
+        
+        var arguments = commandAst.CommandElements.Select(x => new PowerShellString(x));
         var prefix = ConstructCommandPrefix(commandAst);
         var dictionaryParsingContext = new DictionaryParsingContext(prefix, arguments);
         var result = GetSuggestions(dictionaryParsingContext).ToList();
@@ -93,13 +91,13 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         }
     }
 
-    private bool TryGetSuggestor(string command, out string key, out ISuggestor suggestor)
+    private bool TryGetSuggestor(PowerShellString command, out string key, out ISuggestor suggestor)
     {
-        foreach (var innerSuggestor in suggestors)
+        foreach (var innerSuggestor in Suggestors)
         {
             foreach (var suggestorKey in innerSuggestor.Keys)
             {
-                if (suggestorKey.Equals(command, StringComparison.OrdinalIgnoreCase))
+                if (suggestorKey.Equals(command.RawValue, StringComparison.OrdinalIgnoreCase))
                 {
                     key = suggestorKey;
                     suggestor = innerSuggestor;
@@ -112,11 +110,11 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         return false;
     }
 
-    private IEnumerable<PredictiveSuggestion> GetDictrionaryPredictons(string commandName)
+    private IEnumerable<PredictiveSuggestion> GetDictrionaryPredictons(PowerShellString commandName)
     {
-        foreach(var suggestor in suggestors)
+        foreach(var suggestor in Suggestors)
         {
-            var key = suggestor.Keys.FirstOrDefault(x => x.Contains(commandName, StringComparison.OrdinalIgnoreCase));
+            var key = suggestor.Keys.FirstOrDefault(x => x.Contains(commandName.RawValue, StringComparison.OrdinalIgnoreCase));
             if (key != null)
             {
                 yield return new PredictiveSuggestion(key, suggestor.Description);

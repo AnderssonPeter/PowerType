@@ -1,11 +1,13 @@
-﻿using FluentAssertions;
+﻿using System.Management.Automation.Language;
+using FluentAssertions;
 using PowerType.Model;
+using PowerType.Parsing;
 using Xunit;
 
 namespace PowerType.Tests;
 public class DictionarySuggestorTests
 {
-    private DictionarySuggestor dictionarySuggestor;
+    private readonly DictionarySuggestor dictionarySuggestor;
     public DictionarySuggestorTests()
     {
         var dictionary = new PowerTypeDictionary()
@@ -100,12 +102,16 @@ public class DictionarySuggestorTests
             new SourceItem
             {
                 Name = "Second"
+            },
+            new SourceItem
+            {
+                Name = "With space"
             }
         });
         dictionary.Initialize(executionContext);
         dictionarySuggestor = new DictionarySuggestor(dictionary);
     }
-
+    
     [Theory]
     [InlineData(new string[] { "git" }, new[] { "git commit", "git checkout", "git --help" })]
     [InlineData(new string[] { "git", "c" }, new[] { "git commit", "git checkout" })]
@@ -129,13 +135,14 @@ public class DictionarySuggestorTests
 
     [InlineData(new string[] { "git", "checkout" }, new string[] { "git checkout --quite", "git checkout First", "git checkout Second", "git checkout --help" })]
     [InlineData(new string[] { "git", "checkout", "F" }, new string[] { "git checkout First" })]
+    [InlineData(new string[] { "git", "checkout", "W" }, new string[] { "git checkout \"With space\"" })]
     [InlineData(new string[] { "git", "checkout", "\"F" }, new string[] { "git checkout \"First\"" })]
     [InlineData(new string[] { "git", "checkout", "'F" }, new string[] { "git checkout 'First'" })]
-    [InlineData(new string[] { "git", "checkout", "i" }, new string[] { "git checkout --quite", "git checkout First" })]
+    [InlineData(new string[] { "git", "checkout", "i" }, new string[] { "git checkout --quite", "git checkout First", "git checkout \"With space\"" })]
     public void TestParsing(string[] input, string[] expectedOutput)
     {
-        var context = new Parsing.DictionaryParsingContext("", new List<string> (input));
-        context.Command = new Parsing.Command("git", null!);
+        var context = new DictionaryParsingContext("", input.Select(x => PowerShellString.FromEscapedSmart(x)));
+        context.Command = new Command("git", null!);
         var result = dictionarySuggestor.GetPredictions(context).Select(x => x.SuggestionText);
         result.Should().BeEquivalentTo(expectedOutput);
     }

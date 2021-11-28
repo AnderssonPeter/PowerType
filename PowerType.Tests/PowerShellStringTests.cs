@@ -157,5 +157,21 @@ public class PowerShellStringTests
         powerShellString.Append(powerShellStringToAppend).EscapedValue.Should().Be(expectedEscapedValue);
     }
 
-    //todo: add unit tests for FromRaw, RemoveClosingFromEscaped, RemoveOpeningFromEscaped, Convert, EnsureEscapedIsOpened, Normalize
+    //todo: add unit tests for FromRaw, FromRawSmart, FromEscapedSmart, RemoveClosingFromEscaped, RemoveOpeningFromEscaped, Convert, EnsureEscapedIsOpened, Normalize
+    [Theory]
+    [InlineData("testtest", StringConstantType.BareWord)]
+    [InlineData("F", StringConstantType.BareWord)]
+    [InlineData("test test", StringConstantType.DoubleQuoted)]
+    [InlineData("test\0test", StringConstantType.DoubleQuoted)]
+    public void FromRawSmart(string rawValue, StringConstantType expectedType) => 
+        PowerShellString.FromRawSmart(rawValue).Type.Should().Be(expectedType);
+
+    [Theory]
+    [InlineData("testtest", StringConstantType.BareWord)]
+    [InlineData("F", StringConstantType.BareWord)]
+    [InlineData("\"test test\"", StringConstantType.DoubleQuoted)]
+    [InlineData("\'test test\'", StringConstantType.DoubleQuoted)]
+    public void FromEscapedSmart(string rawValue, StringConstantType expectedType) =>
+        PowerShellString.FromEscapedSmart(rawValue).Type.Should().Be(expectedType);
+    
 }

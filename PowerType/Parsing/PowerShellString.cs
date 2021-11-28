@@ -1,9 +1,11 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Management.Automation.Language;
 using System.Text;
 
 namespace PowerType.Parsing;
 
+[DebuggerDisplay("{EscapedValue}")]
 public class PowerShellString
 {
     private readonly static IReadOnlyDictionary<char, char> escapeLookup = new Dictionary<char, char>()
@@ -20,18 +22,18 @@ public class PowerShellString
 
     private readonly static IReadOnlyDictionary<char, char> escapeReverseLookup = escapeLookup.ToDictionary(x => x.Value, x => x.Key);
 
-    const char doubleQuotationMark = '"';
-    const char leftDoubleQuotationMark = '\u201C';
-    const char rightDoubleQuotationMark = '\u201D';
-    const char doubleLowNineQuotationMark = '\u201E';
+    private const char doubleQuotationMark = '"';
+    private const char leftDoubleQuotationMark = '\u201C';
+    private const char rightDoubleQuotationMark = '\u201D';
+    private const char doubleLowNineQuotationMark = '\u201E';
 
     private static readonly char[] doubleQuoteCharacters = { doubleQuotationMark, leftDoubleQuotationMark, rightDoubleQuotationMark, doubleLowNineQuotationMark };
 
-    const char singleQuotationMark = '\'';
-    const char leftSingleQuotationMark = '\u2018';
-    const char rightSingleQuotationMark = '\u2019';
-    const char singleLowNineQuotationMark = '\u201A';
-    const char singleHighReversedNineQuotationMark = '\u201B';
+    private const char singleQuotationMark = '\'';
+    private const char leftSingleQuotationMark = '\u2018';
+    private const char rightSingleQuotationMark = '\u2019';
+    private const char singleLowNineQuotationMark = '\u201A';
+    private const char singleHighReversedNineQuotationMark = '\u201B';
 
     private static readonly char[] singleQuoteCharacters = { singleQuotationMark, leftSingleQuotationMark, rightSingleQuotationMark, singleLowNineQuotationMark, singleHighReversedNineQuotationMark };
 
@@ -95,9 +97,10 @@ public class PowerShellString
         }
         else
         {
-            RawValue = commandElementAst.ToString();
+            throw new InvalidOperationException("We have no idea how to handle this value!");
+            /*RawValue = commandElementAst.ToString();
             Type = StringConstantType.DoubleQuoted;
-            EscapedValue = Escape(Type, RawValue);
+            EscapedValue = Escape(Type, RawValue);*/
         }
     }
 
@@ -113,19 +116,57 @@ public class PowerShellString
         var escapedValue = Escape(type, rawValue);
         if (openingChars.TryGetValue(type, out var openingChar))
         {
-            escapedValue = openingChar + escapedValue;
+            escapedValue = openingChar.First() + escapedValue;
         }
         if (closingChars.TryGetValue(type, out var closingChar))
         {
-            escapedValue += closingChar;
+            escapedValue += closingChar.First();
         }
         return new PowerShellString(type, escapedValue, rawValue);
+    }
+
+    /// <summary>
+    /// Tries to automatically find the correct StringConstantType based on the string content.
+    /// Highest priory is given to BareWord if that fails DoubleQuoted will be used.
+    /// </summary>
+    /// <param name="rawValue"></param>
+    /// <returns></returns>
+    public static PowerShellString FromRawSmart(string rawValue)
+    {
+        var escape = charsToEscape[StringConstantType.BareWord];
+        if (escape.Any(x => rawValue.Contains(x)))
+        {
+            return FromRaw(StringConstantType.DoubleQuoted, rawValue);
+        }
+        return FromRaw(StringConstantType.BareWord, rawValue);
     }
 
     public static PowerShellString FromEscaped(StringConstantType type, string escapedValue)
     {
         var rawValue = Unescape(type, escapedValue);
         return new PowerShellString(type, escapedValue, rawValue);
+    }
+
+    /// <summary>
+    /// Tries to automatically find the correct StringConstantType based on the string content.
+    /// </summary>
+    public static PowerShellString FromEscapedSmart(string escapedValue)
+    {
+        StringConstantType type = StringConstantType.BareWord;
+        if (escapedValue.StartsWith('\''))
+        {
+            type = StringConstantType.SingleQuoted;
+        }
+        else if (escapedValue.StartsWith('"'))
+        {
+            type = StringConstantType.DoubleQuoted;
+        }
+        var index = escapedValue.IndexOf(' ');
+        if (index == 0 || (index >= 1 && escapedValue[index - 1] != '`'))
+        {
+            type = StringConstantType.DoubleQuoted;
+        }
+        return FromEscaped(type, escapedValue);
     }
 
     public string EscapedValue { get; }
@@ -144,7 +185,7 @@ public class PowerShellString
             {
                 if (EscapedValue.EndsWith(c))
                 {
-                    return new PowerShellString(Type, EscapedValue.Substring(0, EscapedValue.Length - c.Length), RawValue);
+                    return new PowerShellString(Type, EscapedValue[..^c.Length], RawValue);
                 }
             }
         }
@@ -164,7 +205,7 @@ public class PowerShellString
             {
                 if (EscapedValue.StartsWith(c))
                 {
-                    return new PowerShellString(Type, EscapedValue.Substring(c.Length), RawValue);
+                    return new PowerShellString(Type, EscapedValue[c.Length..], RawValue);
                 }
             }
         }
@@ -184,7 +225,7 @@ public class PowerShellString
         {
             return this;
         }
-        return PowerShellString.FromRaw(type, RawValue);
+        return FromRaw(type, RawValue);
     }
 
     
@@ -263,7 +304,7 @@ public class PowerShellString
         }
         if (escapeChars == null)
         {
-            return escapedValue.Substring(startIndex, endIndex - startIndex);
+            return escapedValue[startIndex..endIndex];
         }
 
         var builder = new StringBuilder(endIndex - startIndex); //The unescaped string will always be shorter than escaped
@@ -294,11 +335,9 @@ public class PowerShellString
                     builder.Append(c);
                 }
             }
-
         }
 
         return builder.ToString();
-
     }
 
     internal static int FindFirst(string value, char[] escapeChars, int index)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Management.Automation;
+using PowerType.Parsing;
 
 namespace PowerType.Model
 {
@@ -37,8 +38,8 @@ namespace PowerType.Model
 
         internal bool HasKeys => Keys != null && Keys.Count > 0;
 
-        internal virtual bool IsPerfectKeyMatch(string value) => HasKeys && Keys.Exists(key => key.Equals(value, StringComparison.OrdinalIgnoreCase));
+        internal virtual bool IsPerfectKeyMatch(PowerShellString value) => HasKeys && Keys.Exists(key => key.Equals(value.RawValue, StringComparison.OrdinalIgnoreCase));
 
-        internal bool IsPartialKeyMatch(string value) => HasKeys && Keys.Exists(key => key.Contains(value, StringComparison.OrdinalIgnoreCase));
+        internal bool IsPartialKeyMatch(PowerShellString value) => HasKeys && Keys.Exists(key => key.Contains(value.RawValue, StringComparison.OrdinalIgnoreCase));
     }
 }

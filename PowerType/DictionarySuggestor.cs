@@ -42,7 +42,7 @@ internal class DictionarySuggestor : ISuggestor
         if (!context.HasValue)
         {
             //todo: change .First to configuration (longest/shortest)
-            return allParameters.Where(x => x.HasKeys).Select(x => new PredictiveSuggestion(context.Reconstruct(x.Keys.First()), x.Description));
+            return allParameters.Where(x => x.HasKeys).Select(x => new PredictiveSuggestion(context.Reconstruct(PowerShellString.FromRawSmart(x.Keys.First())), x.Description));
         }
         var currentArgument = context.CurrentArgument;
         //Check if we can find a perfect match
@@ -57,11 +57,11 @@ internal class DictionarySuggestor : ISuggestor
             }
             else if (perfectMatch is ValueParameter valueParameter)
             {
-                if (valueParameter.TryGetKeyAndValue(currentArgument, out var key, out string value))
+                if (valueParameter.TryGetKeyAndValue(currentArgument, out var key, out PowerShellString value))
                 {
                     context.Parameters.Add(new ParameterWithValue(key, perfectMatch)
                     {
-                        Value = context.IsLast ? null : value,
+                        Value = context.IsLast && !value.IsEscapedClosed() ? null : value,
                         UsedEqualSign = true
                     });
                     if (IsValueDone(value))
@@ -74,8 +74,8 @@ internal class DictionarySuggestor : ISuggestor
                         {
                             return valueParameter.Source
                                 .GetItems()
-                                .Where(x => x.Name.Contains(value, StringComparison.OrdinalIgnoreCase))
-                                .Select(x => new PredictiveSuggestion(context.Reconstruct(x.Name), x.Description));
+                                .Where(x => x.Name.Contains(value.RawValue, StringComparison.OrdinalIgnoreCase))
+                                .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(value.Type, x.Name)), x.Description));
                         }
                         return Enumerable.Empty<PredictiveSuggestion>();
                     }
@@ -87,28 +87,27 @@ internal class DictionarySuggestor : ISuggestor
                     {
                         return valueParameter.Source
                             .GetItems()
-                            .Select(x => new PredictiveSuggestion(context.Reconstruct(x.Name), x.Description));
+                            .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(currentArgument.Type, x.Name)), x.Description));
                     }
                     return Enumerable.Empty<PredictiveSuggestion>();
                 }
                 else if (context.HasThreeOrMoreLeft)
                 {
-                    value = context.NextArgument;
                     context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch)
                     {
-                        Value = value
+                        Value = context.NextArgument
                     });
                 }
                 else if (context.IsSecondLast)
                 {
-                    value = context.NextArgument;
+                    var search = context.NextArgument;
                     context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch));
                     if (valueParameter.Source != null)
                     {
                         return valueParameter.Source
                             .GetItems()
-                            .Where(x => x.Name.Contains(value, StringComparison.OrdinalIgnoreCase))
-                            .Select(x => new PredictiveSuggestion(context.Reconstruct(x.Name), x.Description));
+                            .Where(x => x.Name.Contains(search.RawValue, StringComparison.OrdinalIgnoreCase))
+                            .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(currentArgument.Type, x.Name)), x.Description));
                     }
                     return Enumerable.Empty<PredictiveSuggestion>();
                 }
@@ -138,13 +137,12 @@ internal class DictionarySuggestor : ISuggestor
         }
     }
 
-    private bool IsValueDone(string value)
+    private bool IsValueDone(PowerShellString value)
     {
-        return (value.StartsWith('"') && value.EndsWith('"')) ||
-               (value.StartsWith('\'') && value.EndsWith('\''));
+        return value.IsEscapedOpened() && value.IsEscapedClosed();
     }
 
-    private IEnumerable<PredictiveSuggestion> GetPartialMatches(DictionaryParsingContext context, IEnumerable<Parameter> parameters, string currentArgument)
+    private IEnumerable<PredictiveSuggestion> GetPartialMatches(DictionaryParsingContext context, IEnumerable<Parameter> parameters, PowerShellString currentArgument)
     {
         foreach (var parameter in parameters)
         {
@@ -152,7 +150,7 @@ internal class DictionarySuggestor : ISuggestor
             {
                 foreach (var key in parameter.Keys)
                 {
-                    if (key.Contains(currentArgument, StringComparison.OrdinalIgnoreCase))
+                    if (key.Contains(currentArgument.RawValue, StringComparison.OrdinalIgnoreCase))
                     {
                         yield return new PredictiveSuggestion(context.Reconstruct(key), parameter.Description);
                         break;
@@ -161,11 +159,20 @@ internal class DictionarySuggestor : ISuggestor
             }
             else if (parameter is ValueParameter valueParameter && valueParameter.Source != null)
             {
-                foreach (var sourceItem in valueParameter.Source.GetItems().Where(item => item.Name.Contains(currentArgument, StringComparison.OrdinalIgnoreCase)))
+                foreach (var sourceItem in valueParameter.Source.GetItems().Where(item => item.Name.Contains(currentArgument.RawValue, StringComparison.OrdinalIgnoreCase)))
                 {
-                    yield return new PredictiveSuggestion(context.Reconstruct(sourceItem.Name), sourceItem.Description);
+                    yield return new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(currentArgument.Type, sourceItem.Name)), sourceItem.Description);
                 }
             }
         }
+    }
+
+    private PowerShellString GetFromRawWithPreferredType(StringConstantType preferredType, string rawValue)
+    {
+        if (preferredType == StringConstantType.BareWord && rawValue.Contains(' '))
+        {
+            preferredType = StringConstantType.DoubleQuoted;
+        }
+        return PowerShellString.FromRaw(preferredType, rawValue);
     }
 }

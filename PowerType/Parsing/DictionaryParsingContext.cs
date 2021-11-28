@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Management.Automation.Language;
+using System.Text;
 
 namespace PowerType.Parsing;
 
@@ -6,10 +7,10 @@ public class DictionaryParsingContext
 {
     private readonly string prefix;
 
-    public DictionaryParsingContext(string prefix, List<string> arguments)
+    public DictionaryParsingContext(string prefix, IEnumerable<PowerShellString> arguments)
     {
         this.prefix = prefix;
-        this.Arguments = arguments;
+        this.Arguments = arguments.ToList();
     }
 
     public Command? Command { get; set; }
@@ -18,17 +19,24 @@ public class DictionaryParsingContext
 
     public int ParsedArguments => (Command?.Size ?? 0) + Parameters.Sum(x => x.Size);
 
-    public IReadOnlyList<string> Arguments { get; }
+    public IReadOnlyList<PowerShellString> Arguments { get; }
     public bool IsLast => Arguments.Count == ParsedArguments + 1;
     public bool IsSecondLast => Arguments.Count == ParsedArguments + 2;
 
     public bool HasThreeOrMoreLeft => Arguments.Count > ParsedArguments + 2;
 
     public bool HasValue => Arguments.Count > ParsedArguments;
-    public string CurrentArgument => Arguments[ParsedArguments];
-    public string NextArgument => Arguments[ParsedArguments + 1];
+    public PowerShellString CurrentArgument => Arguments[ParsedArguments];
+    public PowerShellString NextArgument => Arguments[ParsedArguments + 1];
 
-    public string Reconstruct(string? argument = null)
+
+    public string Reconstruct(string? argument)
+    {
+        PowerShellString? powerShellString = argument == null ? null : PowerShellString.FromRaw(StringConstantType.BareWord, argument);
+        return Reconstruct(powerShellString);
+    }
+
+    public string Reconstruct(PowerShellString? argument = null)
     {
         var builder = new StringBuilder(prefix ?? string.Empty);
         if (Command != null)
@@ -41,7 +49,7 @@ public class DictionaryParsingContext
             {
                 builder.Append(' ');
             }
-            builder.Append(parameter.Key);
+            builder.Append(parameter.Key.EscapedValue);
             if (parameter.Value != null)
             {
                 if (parameter.UsedEqualSign)
@@ -52,7 +60,7 @@ public class DictionaryParsingContext
                 {
                     builder.Append(' ');
                 }
-                builder.Append(parameter.Value);
+                builder.Append(parameter.Value.EscapedValue);
             }
         }
 
@@ -75,7 +83,7 @@ public class DictionaryParsingContext
                 builder.Append(' ');
             }
 
-            builder.Append(argument);
+            builder.Append(argument.EscapedValue);
         }
 
         return builder.ToString();
