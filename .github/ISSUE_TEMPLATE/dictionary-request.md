@@ -7,5 +7,5 @@ assignees: ''
 
 ---
 
-Program: ...
-Documentation: ...
+Program: [name of program] 
+Documentation: [link to documentation or copy documentation here]
