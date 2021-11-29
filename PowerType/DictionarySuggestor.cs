@@ -41,8 +41,7 @@ internal class DictionarySuggestor : ISuggestor
         var allParameters = parameters.Union(additionalParameters);
         if (!context.HasValue)
         {
-            //todo: change .First to configuration (longest/shortest)
-            return allParameters.Where(x => x.HasKeys).Select(x => new PredictiveSuggestion(context.Reconstruct(PowerShellString.FromRawSmart(x.Keys.First())), x.Description));
+            return GetPartialMatches(context, allParameters, PowerShellString.Empty);
         }
         var currentArgument = context.CurrentArgument;
         //Check if we can find a perfect match
@@ -59,12 +58,14 @@ internal class DictionarySuggestor : ISuggestor
             {
                 if (valueParameter.TryGetKeyAndValue(currentArgument, out var key, out PowerShellString value))
                 {
+                    var isDone = IsValueDone(context.IsLast, value);
                     context.Parameters.Add(new ParameterWithValue(key, perfectMatch)
                     {
-                        Value = context.IsLast && !value.IsEscapedClosed() ? null : value,
+                        Value = !isDone ? null : value,
                         UsedEqualSign = true
                     });
-                    if (IsValueDone(value))
+                    
+                    if (isDone)
                     {
                         return repeat(perfectMatch);
                     }
@@ -101,7 +102,11 @@ internal class DictionarySuggestor : ISuggestor
                 else if (context.IsSecondLast)
                 {
                     var search = context.NextArgument;
-                    context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch));
+                    var isDone = IsValueDone(true, search);
+                    context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch)
+                    {
+                        Value = !isDone ? null : search
+                    });
                     if (valueParameter.Source != null)
                     {
                         return valueParameter.Source
@@ -109,7 +114,6 @@ internal class DictionarySuggestor : ISuggestor
                             .Where(x => x.Name.Contains(search.RawValue, StringComparison.OrdinalIgnoreCase))
                             .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(currentArgument.Type, x.Name)), x.Description));
                     }
-                    return Enumerable.Empty<PredictiveSuggestion>();
                 }
                 else
                 {
@@ -137,9 +141,9 @@ internal class DictionarySuggestor : ISuggestor
         }
     }
 
-    private bool IsValueDone(PowerShellString value)
+    private bool IsValueDone(bool isLast, PowerShellString value)
     {
-        return value.IsEscapedOpened() && value.IsEscapedClosed();
+        return !isLast || value.Type != StringConstantType.BareWord && value.IsEscapedOpened() && value.IsEscapedClosed();
     }
 
     private IEnumerable<PredictiveSuggestion> GetPartialMatches(DictionaryParsingContext context, IEnumerable<Parameter> parameters, PowerShellString currentArgument)

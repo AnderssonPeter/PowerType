@@ -22,6 +22,8 @@ public class PowerShellString
 
     private readonly static IReadOnlyDictionary<char, char> escapeReverseLookup = escapeLookup.ToDictionary(x => x.Value, x => x.Key);
 
+    public readonly static PowerShellString Empty = new PowerShellString(StringConstantType.BareWord, String.Empty, string.Empty);
+
     private const char doubleQuotationMark = '"';
     private const char leftDoubleQuotationMark = '\u201C';
     private const char rightDoubleQuotationMark = '\u201D';
