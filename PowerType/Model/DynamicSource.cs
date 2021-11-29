@@ -8,9 +8,9 @@ namespace PowerType.Model
     {
         IExecutionContext executionContext = null!;
 
-        public ScriptBlock Command { get; set; } = null!;
+        public ScriptBlock CommandExpression { get; set; } = null!;
 
-        internal override IEnumerable<SourceItem> GetItems() => executionContext.ExecuteQuery<SourceItem>(Command, null!);
+        internal override IEnumerable<SourceItem> GetItems() => executionContext.ExecuteQuery<SourceItem>(CommandExpression, null!);
 
         internal void Initialize(IExecutionContext executionContext)
         {
@@ -20,9 +20,9 @@ namespace PowerType.Model
         override internal void Validate()
         {
             base.Validate();
-            if (Command == null)
+            if (CommandExpression == null)
             {
-                throw new ArgumentNullException(nameof(Command));
+                throw new ArgumentNullException(nameof(CommandExpression));
             }
         }
     }

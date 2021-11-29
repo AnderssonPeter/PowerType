@@ -45,7 +45,7 @@ internal class DictionarySuggestor : ISuggestor
         }
         var currentArgument = context.CurrentArgument;
         //Check if we can find a perfect match
-        var perfectMatch = allParameters.FirstOrDefault(parameter => parameter.IsPerfectKeyMatch(currentArgument) && parameter.ConditionValue());
+        var perfectMatch = allParameters.FirstOrDefault(parameter => parameter.IsPerfectKeyMatch(currentArgument) && parameter.Condition());
         if (perfectMatch != null)
         {
             if (perfectMatch is CommandParameter commandParameter)

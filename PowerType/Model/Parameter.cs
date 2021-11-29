@@ -14,7 +14,7 @@ namespace PowerType.Model
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public bool Recursive { get; set; }
-        public ScriptBlock? Condition { get; set; }
+        public ScriptBlock? ConditionExpression { get; set; }
 
         internal virtual void Initialize(IExecutionContext executionContext)
         {
@@ -34,7 +34,7 @@ namespace PowerType.Model
             }
         }
 
-        internal bool ConditionValue() => Condition == null || executionContext.ExecuteValue<bool>(Condition, null!);
+        internal bool Condition() => ConditionExpression == null || executionContext.ExecuteValue<bool>(ConditionExpression, null!);
 
         internal bool HasKeys => Keys != null && Keys.Count > 0;
 

@@ -28,7 +28,7 @@
 $allRepositories = [DynamicSource]@{
 	Name = "AllRepositories";
 	Description = "Local and remote repositories";
-	Command = {
+	CommandExpression = {
 		git --no-optional-locks branch -a --no-color | % { $_.trim(" *$") } | Where-Object { !$_.StartsWith("(HEAD") }
 	}
 }

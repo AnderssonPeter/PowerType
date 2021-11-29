@@ -79,7 +79,7 @@ public class DictionarySuggestorTests
                             Source = new DynamicSource
                             {
                                 Name = "Cleanup mode",
-                                Command = System.Management.Automation.ScriptBlock.Create("")
+                                CommandExpression = System.Management.Automation.ScriptBlock.Create("")
                                 
                             }
                         }
