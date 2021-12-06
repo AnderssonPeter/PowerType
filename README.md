@@ -2,8 +2,8 @@
 Autocomplete for Powershell
 
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/powertype)](https://www.powershellgallery.com/packages/PowerType)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PowerType)](https://www.powershellgallery.com/packages/PowerType)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/AnderssonPeter/PowerType/blob/main/LICENSE.md)
-
 
 [![unit tests](https://github.com/AnderssonPeter/PowerType/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/AnderssonPeter/PowerType/actions/workflows/test.yml)
 [![Testspace tests](https://img.shields.io/testspace/tests/AnderssonPeter/AnderssonPeter:PowerType/main)](https://anderssonpeter.testspace.com/spaces/156585/result_sets)
