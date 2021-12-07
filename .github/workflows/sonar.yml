@@ -62,6 +62,5 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"AnderssonPeter_PowerType" /o:"anderssonpeter" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet build --configuration Release --no-restore
-          dotnet test --configuration Release --no-restore --no-build
+          dotnet build --configuration Release --no-restore PowerType\PowerType.csproj
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
