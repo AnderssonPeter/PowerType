@@ -8,6 +8,7 @@ Autocomplete for Powershell
 [![unit tests](https://github.com/AnderssonPeter/PowerType/actions/workflows/test.yml/badge.svg?event=push)](https://github.com/AnderssonPeter/PowerType/actions/workflows/test.yml)
 [![Testspace tests](https://img.shields.io/testspace/tests/AnderssonPeter/AnderssonPeter:PowerType/main)](https://anderssonpeter.testspace.com/spaces/156585/result_sets)
 [![Coverage Status](https://coveralls.io/repos/github/AnderssonPeter/PowerType/badge.svg)](https://coveralls.io/github/AnderssonPeter/PowerType)
+[![Sonar Violations (short format)](https://img.shields.io/sonar/violations/AnderssonPeter_PowerType/main?format=long&server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/project/issues?id=AnderssonPeter_PowerType&resolved=false&types=CODE_SMELL)
 
 ## Progress
 [![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/1)](https://github.com/AnderssonPeter/PowerType/milestone/1)
