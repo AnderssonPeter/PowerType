@@ -139,6 +139,8 @@ public class DictionarySuggestorTests
     [InlineData(new string[] { "git", "checkout", "\"F" }, new string[] { "git checkout \"First\"" })]
     [InlineData(new string[] { "git", "checkout", "'F" }, new string[] { "git checkout 'First'" })]
     [InlineData(new string[] { "git", "checkout", "i" }, new string[] { "git checkout --quite", "git checkout First", "git checkout \"With space\"" })]
+
+    [InlineData(new string[] { "git unknown" }, new[] { "git unknown commit", "git unknown checkout", "git unknown --help" })] //ignore unknown parameters
     public void TestParsing(string[] input, string[] expectedOutput)
     {
         var context = new DictionaryParsingContext("", input.Select(x => PowerShellString.FromEscapedSmart(x)));
