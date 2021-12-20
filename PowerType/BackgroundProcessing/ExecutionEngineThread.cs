@@ -26,13 +26,15 @@ internal class ExecutionEngineThread : IDisposable
         backgroundThread.Start();
     }
 
+    /// <summary>This method is thread safe</summary>
     public bool IsHealthy(out Exception? exception)
     {
+        Thread.MemoryBarrier();
         exception = backgroundThreadException;
         return exception == null && backgroundThread.IsAlive;
     }
 
-    /// <remarks>This method is thread safe</remarks>
+    /// <summary>This method is thread safe</summary>
     public List<DictionarySuggestor> GetSuggestors()
     {
         lock (dictionariesLocker)
@@ -41,6 +43,7 @@ internal class ExecutionEngineThread : IDisposable
         }
     }
 
+    /// <summary>This method is thread safe</summary>
     public List<PowerTypeDictionary> GetDictionaries()
     {
         lock (dictionariesLocker)
