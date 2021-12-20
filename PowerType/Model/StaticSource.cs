@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Management.Automation;
+using PowerType.Parsing;
 
 namespace PowerType.Model
 {

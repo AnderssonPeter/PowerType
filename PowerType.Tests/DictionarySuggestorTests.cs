@@ -10,6 +10,16 @@ public class DictionarySuggestorTests
     private readonly DictionarySuggestor dictionarySuggestor;
     public DictionarySuggestorTests()
     {
+        var allRepositories = new DynamicSource
+        {
+            Name = "All Repositories",
+            CommandExpression = System.Management.Automation.ScriptBlock.Create("@('First', 'Second', 'With space')"),
+            Cache = new Cache
+            {
+                ByCurrentWorkingDirectory = true,
+                ByTime = TimeSpan.FromSeconds(15)
+            }
+        };
         var dictionary = new PowerTypeDictionary()
         {
             Keys = new List<string>
@@ -76,12 +86,7 @@ public class DictionarySuggestorTests
                         },
                         new ValueParameter {
                             Name = "Repository",
-                            Source = new DynamicSource
-                            {
-                                Name = "Cleanup mode",
-                                CommandExpression = System.Management.Automation.ScriptBlock.Create("")
-                                
-                            }
+                            Source = allRepositories
                         }
                     }
                 },
@@ -93,22 +98,14 @@ public class DictionarySuggestorTests
                 }
             }
         };
-        var executionContext = new DummyExecutionContext();
-        executionContext.SetQuery<SourceItem>(new[] {
-            new SourceItem
-            {
-                Name = "First"
-            },
-            new SourceItem
-            {
-                Name = "Second"
-            },
-            new SourceItem
-            {
-                Name = "With space"
-            }
-        });
-        dictionary.Initialize(executionContext);
+        dictionary.Initialize(new SystemTime());
+        dictionary.Validate();
+
+        //Fake cached values!
+        allRepositories.Cache.UpdateCache(new List<SourceItem>
+        {
+            SourceItem.FromName("First"), SourceItem.FromName("Second"), SourceItem.FromName("With space")
+        }, "");
         dictionarySuggestor = new DictionarySuggestor(dictionary);
     }
     
@@ -140,7 +137,8 @@ public class DictionarySuggestorTests
     [InlineData(new string[] { "git", "checkout", "'F" }, new string[] { "git checkout 'First'" })]
     [InlineData(new string[] { "git", "checkout", "i" }, new string[] { "git checkout --quite", "git checkout First", "git checkout \"With space\"" })]
 
-    [InlineData(new string[] { "git unknown" }, new[] { "git unknown commit", "git unknown checkout", "git unknown --help" })] //ignore unknown parameters
+    [InlineData(new string[] { "git", "unknown" }, new string[] { })]
+    [InlineData(new string[] { "git", "unknown", "c" }, new[] { "git unknown commit", "git unknown checkout" })] //ignore unknown parameters
     public void TestParsing(string[] input, string[] expectedOutput)
     {
         var context = new DictionaryParsingContext("", input.Select(x => PowerShellString.FromEscapedSmart(x)));

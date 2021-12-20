@@ -39,19 +39,6 @@ public class PowerShellString
 
     private static readonly char[] singleQuoteCharacters = { singleQuotationMark, leftSingleQuotationMark, rightSingleQuotationMark, singleLowNineQuotationMark, singleHighReversedNineQuotationMark };
 
-    /*
-     * todo:
-     * handle
-     * " (U+0022)
-     * Left double quotation mark (U+201C)
-     * Right double quotation mark (U+201D)
-     * Double low-9 quotation mark (U+201E)
-     * ' (U+0027)
-     * Left single quotation mark (U+2018)
-     * Right single quotation mark (U+2019)
-     * Single low-9 quotation mark (U+201A)
-     * Single high-reversed-9 quotation mark (U+201B)
-     */
     private readonly static IReadOnlyDictionary<StringConstantType, char[]> charsToEscape = new Dictionary<StringConstantType, char[]>()
     {
         { StringConstantType.BareWord,               singleQuoteCharacters.Concat(doubleQuoteCharacters).Concat(new char[] { '`', ' ',     '{', '}', '\0', '\a', '\b', '\f', '\t', '\v', '\n', '\r' }).ToArray() },

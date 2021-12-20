@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Management.Automation;
+using PowerType.Parsing;
 
 namespace PowerType.Model
 {
@@ -8,6 +9,10 @@ namespace PowerType.Model
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         internal abstract IEnumerable<SourceItem> GetItems();
+
+        internal virtual void Initialize(ISystemTime systemTime)
+        {
+        }
 
         internal virtual void Validate()
         {

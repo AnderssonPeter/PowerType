@@ -1,4 +1,6 @@
-﻿using PowerType.Parsing;
+﻿using PowerType.BackgroundProcessing;
+using PowerType.Parsing;
+using System.Management.Automation;
 using System.Management.Automation.Language;
 using System.Management.Automation.Subsystem.Prediction;
 
@@ -6,6 +8,7 @@ namespace PowerType;
 
 public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 {
+    private readonly ExecutionEngine executionEngine;
     public string Description => "Provides suggestions for common command tools";
 
     public Guid Id => Identifier;
@@ -14,16 +17,19 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     public string Name => "PowerType";
 
-    public List<ISuggestor> Suggestors { get; }
-
-    public PowerTypePredictor(IEnumerable<ISuggestor> suggestors)
+    public PowerTypePredictor(IEnumerable<string> dictionaryFiles)
     {
-        this.Suggestors = suggestors.ToList();
+        executionEngine = new ExecutionEngine();
+        executionEngine.Start();
+        foreach(var dictionaryFile in dictionaryFiles)
+        {
+            executionEngine.InitialDictionary(dictionaryFile);
+        }
     }
 
     public bool CanAcceptFeedback(PredictionClient client, PredictorFeedbackKind feedback)
     {
-        return true;
+        return false;
     }
 
     private static string ConstructCommandPrefix(CommandAst commandAst)
@@ -37,34 +43,43 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     public SuggestionPackage GetSuggestion(PredictionClient client, PredictionContext context, CancellationToken cancellationToken)
     {
-        var relatedAsts = context.RelatedAsts;
-        CommandAst? commandAst = null;
-
-        for (var i = relatedAsts.Count - 1; i >= 0; --i)
+        try
         {
-            if (relatedAsts[i] is CommandAst c)
+            var relatedAsts = context.RelatedAsts;
+            CommandAst? commandAst = null;
+
+            for (var i = relatedAsts.Count - 1; i >= 0; --i)
             {
-                commandAst = c;
-                break;
+                if (relatedAsts[i] is CommandAst c)
+                {
+                    commandAst = c;
+                    break;
+                }
             }
-        }
 
-        if (commandAst == null)
-        {
-            return new SuggestionPackage();
-        }
+            if (commandAst == null)
+            {
+                return new SuggestionPackage();
+            }
 
-        var commandName = commandAst.GetCommandName();
+            var commandName = commandAst.GetCommandName();
         
-        var arguments = commandAst.CommandElements.Select(x => new PowerShellString(x));
-        var prefix = ConstructCommandPrefix(commandAst);
-        var dictionaryParsingContext = new DictionaryParsingContext(prefix, arguments);
-        var result = GetSuggestions(dictionaryParsingContext).ToList();
-        if (result.Count == 0)
-        {
-            return new SuggestionPackage();
+            var arguments = commandAst.CommandElements.Select(x => new PowerShellString(x));
+            var prefix = ConstructCommandPrefix(commandAst);
+            var dictionaryParsingContext = new DictionaryParsingContext(prefix, arguments);
+            var result = GetSuggestions(dictionaryParsingContext).ToList();
+            if (result.Count == 0)
+            {
+                return default;
+            }
+            return new SuggestionPackage(result);
         }
-        return new SuggestionPackage(result);
+        catch (Exception ex)
+        {
+            
+            Console.WriteLine(ex);
+            return default;
+        }
     }
 
     private IEnumerable<PredictiveSuggestion> GetSuggestions(DictionaryParsingContext dictionaryParsingContext)
@@ -83,7 +98,9 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         }
         if (TryGetSuggestor(commandName, out var key, out var suggestor))
         {
-            dictionaryParsingContext.Command = new Command(key, suggestor);
+            dictionaryParsingContext.Command = new Parsing.Command(key, suggestor);
+            var d = Directory.GetCurrentDirectory();
+            executionEngine.Cache(suggestor.Dictionary, Environment.CurrentDirectory); //todo: this is incorrect and does not reflect when we change directory!
             foreach (var result in suggestor.GetPredictions(dictionaryParsingContext))
             {
                 yield return result;
@@ -91,9 +108,10 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         }
     }
 
-    private bool TryGetSuggestor(PowerShellString command, out string key, out ISuggestor suggestor)
+    private bool TryGetSuggestor(PowerShellString command, out string key, out DictionarySuggestor suggestor)
     {
-        foreach (var innerSuggestor in Suggestors)
+        var suggestors = executionEngine.GetSuggestors();
+        foreach (var innerSuggestor in suggestors)
         {
             foreach (var suggestorKey in innerSuggestor.Keys)
             {
@@ -112,7 +130,8 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     private IEnumerable<PredictiveSuggestion> GetDictrionaryPredictons(PowerShellString commandName)
     {
-        foreach(var suggestor in Suggestors)
+        var suggestors = executionEngine.GetSuggestors();
+        foreach (var suggestor in suggestors)
         {
             var key = suggestor.Keys.FirstOrDefault(x => x.Contains(commandName.RawValue, StringComparison.OrdinalIgnoreCase));
             if (key != null)
@@ -140,5 +159,6 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     public void Dispose()
     {
+        executionEngine.Stop();
     }
 }

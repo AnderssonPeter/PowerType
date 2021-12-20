@@ -5,8 +5,8 @@ using System.Management.Automation.Subsystem.Prediction;
 namespace PowerType;
 
 /// <summary>
-/// <para type="synopsis">Cmdlet to enable Az Predictor and start receiving suggestions</para>
-/// <para type="description">Use this cmdlet to enable Az Predictor and start receiving suggestions</para>
+/// <para type="synopsis">Cmdlet to disable PowerType Predictor and start receiving suggestions</para>
+/// <para type="description">Use this cmdlet to disable PowerType Predictor and start receiving suggestions</para>
 /// </summary>
 [Cmdlet("Disable", "PowerType"), OutputType(typeof(bool))]
 public class DisablePowerTypePredictor : PowerTypeCmdlet

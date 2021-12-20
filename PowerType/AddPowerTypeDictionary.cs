@@ -16,8 +16,8 @@ public class AddPowerTypeDictionary : PowerTypeCmdlet
     protected override void ProcessRecord()
     {
         WriteDebug($"Adding {Dictionary.Name}");
-        var executionContext = new ExecutionContext(InvokeCommand, SessionState);
-        Dictionary.Initialize(executionContext);
+        Dictionary.Initialize(SystemTime.Instance);
+        Dictionary.Validate();
         var suggestor = new DictionarySuggestor(Dictionary);
         WriteObject(suggestor);
         base.ProcessRecord();

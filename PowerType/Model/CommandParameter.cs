@@ -6,21 +6,25 @@ namespace PowerType.Model
     {
         public List<Parameter> Parameters { get; set; } = new List<Parameter>();
 
-        internal override void Initialize(IExecutionContext executionContext)
+        internal override void Initialize(ISystemTime systemTime)
         {            
-            base.Initialize(executionContext);
+            base.Initialize(systemTime);
             foreach(var parameter in Parameters)
             {
-                parameter.Initialize(executionContext);
+                parameter.Initialize(systemTime);
             }
         }
 
-        protected override void Validate()
+        internal override void Validate()
         {
             base.Validate();
             if (Parameters == null || Parameters.Count == 0)
             {
                 throw new ArgumentNullException(nameof(Parameters));
+            }
+            foreach (var parameter in Parameters)
+            {
+                parameter.Validate();
             }
         }
     }

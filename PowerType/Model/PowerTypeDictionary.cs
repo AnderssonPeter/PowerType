@@ -18,20 +18,18 @@ namespace PowerType.Model
         public string Description { get; set; } = string.Empty;
         public List<Parameter> Parameters { get; set; } = null!;
 
-        internal void Initialize(IExecutionContext executionContext)
+        internal void Initialize(ISystemTime systemTime)
         {
-            if (executionContext == null)
+            if (Parameters != null)
             {
-                throw new ArgumentNullException(nameof(executionContext));
-            }
-            Validate();
-            foreach (var parameter in Parameters)
-            {
-                parameter.Initialize(executionContext);
+                foreach (var parameter in Parameters)
+                {
+                    parameter.Initialize(systemTime);
+                }
             }
         }
 
-        private void Validate()
+        internal void Validate()
         {
             if (Keys == null || Keys.Count == 0)
             {
@@ -52,6 +50,10 @@ namespace PowerType.Model
                 throw new ArgumentNullException(nameof(Parameters));
             }
 
+            foreach (var parameter in Parameters)
+            {
+                parameter.Validate();
+            }
         }
     }
 }

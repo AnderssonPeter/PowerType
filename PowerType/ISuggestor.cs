@@ -1,4 +1,5 @@
-﻿using PowerType.Parsing;
+﻿using PowerType.Model;
+using PowerType.Parsing;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,5 +19,6 @@ public interface ISuggestor
     public string Name { get; }
     public string Description { get; }
     public IEnumerable<PredictiveSuggestion> GetPredictions(DictionaryParsingContext dictionaryParsingContext);
+
 }
 

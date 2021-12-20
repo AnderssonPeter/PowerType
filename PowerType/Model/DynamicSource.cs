@@ -2,28 +2,34 @@
 using System.Linq;
 using System.Management.Automation;
 
-namespace PowerType.Model
+namespace PowerType.Model;
+
+public class DynamicSource : Source
 {
-    public class DynamicSource : Source
+    public Cache Cache { get; set; } = null!;
+
+    public ScriptBlock CommandExpression { get; set; } = null!;
+
+    internal override IEnumerable<SourceItem> GetItems() =>
+        Cache.GetCachedItems();
+
+    internal override void Initialize(ISystemTime systemTime)
     {
-        IExecutionContext executionContext = null!;
+        Cache.Initialize(systemTime);
+        base.Initialize(systemTime);
+    }
 
-        public ScriptBlock CommandExpression { get; set; } = null!;
-
-        internal override IEnumerable<SourceItem> GetItems() => executionContext.ExecuteQuery<SourceItem>(CommandExpression, null!);
-
-        internal void Initialize(IExecutionContext executionContext)
+    override internal void Validate()
+    {
+        base.Validate();
+        if (CommandExpression == null)
         {
-            this.executionContext = executionContext;
+            throw new ArgumentNullException(nameof(CommandExpression));
         }
-
-        override internal void Validate()
+        if (Cache == null)
         {
-            base.Validate();
-            if (CommandExpression == null)
-            {
-                throw new ArgumentNullException(nameof(CommandExpression));
-            }
+            throw new ArgumentNullException(nameof(Cache));
         }
+        Cache.Validate();
     }
 }

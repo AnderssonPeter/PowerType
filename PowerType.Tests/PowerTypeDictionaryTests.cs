@@ -17,7 +17,8 @@ public class PowerTypeDictionaryTests
         var dictionary = new PowerTypeDictionary();
         var temp = () =>
         {
-            dictionary.Initialize(new DummyExecutionContext());
+            dictionary.Initialize(new SystemTimeMock());
+            dictionary.Validate();
         };
         temp.Should().Throw<ArgumentNullException>();
     }
@@ -42,7 +43,8 @@ public class PowerTypeDictionaryTests
                 }
             }
         };
-        dictionary.Initialize(new DummyExecutionContext());
+        dictionary.Initialize(new SystemTimeMock());
+        dictionary.Validate();
         
     }
 }

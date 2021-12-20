@@ -40,8 +40,8 @@ $allRepositories = [DynamicSource]@{
 
 # Should we remove the Parameter part? CommandParameter -> Command?
 $dictionary = [PowerTypeDictionary]@{
-	Keys = @("git");
-	Name = "git";
+	Keys = @("test");
+	Name = "test";
 	Description = "fast, scalable, distributed revision control system";
 	Platforms = [Platforms]::All;
 	Parameters = @(

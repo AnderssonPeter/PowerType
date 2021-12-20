@@ -12,8 +12,8 @@ using System.Text;
 namespace PowerType;
 
 /// <summary>
-/// <para type="synopsis">Cmdlet to enable Az Predictor and start receiving suggestions</para>
-/// <para type="description">Use this cmdlet to enable Az Predictor and start receiving suggestions</para>
+/// <para type="synopsis">Cmdlet to enable PowerType Predictor and start receiving suggestions</para>
+/// <para type="description">Use this cmdlet to enable PowerType Predictor and start receiving suggestions</para>
 /// </summary>
 [Cmdlet("Enable", "PowerType"), OutputType(typeof(bool))]
 public class EnablePowerTypePredictor : PowerTypeCmdlet
@@ -40,6 +40,12 @@ public class EnablePowerTypePredictor : PowerTypeCmdlet
     [Parameter(Mandatory = false, HelpMessage = "List of dictionaries to load, if not provided all are loaded.")]
     public string[]? DictionariesToLoad { get; set; }
 
+    /// <summary>
+    /// <para type="description">List of dictionaries to load, if not provided all are loaded. </para>
+    /// </summary>
+    [Parameter(Mandatory = false, HelpMessage = "List of dictionaries to load, if not provided all are loaded.")]
+    public string[]? DictionariesToIgnore { get; set; }
+
 
     /// <inheritdoc/>
     protected override void ProcessRecord()
@@ -49,11 +55,10 @@ public class EnablePowerTypePredictor : PowerTypeCmdlet
 
         InvokeCommand.InvokeScript(scriptToRun.ToString());
 
-        var suggestors = LoadDictionaries();
 
-
-        var predictor = new PowerTypePredictor(suggestors);
+        var predictor = new PowerTypePredictor(GetDictionaries());
         SubsystemManager.RegisterSubsystem<ICommandPredictor, PowerTypePredictor>(predictor);
+        
 
         if (PassThru.IsPresent)
         {
@@ -75,19 +80,29 @@ public class EnablePowerTypePredictor : PowerTypeCmdlet
 
     public static string DictionariesDirectory => Path.Combine(ModuleDirectory, "Dictionaries");
 
-    private IEnumerable<ISuggestor> LoadDictionaries()
+    private IEnumerable<string> GetDictionaries()
     {
-        WriteDebug($"Loading dictionaries");
         foreach (var dictionaryPath in Directory.EnumerateFiles(DictionariesDirectory, "*.ps1"))
         {
-            WriteDebug($"Loading {dictionaryPath}");
-            var script = ScriptBlock.Create($"using namespace PowerType.Model\n{dictionaryPath}");
-            var watch = Stopwatch.StartNew();
-            var result = InvokeCommand.InvokeScript(true, script, new List<object>());
-            var suggestor = result.Select(x => x.BaseObject).Cast<ISuggestor>().Single();
-            watch.Stop();
-            WriteDebug($"Loaded {dictionaryPath}, {watch.ElapsedMilliseconds} ms");
-            yield return suggestor;
+            var filename = Path.GetFileNameWithoutExtension(dictionaryPath);
+            if (DictionariesToLoad != null)
+            {
+                if (DictionariesToLoad.Contains(filename, StringComparer.OrdinalIgnoreCase))
+                {
+                    yield return filename;
+                }
+            }
+            else if (DictionariesToIgnore != null)
+            {
+                if (!DictionariesToIgnore.Contains(filename, StringComparer.OrdinalIgnoreCase))
+                {
+                    yield return filename;
+                }
+            }
+            else
+            {
+                yield return dictionaryPath;
+            }
         }
     }
 }

@@ -8,25 +8,25 @@ public class ValueParameter : Parameter
     public ParameterType? Type { get; set; }
     public Source? Source { get; set; }
 
-    internal override void Initialize(IExecutionContext executionContext)
+    internal override void Initialize(ISystemTime systemTime)
     {
-        base.Initialize(executionContext);
+        base.Initialize(systemTime);
         if (Source != null)
         {
-            Source.Validate();
-            if (Source is DynamicSource dynamicSource)
-            {
-                dynamicSource.Initialize(executionContext);
-            }
+            Source.Initialize(systemTime);
         }
     }
 
-    protected override void Validate()
+    internal override void Validate()
     {
         base.Validate();
         if (RequiresEqualSign && !HasKeys)
         {
             throw new ArgumentException("Can't have key less value parameter with RequiresEqualSign");
+        }
+        if (Source != null)
+        {
+            Source.Validate();
         }
     }
 

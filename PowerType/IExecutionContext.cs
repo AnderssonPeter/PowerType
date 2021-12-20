@@ -1,10 +1,11 @@
 ﻿using System.Management.Automation;
+using PowerType.Model;
+using PowerType.Parsing;
 
-namespace PowerType
+namespace PowerType;
+
+internal interface IExecutionContext
 {
-    public interface IExecutionContext
-    {
-        IEnumerable<T> ExecuteQuery<T>(ScriptBlock command, Dictionary<string, object> arguments);
-        T? ExecuteValue<T>(ScriptBlock command, Dictionary<string, object> arguments);
-    }
+    IEnumerable<SourceItem> GetDynamicSourceItems(ScriptBlock scriptBlock, DictionaryParsingContext dictionaryParsingContext, Parameter parameter);
+    bool GetCondition(ScriptBlock scriptBlock, DictionaryParsingContext dictionaryParsingContext, Parameter parameter);
 }

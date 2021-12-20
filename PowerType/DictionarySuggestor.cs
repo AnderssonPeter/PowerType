@@ -13,24 +13,46 @@ namespace PowerType;
 
 internal class DictionarySuggestor : ISuggestor
 {
-    private readonly PowerTypeDictionary dictionary;
+    private readonly List<DynamicSource> dynamicSources;
+    public PowerTypeDictionary Dictionary { get; }
 
-    public string Name => dictionary.Name;
+    public string Name => Dictionary.Name;
 
-    public string Description => dictionary.Description;
+    public string Description => Dictionary.Description;
 
-    public IEnumerable<string> Keys => dictionary.Keys;
+    public IEnumerable<string> Keys => Dictionary.Keys;
 
     public bool HasKey(string key) => Keys.Contains(key, StringComparer.OrdinalIgnoreCase);
 
     public DictionarySuggestor(PowerTypeDictionary dictionary)
     {
-        this.dictionary = dictionary;
+        this.Dictionary = dictionary;
+        dynamicSources = dictionary.Parameters.SelectMany(p => RecursiveGet(p)).ToList();
+    }
+
+    public IEnumerable<DynamicSource> GetDynamicSources() => dynamicSources;
+
+    public static IEnumerable<DynamicSource> RecursiveGet(Parameter parameter)
+    {
+        if (parameter is ValueParameter valueParameter && valueParameter.Source is DynamicSource dynamicSource)
+        {
+            yield return dynamicSource;
+        }
+        else if (parameter is CommandParameter commandParameter)
+        {
+            foreach (Parameter subParameter in commandParameter.Parameters)
+            {
+                foreach (DynamicSource dynamicSource2 in RecursiveGet(subParameter))
+                {
+                    yield return dynamicSource2;
+                }
+            }
+        }
     }
 
     public IEnumerable<PredictiveSuggestion> GetPredictions(DictionaryParsingContext dictionaryParsingContext)
     {
-        return Parse(dictionary.Parameters, dictionaryParsingContext, Enumerable.Empty<Parameter>());
+        return Parse(Dictionary.Parameters, dictionaryParsingContext, Enumerable.Empty<Parameter>());
     }
 
     private IEnumerable<PredictiveSuggestion> Parse(IEnumerable<Parameter> parameters, DictionaryParsingContext context, IEnumerable<Parameter> additionalParameters)
@@ -45,7 +67,7 @@ internal class DictionarySuggestor : ISuggestor
         }
         var currentArgument = context.CurrentArgument;
         //Check if we can find a perfect match
-        var perfectMatch = allParameters.FirstOrDefault(parameter => parameter.IsPerfectKeyMatch(currentArgument) && parameter.Condition());
+        var perfectMatch = allParameters.FirstOrDefault(parameter => parameter.IsPerfectKeyMatch(currentArgument) && parameter.IsAvailable(context));
         if (perfectMatch != null)
         {
             if (perfectMatch is CommandParameter commandParameter)
@@ -64,7 +86,6 @@ internal class DictionarySuggestor : ISuggestor
                         Value = !isDone ? null : value,
                         UsedEqualSign = true
                     });
-                    
                     if (isDone)
                     {
                         return repeat(perfectMatch);
@@ -150,22 +171,25 @@ internal class DictionarySuggestor : ISuggestor
     {
         foreach (var parameter in parameters)
         {
-            if (parameter.HasKeys)
+            if (parameter.IsAvailable(context))
             {
-                foreach (var key in parameter.Keys)
+                if (parameter.HasKeys)
                 {
-                    if (key.Contains(currentArgument.RawValue, StringComparison.OrdinalIgnoreCase))
+                    foreach (var key in parameter.Keys)
                     {
-                        yield return new PredictiveSuggestion(context.Reconstruct(key), parameter.Description);
-                        break;
+                        if (key.Contains(currentArgument.RawValue, StringComparison.OrdinalIgnoreCase))
+                        {
+                            yield return new PredictiveSuggestion(context.Reconstruct(key), parameter.Description);
+                            break;
+                        }
                     }
                 }
-            }
-            else if (parameter is ValueParameter valueParameter && valueParameter.Source != null)
-            {
-                foreach (var sourceItem in valueParameter.Source.GetItems().Where(item => item.Name.Contains(currentArgument.RawValue, StringComparison.OrdinalIgnoreCase)))
+                else if (parameter is ValueParameter valueParameter && valueParameter.Source != null)
                 {
-                    yield return new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(currentArgument.Type, sourceItem.Name)), sourceItem.Description);
+                    foreach (var sourceItem in valueParameter.Source.GetItems().Where(item => item.Name.Contains(currentArgument.RawValue, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        yield return new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(currentArgument.Type, sourceItem.Name)), sourceItem.Description);
+                    }
                 }
             }
         }
