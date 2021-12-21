@@ -4,10 +4,10 @@ namespace PowerType.Model.Conditions;
 
 public class InCondition : Condition
 {
-    private readonly object value;
-    private readonly object collection;
+    private readonly object? value;
+    private readonly object? collection;
 
-    public InCondition(object value, object collection)
+    public InCondition(object? value, object? collection)
     {
         this.value = value;
         this.collection = collection;

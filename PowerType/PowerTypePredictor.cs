@@ -1,6 +1,5 @@
 ﻿using PowerType.BackgroundProcessing;
 using PowerType.Parsing;
-using System.Management.Automation;
 using System.Management.Automation.Language;
 using System.Management.Automation.Subsystem.Prediction;
 
@@ -14,10 +13,11 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
     public Guid Id => Identifier;
 
     internal static readonly Guid Identifier = new("599d1760-4ee1-4ed2-806e-f2a1b1a0ba4d");
+    private readonly ICurrentWorkingDirectoryProvider currentWorkingDirectoryProvider;
 
     public string Name => "PowerType";
 
-    public PowerTypePredictor(IEnumerable<string> dictionaryFiles)
+    public PowerTypePredictor(ICurrentWorkingDirectoryProvider currentWorkingDirectoryProvider, IEnumerable<string> dictionaryFiles)
     {
         executionEngine = new ExecutionEngine();
         executionEngine.Start();
@@ -25,6 +25,8 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         {
             executionEngine.InitialDictionary(dictionaryFile);
         }
+
+        this.currentWorkingDirectoryProvider = currentWorkingDirectoryProvider;
     }
 
     public bool CanAcceptFeedback(PredictionClient client, PredictorFeedbackKind feedback)
@@ -76,7 +78,6 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         }
         catch (Exception ex)
         {
-            
             Console.WriteLine(ex);
             return default;
         }
@@ -99,8 +100,7 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         if (TryGetSuggestor(commandName, out var key, out var suggestor))
         {
             dictionaryParsingContext.Command = new Parsing.Command(key, suggestor);
-            var d = Directory.GetCurrentDirectory();
-            executionEngine.Cache(suggestor.Dictionary, Environment.CurrentDirectory); //todo: this is incorrect and does not reflect when we change directory!
+            executionEngine.Cache(suggestor.Dictionary, currentWorkingDirectoryProvider.CurrentWorkingDirectory);
             foreach (var result in suggestor.GetPredictions(dictionaryParsingContext))
             {
                 yield return result;
@@ -160,5 +160,6 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
     public void Dispose()
     {
         executionEngine.Stop();
+        currentWorkingDirectoryProvider.Dispose();
     }
 }

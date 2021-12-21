@@ -55,11 +55,10 @@ public class EnablePowerTypePredictor : PowerTypeCmdlet
 
         InvokeCommand.InvokeScript(scriptToRun.ToString());
 
-
-        var predictor = new PowerTypePredictor(GetDictionaries());
+        var currentWorkingDirectoryProvider = new CurrentWorkingDirectoryProvider(SessionState);
+        var predictor = new PowerTypePredictor(currentWorkingDirectoryProvider, GetDictionaries());
         SubsystemManager.RegisterSubsystem<ICommandPredictor, PowerTypePredictor>(predictor);
         
-
         if (PassThru.IsPresent)
         {
             WriteObject(true);

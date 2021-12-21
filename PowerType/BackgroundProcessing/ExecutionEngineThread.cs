@@ -118,7 +118,6 @@ internal class ExecutionEngineThread : IDisposable
         }
     }
 
-
     private void Handle(CacheDictionaryDynamicSources command)
     {
         var dictionaryInformation = GetDictionaryInformation(command.Dictionary);
@@ -127,6 +126,7 @@ internal class ExecutionEngineThread : IDisposable
         {
             if (dynamicSource.Cache.ShouldUpdate(command.CurrentWorkingDirectory))
             {
+                dictionaryInformation.Runspace.SessionStateProxy.Path.SetLocation(command.CurrentWorkingDirectory);
                 var result = dynamicSource.CommandExpression.Invoke();
                 var items = result.Select(x => x.BaseObject is string ?
                     new SourceItem { Name = (string)x.BaseObject } :
