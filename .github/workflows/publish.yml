@@ -41,4 +41,4 @@ jobs:
     - name: Publish and upload artifacts
       shell: pwsh
       run: |
-        Publish-Module -Path 'artifacts\PowerType' -NuGetApiKey ' ${{ secrets.POWERSHELL_GALLERY_API_KEY }}'
+        Publish-Module -Path 'artifacts\PowerType' -NuGetApiKey '${{ secrets.POWERSHELL_GALLERY_API_KEY }}' -IconUri 'https://raw.githubusercontent.com/AnderssonPeter/PowerType/main/Icon.svg'
