@@ -160,7 +160,7 @@ internal class ExecutionEngineThread : IDisposable
 
         if (!backgroundThread.Join(200))
         {
-            throw new Exception("Failed to shutdown background thread!");
+            //todo: log that we failed to shutdown background thread!
         }
     }
 }

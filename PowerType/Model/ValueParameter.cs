@@ -4,6 +4,7 @@ namespace PowerType.Model;
 
 public class ValueParameter : Parameter
 {
+    protected override bool AllowEmptyKeys => true;
     public bool RequiresEqualSign { get; set; }
     public ParameterType? Type { get; set; }
     public Source? Source { get; set; }

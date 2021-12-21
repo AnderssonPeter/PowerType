@@ -143,18 +143,22 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     public void OnCommandLineAccepted(PredictionClient client, IReadOnlyList<string> history)
     {
+        //This input is not needed
     }
 
     public void OnCommandLineExecuted(PredictionClient client, string commandLine, bool success)
     {
+        //This input is not needed
     }
 
     public void OnSuggestionAccepted(PredictionClient client, uint session, string acceptedSuggestion)
     {
+        //This input is not needed
     }
 
     public void OnSuggestionDisplayed(PredictionClient client, uint session, int countOrIndex)
     {
+        //This input is not needed
     }
 
     public void Dispose()

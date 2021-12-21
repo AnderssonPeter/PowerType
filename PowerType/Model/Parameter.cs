@@ -12,6 +12,7 @@ namespace PowerType.Model;
 public abstract class Parameter
 {
     public List<string> Keys { get; set; } = null!;
+    protected virtual bool AllowEmptyKeys => false;
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
     public bool Recursive { get; set; }
@@ -23,7 +24,7 @@ public abstract class Parameter
 
     internal virtual void Validate()
     {
-        if (this is not ValueParameter && !HasKeys)
+        if (!AllowEmptyKeys && !HasKeys)
         {
             throw new Exception("Parameter must have at least one key");
         }

@@ -1,13 +1,7 @@
 ﻿using PowerType.Model;
 using PowerType.Parsing;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Management.Automation.Language;
 using System.Management.Automation.Subsystem.Prediction;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PowerType;
 
@@ -57,9 +51,6 @@ internal class DictionarySuggestor : ISuggestor
 
     private IEnumerable<PredictiveSuggestion> Parse(IEnumerable<Parameter> parameters, DictionaryParsingContext context, IEnumerable<Parameter> additionalParameters)
     {
-        var repeat = (Parameter perfectMatch) =>
-            Parse(parameters.Where(parameter => parameter != perfectMatch), context, additionalParameters);
-
         var allParameters = parameters.Union(additionalParameters);
         if (!context.HasValue)
         {
@@ -70,84 +61,7 @@ internal class DictionarySuggestor : ISuggestor
         var perfectMatch = allParameters.FirstOrDefault(parameter => parameter.IsPerfectKeyMatch(currentArgument) && parameter.IsAvailable(context));
         if (perfectMatch != null)
         {
-            if (perfectMatch is CommandParameter commandParameter)
-            {
-                var recursiveParameters = parameters.Where(x => x.Recursive).ToList();
-                context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch));
-                return Parse(commandParameter.Parameters, context, additionalParameters.Union(recursiveParameters));
-            }
-            else if (perfectMatch is ValueParameter valueParameter)
-            {
-                if (valueParameter.TryGetKeyAndValue(currentArgument, out var key, out PowerShellString value))
-                {
-                    var isDone = IsValueDone(context.IsLast, value);
-                    context.Parameters.Add(new ParameterWithValue(key, perfectMatch)
-                    {
-                        Value = !isDone ? null : value,
-                        UsedEqualSign = true
-                    });
-                    if (isDone)
-                    {
-                        return repeat(perfectMatch);
-                    }
-                    if (!context.HasValue)
-                    {
-                        if (valueParameter.Source != null)
-                        {
-                            return valueParameter.Source
-                                .GetItems()
-                                .Where(x => x.Name.Contains(value.RawValue, StringComparison.OrdinalIgnoreCase))
-                                .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(value.Type, x.Name)), x.Description));
-                        }
-                        return Enumerable.Empty<PredictiveSuggestion>();
-                    }
-                }
-                else if (context.IsLast)
-                {
-                    context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch));
-                    if (valueParameter.Source != null)
-                    {
-                        return valueParameter.Source
-                            .GetItems()
-                            .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(currentArgument.Type, x.Name)), x.Description));
-                    }
-                    return Enumerable.Empty<PredictiveSuggestion>();
-                }
-                else if (context.HasThreeOrMoreLeft)
-                {
-                    context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch)
-                    {
-                        Value = context.NextArgument
-                    });
-                }
-                else if (context.IsSecondLast)
-                {
-                    var search = context.NextArgument;
-                    var isDone = IsValueDone(true, search);
-                    context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch)
-                    {
-                        Value = !isDone ? null : search
-                    });
-                    if (valueParameter.Source != null)
-                    {
-                        return valueParameter.Source
-                            .GetItems()
-                            .Where(x => x.Name.Contains(search.RawValue, StringComparison.OrdinalIgnoreCase))
-                            .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(currentArgument.Type, x.Name)), x.Description));
-                    }
-                }
-                else
-                {
-                    throw new InvalidOperationException();
-                    //context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch));
-                }
-            }
-            else
-            {
-                context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch));
-            }
-            //Check for more matches on same level
-            return repeat(perfectMatch);
+            return GetPerfectMatches(parameters, context, additionalParameters, currentArgument, perfectMatch);
         }
         else if (context.IsLast)
         {
@@ -162,10 +76,96 @@ internal class DictionarySuggestor : ISuggestor
         }
     }
 
-    private bool IsValueDone(bool isLast, PowerShellString value)
+    private IEnumerable<PredictiveSuggestion> GetPerfectMatches(IEnumerable<Parameter> parameters, DictionaryParsingContext context, IEnumerable<Parameter> additionalParameters, PowerShellString currentArgument, Parameter perfectMatch)
     {
-        return !isLast || value.Type != StringConstantType.BareWord && value.IsEscapedOpened() && value.IsEscapedClosed();
+        var repeat = (Parameter perfectMatch) =>
+                        Parse(parameters.Where(parameter => parameter != perfectMatch), context, additionalParameters);
+
+        if (perfectMatch is CommandParameter commandParameter)
+        {
+            var recursiveParameters = parameters.Where(x => x.Recursive).ToList();
+            context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch));
+            return Parse(commandParameter.Parameters, context, additionalParameters.Union(recursiveParameters));
+        }
+        else if (perfectMatch is ValueParameter valueParameter)
+        {
+            if (valueParameter.TryGetKeyAndValue(currentArgument, out var key, out PowerShellString value))
+            {
+                var isDone = IsValueDone(context.IsLast, value);
+                context.Parameters.Add(new ParameterWithValue(key, perfectMatch)
+                {
+                    Value = !isDone ? null : value,
+                    UsedEqualSign = true
+                });
+                if (isDone)
+                {
+                    return repeat(perfectMatch);
+                }
+                if (!context.HasValue)
+                {
+                    if (valueParameter.Source != null)
+                    {
+                        return GetPartialSourceMatches(context, valueParameter.Source, value);
+                    }
+                    return Enumerable.Empty<PredictiveSuggestion>();
+                }
+            }
+            else if (context.IsLast)
+            {
+                context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch));
+                return GetAllSourceMatches(context, currentArgument, valueParameter);
+            }
+            else if (context.HasThreeOrMoreLeft)
+            {
+                context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch)
+                {
+                    Value = context.NextArgument
+                });
+            }
+            else if (context.IsSecondLast)
+            {
+                var search = context.NextArgument;
+                var isDone = IsValueDone(true, search);
+                context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch)
+                {
+                    Value = !isDone ? null : search
+                });
+                if (valueParameter.Source != null)
+                {
+                    return GetPartialSourceMatches(context, valueParameter.Source, search);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException();
+                //context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch));
+            }
+        }
+        else
+        {
+            context.Parameters.Add(new ParameterWithValue(currentArgument, perfectMatch));
+        }
+        //Check for more matches on same level
+        return repeat(perfectMatch);
     }
+
+    private IEnumerable<PredictiveSuggestion> GetAllSourceMatches(DictionaryParsingContext context, PowerShellString currentArgument, ValueParameter valueParameter)
+    {
+        if (valueParameter.Source != null)
+        {
+            return valueParameter.Source
+                .GetItems()
+                .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(currentArgument.Type, x.Name)), x.Description));
+        }
+        return Enumerable.Empty<PredictiveSuggestion>();
+    }
+
+    private IEnumerable<PredictiveSuggestion> GetPartialSourceMatches(DictionaryParsingContext context, Source source, PowerShellString value) => source
+                            .GetItems()
+                            .Where(x => x.Name.Contains(value.RawValue, StringComparison.OrdinalIgnoreCase))
+                            .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(value.Type, x.Name)), x.Description));
+    private static bool IsValueDone(bool isLast, PowerShellString value) =>
+        !isLast || (value.Type != StringConstantType.BareWord && value.IsEscapedOpened() && value.IsEscapedClosed());
 
     private IEnumerable<PredictiveSuggestion> GetPartialMatches(DictionaryParsingContext context, IEnumerable<Parameter> parameters, PowerShellString currentArgument)
     {
