@@ -2,7 +2,7 @@
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PowerType?style=flat-square)](https://www.powershellgallery.com/packages/PowerType)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/AnderssonPeter/PowerType/blob/main/LICENSE.md)
 
-[![unit tests](https://img.shields.io/github/workflow/status/AnderssonPeter/PowerType/unit%20tests?label=Unit%20tests&style=flat-square)](https://github.com/AnderssonPeter/PowerType/actions/workflows/test.yml)
+[![unit tests](https://img.shields.io/github/workflow/status/AnderssonPeter/PowerType/unit%20tests?label=unit%20tests&style=flat-square)](https://github.com/AnderssonPeter/PowerType/actions/workflows/test.yml)
 [![Testspace tests](https://img.shields.io/testspace/tests/AnderssonPeter/AnderssonPeter:PowerType/main?style=flat-square)](https://anderssonpeter.testspace.com/spaces/156585/result_sets)
 [![Coverage Status](https://img.shields.io/coveralls/github/AnderssonPeter/PowerType?style=flat-square)](https://coveralls.io/github/AnderssonPeter/PowerType)
 [![Sonar Violations (short format)](https://img.shields.io/sonar/violations/AnderssonPeter_PowerType/main?format=long&server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/project/issues?id=AnderssonPeter_PowerType&resolved=false&types=CODE_SMELL)
