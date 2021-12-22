@@ -2,7 +2,7 @@
 
 public interface ISystemTime
 {
-    DateTime Now { get; }
+    DateTime UtcNow { get; }
 }
 
 public class Cache
@@ -37,7 +37,7 @@ public class Cache
     {
         lock (locker)
         {
-            var diff = systemTime.Now.Subtract(lastUpdate);
+            var diff = systemTime.UtcNow.Subtract(lastUpdate);
             return (ByTime.HasValue && diff > ByTime.Value) ||
                    (ByCurrentWorkingDirectory && lastWokringDirectory != currentWorkingDirectory);
         }
@@ -48,7 +48,7 @@ public class Cache
         lock (locker)
         {
             this.lastWokringDirectory = currentWorkingDirectory;
-            this.lastUpdate = systemTime.Now;
+            this.lastUpdate = systemTime.UtcNow;
             cachedItems = items;
         }
     }

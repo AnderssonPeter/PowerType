@@ -126,12 +126,19 @@ internal class ExecutionEngineThread : IDisposable
         {
             if (dynamicSource.Cache.ShouldUpdate(command.CurrentWorkingDirectory))
             {
-                dictionaryInformation.Runspace.SessionStateProxy.Path.SetLocation(command.CurrentWorkingDirectory);
-                var result = dynamicSource.CommandExpression.Invoke();
-                var items = result.Select(x => x.BaseObject is string ?
-                    new SourceItem { Name = (string)x.BaseObject } :
-                    (SourceItem)x.BaseObject).ToList();
-                dynamicSource.Cache.UpdateCache(items, command.CurrentWorkingDirectory);
+                try
+                {
+                    dictionaryInformation.Runspace.SessionStateProxy.Path.SetLocation(command.CurrentWorkingDirectory);
+                    var result = dynamicSource.CommandExpression.Invoke();
+                    var items = result.Select(x => x.BaseObject is string ?
+                        new SourceItem { Name = (string)x.BaseObject } :
+                        (SourceItem)x.BaseObject).ToList();
+                    dynamicSource.Cache.UpdateCache(items, command.CurrentWorkingDirectory);
+                }
+                catch(System.Management.Automation.DriveNotFoundException)
+                {
+                    //todo: log exception
+                }
             }
         }
     }

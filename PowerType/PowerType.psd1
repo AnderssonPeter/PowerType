@@ -34,7 +34,7 @@ Description = 'Module providing recommendations for common tools - This module r
 Suggestions must be activated:
 - Enable-PowerType:        Activate the suggestions
 - Disable-PowerType:       Disable the suggestions
-- Add-PowerTypeDictionary: Adds a power type dictionary
+- Add-PowerTypeDictionary: Adds a power type dictionary, this is used internally and should not be called manually
 
 For more information on PowerType, please visit the following: https://github.com/AnderssonPeter/PowerType'
 

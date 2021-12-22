@@ -5,5 +5,5 @@ namespace PowerType;
 internal class SystemTime : ISystemTime
 {
     public static readonly SystemTime Instance = new ();
-    public DateTime Now => DateTime.Now;
+    public DateTime UtcNow => DateTime.UtcNow;
 }

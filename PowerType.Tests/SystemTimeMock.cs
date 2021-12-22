@@ -14,7 +14,7 @@ class SystemTimeMock : ISystemTime
     {
 
     }
-    public DateTime Now => value;
+    public DateTime UtcNow => value;
     public void Advance(TimeSpan timeToAdd)
     {
         value = value.Add(timeToAdd);
