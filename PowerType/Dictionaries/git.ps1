@@ -29,7 +29,7 @@ $allRepositories = [DynamicSource]@{
 	Name = "AllRepositories";
 	Description = "Local and remote repositories";
 	CommandExpression = {
-		git --no-optional-locks branch -a --no-color  | % { $_.trim(' *$(') } | % { $_.StartsWith("remotes/origin/") ? $_.Substring(15) : $_ } | Where-Object { !$_.StartsWith("HEAD") } | Get-Unique
+		git --no-optional-locks branch -a --no-color  | % { $_.trim(' *$(') } | % { $_.StartsWith("remotes/origin/") ? $_.Substring(15) : $_ } | Where-Object { !$_.StartsWith("HEAD") } | Select -Unique
 	};
 	Cache = [Cache]@{
 		ByCurrentWorkingDirectory = $true;

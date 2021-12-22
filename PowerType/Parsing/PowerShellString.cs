@@ -86,7 +86,7 @@ public class PowerShellString
         }
         else
         {
-            throw new InvalidOperationException("We have no idea how to handle this value!");
+            throw new InvalidOperationException("We have no idea how to handle this type: " + commandElementAst.GetType().ToString());
             /*RawValue = commandElementAst.ToString();
             Type = StringConstantType.DoubleQuoted;
             EscapedValue = Escape(Type, RawValue);*/
