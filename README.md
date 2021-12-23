@@ -7,11 +7,6 @@
 [![Coverage Status](https://img.shields.io/coveralls/github/AnderssonPeter/PowerType?style=flat-square)](https://coveralls.io/github/AnderssonPeter/PowerType)
 [![Sonar Violations (short format)](https://img.shields.io/sonar/violations/AnderssonPeter_PowerType/main?format=long&server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/project/issues?id=AnderssonPeter_PowerType&resolved=false&types=CODE_SMELL)
 
-[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/1?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/1)
-[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/2?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/2)
-[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/3?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/3)
-[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/4?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/4)
-
 <div align="center">
   <img src="Icon.svg" alt="Logo" width="80" height="80">
   
@@ -21,16 +16,41 @@
   <p align="center">
     Autocomplete for Powershell
     <br />
-    <br />
     ·
-    <a href="https://github.com/AnderssonPeter/PowerType/issues/new/choose">Report Bug</a>
+    <a href="https://github.com/AnderssonPeter/PowerType/issues/new?assignees=&labels=dictionary+request&template=dictionary-request.md&title=">Request Dictionary</a>
     ·
-    <a href="https://github.com/AnderssonPeter/PowerType/issues/new/choose">Request Feature</a>
+    <a href="https://github.com/AnderssonPeter/PowerType/issues/new?assignees=&labels=&template=feature_request.md&title=">Request Feature</a>
+    ·
+    <a href="https://github.com/AnderssonPeter/PowerType/issues/new?assignees=&labels=bug&template=bug_report.md&title=">Report Bug</a>
     ·
   </p>
 </div>
 
+[![asciicast](https://asciinema.org/a/458149.svg)](https://asciinema.org/a/458149?autoplay=1)
 
+# Installation
+I don't recommend using PowerType in its current state and form but if you want to try it out run the following:
+```PowerShell
+Install-Module PowerType
+Import-Module PowerType
+Enable-PowerType
+```
+
+If you now type `git` you should get some basic autocompletion, the dictionary for git is far from complete and dosent know about all commands and parameters yet.
+
+To uninstall run
+```Powershell
+Disable-PowerType
+Remove-Module PowerType
+Uninstall-Module PowerType
+```
+
+# Progress
+
+[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/1?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/1)
+[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/2?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/2)
+[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/3?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/3)
+[![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/4?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/4)
 
 This project is far from done but has the aim to provide autocomplete for common cli tools like git, docker, dotnet, node, npm and many more while using powershell. 
 
