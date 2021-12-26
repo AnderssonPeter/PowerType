@@ -36,7 +36,7 @@ Import-Module PowerType
 Enable-PowerType
 ```
 
-If you now type `git` you should get some basic autocompletion, the dictionary for git is far from complete and dosent know about all commands and parameters yet.
+If you now type `git` you should get some basic autocompletion, the [dictionary for git](PowerType/Dictionaries/git.ps1) is far from complete and dosent know about all commands and parameters yet.
 
 To uninstall run
 ```Powershell
