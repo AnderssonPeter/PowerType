@@ -52,7 +52,7 @@ Uninstall-Module PowerType
 [![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/3?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/3)
 [![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/4?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/4)
 
-This project is far from done but has the aim to provide autocomplete for common cli tools like git, docker, dotnet, node, npm and many more while using powershell. 
+This project is far from done but has the aim to provide autocomplete for common cli tools like [git](PowerType/Dictionaries/git.ps1), docker, dotnet, node, npm and many more while using powershell. 
 
 
 # Acknowledgements
