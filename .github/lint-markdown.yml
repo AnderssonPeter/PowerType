@@ -1,0 +1,12 @@
+name: Lint markdown
+
+on: push
+
+jobs:
+  markdown-link-check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Check for broken links
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
