@@ -65,7 +65,7 @@ PrivateData = @{
         ProjectUri = 'https://github.com/AnderssonPeter/PowerType/'
 
         # A URL to an icon representing this module.
-        # IconUri = ''
+        IconUri = 'https://raw.githubusercontent.com/AnderssonPeter/PowerType/main/Icon.svg'
 
         # ReleaseNotes of this module
         ReleaseNotes = '* Initial version'
