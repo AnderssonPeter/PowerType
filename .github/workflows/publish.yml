@@ -49,4 +49,4 @@ jobs:
     - name: Publish and upload artifacts
       shell: pwsh
       run: |
-        Publish-Module -Path 'artifacts\PowerType' -NuGetApiKey '${{ secrets.POWERSHELL_GALLERY_API_KEY }}' -ReleaseNotes ${{ github.event.release.body }} 
+        Publish-Module -Path 'artifacts\PowerType' -NuGetApiKey '${{ secrets.POWERSHELL_GALLERY_API_KEY }}' -ReleaseNotes '${{ github.event.release.body }}'
