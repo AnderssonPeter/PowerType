@@ -37,8 +37,16 @@ jobs:
         $file = 'artifacts\PowerType\PowerType.psd1'
         $regex = "^ModuleVersion = '\d+\.\d+\.\d+'$"
         (Get-Content $file) -replace $regex, "ModuleVersion = '${{ github.event.release.tag_name }}'" | Set-Content $file
-    
+
+    - name: Enable Prerelease
+      if: github.event.release.prerelease == true
+      shell: pwsh
+      run: |
+        $file = 'artifacts\PowerType\PowerType.psd1'
+        $regex = "# Prerelease = '"
+        (Get-Content $file) -replace $regex, "Prerelease = '" | Set-Content $file
+
     - name: Publish and upload artifacts
       shell: pwsh
       run: |
-        Publish-Module -Path 'artifacts\PowerType' -NuGetApiKey '${{ secrets.POWERSHELL_GALLERY_API_KEY }}' -IconUri 'https://raw.githubusercontent.com/AnderssonPeter/PowerType/main/Icon.svg' -ReleaseNotes ${{ github.event.release.body }} 
+        Publish-Module -Path 'artifacts\PowerType' -NuGetApiKey '${{ secrets.POWERSHELL_GALLERY_API_KEY }}' -ReleaseNotes ${{ github.event.release.body }} 
