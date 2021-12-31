@@ -14,7 +14,6 @@
         <Description>Autocomplete for Powershell</Description>
         <PackageProjectUrl>https://github.com/AnderssonPeter/PowerType</PackageProjectUrl>
         <RepositoryUrl>https://github.com/AnderssonPeter/PowerType</RepositoryUrl>
-        <PackageReleaseNotes>1.0.0 Initial release</PackageReleaseNotes>
 
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
