@@ -31,7 +31,7 @@
 # Installation
 I don't recommend using PowerType in its current state and form but if you want to try it out run the following:
 ```PowerShell
-Install-Module PowerType
+Install-Module PowerType -AllowPrerelease
 Import-Module PowerType
 Enable-PowerType
 ```
