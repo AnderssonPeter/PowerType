@@ -22,7 +22,7 @@ public class PowerShellString
 
     private readonly static IReadOnlyDictionary<char, char> escapeReverseLookup = escapeLookup.ToDictionary(x => x.Value, x => x.Key);
 
-    public readonly static PowerShellString Empty = new PowerShellString(StringConstantType.BareWord, String.Empty, string.Empty);
+    public readonly static PowerShellString Empty = new(StringConstantType.BareWord, String.Empty, string.Empty);
 
     private const char doubleQuotationMark = '"';
     private const char leftDoubleQuotationMark = '\u201C';
@@ -181,7 +181,6 @@ public class PowerShellString
         return this;
     }
 
-
     internal PowerShellString RemoveOpeningFromEscaped()
     {
         if (EscapedValue == null)
@@ -216,8 +215,6 @@ public class PowerShellString
         }
         return FromRaw(type, RawValue);
     }
-
-    
 
     //todo: Escape unicode chars like ♥ they should be encoded like $([char]0x2665)
     internal static string Escape(StringConstantType type, string rawValue)

@@ -7,7 +7,7 @@ public abstract class CompareCondition : Condition
     private readonly object firstValue;
     private readonly object secondValue;
 
-    public CompareCondition(object firstValue, object secondValue)
+    protected CompareCondition(object firstValue, object secondValue)
     {
         this.firstValue = firstValue;
         this.secondValue = secondValue;
@@ -21,7 +21,7 @@ public abstract class CompareCondition : Condition
         if (type == null)
             return false;
         var genericType = typeof(System.Collections.Generic.Comparer<>).MakeGenericType(type);
-        
+
         var comparerProperty = genericType.GetProperty("Default");
         if (comparerProperty == null)
         {

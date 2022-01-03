@@ -1,31 +1,45 @@
 function Parse-KeyText ($Content) {
-	$Content = $Content.Replace("`r`n", "`n").Replace("`n", "{ENTER}")
-	[regex]$regex = '(?<modifiers>[+^%]+)?(?<content>{[^}]+}|[^+?^\^^%])'
-	$regex.Matches($Content) | % { $_.Value }
+    $Content = $Content.Replace("`r`n", "`n").Replace("`n", "{ENTER}")
+    [regex]$regex = '(?<modifiers>[+^%]+)?(?<content>{[^}]+}|[^+?^\^^%])'
+    $regex.Matches($Content) | % { $_.Value }
 }
 
 function Send-Keys ($KeyStrokes, $KeyPressSleep = 30, $LongSleep = 1500) {
-    $wshell = New-Object -ComObject wscript.shell;
-	foreach ($KeyPress in $KeyStrokes)
-	{
-		if ($KeyPress -eq '{SLEEP}')
-		{
-			Sleep -Milliseconds $LongSleep
-		}
-		else {
-			Sleep -Milliseconds $KeyPressSleep
-			$wshell.SendKeys($KeyPress)
-		}
-	}
+    $wshell = New-Object -ComObject wscript.shell
+    Sleep -Milliseconds 100
+    foreach ($KeyPress in $KeyStrokes)
+    {
+        if ($KeyPress -eq '{ALT}')
+        {
+            $KeyPress = '%'
+        }
+        else if ($KeyPress -eq '{SHIFT}')
+        {
+            $KeyPress = '+'
+        }
+        else if ($KeyPress -eq '{CTRL}')
+        {
+            $KeyPress = '^'
+        }
+        
+        if ($KeyPress -eq '{SLEEP}')
+        {
+            Sleep -Milliseconds $LongSleep
+        }		
+        else {
+            Sleep -Milliseconds $KeyPressSleep
+            $wshell.SendKeys($KeyPress)
+        }
+    }
 }
 #Documentation https://ss64.com/vb/sendkeys.html
 $textToSend = @"
-+^t{SLEEP}cd D:\Users\Peter\source\repos\FluentTerminal
+{SHIFT}{CTRL}t{SLEEP}cd D:\Users\Peter\source\repos\FluentTerminal
 powersession rec -c "pwsh -nologo" recording.txt
 {SLEEP}Import-Module PowerType
 {SLEEP}Enable-PowerType
 git c{SLEEP}{DOWN}{SLEEP}{DOWN}{SLEEP} m{SLEEP}{DOWN}{SLEEP}
-exit
+{SHIFT}{CTRL}w
 {SLEEP}exit
 
 "@

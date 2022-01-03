@@ -25,9 +25,9 @@ public class ConditionTests
         public override bool Evaluate(Dictionary<string, object> parameters) => value;
     }
 
-    Dictionary<string, object> parameters = new()
+    readonly Dictionary<string, object> parameters = new()
     {
-        { "DictionaryParsingContext", new DictionaryParsingContext("", new PowerShellString[] { }) },
+        { "DictionaryParsingContext", new DictionaryParsingContext("", Array.Empty<PowerShellString>()) },
         { "Parameter", new ValueParameter { Name = "test" } }
     };
 
@@ -39,10 +39,8 @@ public class ConditionTests
     [InlineData("%DictionaryParsingContext.notfound.notfound%", null)]
     [InlineData("%Parameter.Name%", "test")]
     [Theory]
-    public void ResolveValue(object? expression, object? expectedValue)
-    {
+    public void ResolveValue(object? expression, object? expectedValue) =>
         Condition.ResolveValue(expression, parameters).Should().Be(expectedValue);
-    }
 
     [InlineData(true, false)]
     [InlineData(false, true)]
@@ -52,7 +50,6 @@ public class ConditionTests
         var notCondition = new NotCondition(new ConstantCondition(value));
         notCondition.Evaluate(parameters).Should().Be(expected);
     }
-
 
     [InlineData(true, true, true)]
     [InlineData(true, false, false)]
@@ -76,7 +73,6 @@ public class ConditionTests
         orCondition.Evaluate(parameters).Should().Be(expected);
     }
 
-
     [InlineData(true, true, true)]
     [InlineData(true, false, false)]
     [InlineData(false, true, false)]
@@ -90,11 +86,10 @@ public class ConditionTests
         condition.Evaluate(parameters).Should().Be(expected);
     }
 
-
-    [InlineData(false, new object[] { false, null }, true)]
-    [InlineData(true, new object[] { null, true }, true)]
-    [InlineData(false, new object[] { true }, false)]
-    [InlineData("last", new object[] { 1, null, "second last", "last" }, true)]
+    [InlineData(false, new object?[] { false, null }, true)]
+    [InlineData(true, new object?[] { null, true }, true)]
+    [InlineData(false, new object?[] { true }, false)]
+    [InlineData("last", new object?[] { 1, null, "second last", "last" }, true)]
     [Theory]
     public void InCondition(object? value, object?[] collection, bool expected)
     {

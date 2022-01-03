@@ -7,7 +7,7 @@ public interface ISystemTime
 
 public class Cache
 {
-    ISystemTime systemTime = default!;
+    private ISystemTime systemTime = default!;
     public TimeSpan? ByTime { get; set; }
     public bool ByCurrentWorkingDirectory { get; set; }
 
@@ -28,8 +28,8 @@ public class Cache
         }
     }
 
-    private object locker = new();
-    private List<SourceItem> cachedItems = new List<SourceItem>();
+    private readonly object locker = new();
+    private List<SourceItem> cachedItems = new();
     private DateTime lastUpdate = DateTime.MinValue;
     private string lastWokringDirectory = string.Empty;
 
@@ -60,5 +60,4 @@ public class Cache
             return cachedItems;
         }
     }
-
 }

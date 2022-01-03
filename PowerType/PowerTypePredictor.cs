@@ -29,10 +29,7 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         this.currentWorkingDirectoryProvider = currentWorkingDirectoryProvider;
     }
 
-    public bool CanAcceptFeedback(PredictionClient client, PredictorFeedbackKind feedback)
-    {
-        return false;
-    }
+    public bool CanAcceptFeedback(PredictionClient client, PredictorFeedbackKind feedback) => false;
 
     private static string ConstructCommandPrefix(CommandAst commandAst)
     {
@@ -65,7 +62,6 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
             }
 
             var commandName = commandAst.GetCommandName();
-        
             var arguments = commandAst.CommandElements.Select(x => new PowerShellString(x));
             var prefix = ConstructCommandPrefix(commandAst);
             var dictionaryParsingContext = new DictionaryParsingContext(prefix, arguments);

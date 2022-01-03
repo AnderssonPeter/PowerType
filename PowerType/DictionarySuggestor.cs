@@ -44,10 +44,8 @@ internal class DictionarySuggestor : ISuggestor
         }
     }
 
-    public IEnumerable<PredictiveSuggestion> GetPredictions(DictionaryParsingContext dictionaryParsingContext)
-    {
-        return Parse(Dictionary.Parameters, dictionaryParsingContext, Enumerable.Empty<Parameter>());
-    }
+    public IEnumerable<PredictiveSuggestion> GetPredictions(DictionaryParsingContext dictionaryParsingContext) =>
+        Parse(Dictionary.Parameters, dictionaryParsingContext, Enumerable.Empty<Parameter>());
 
     private IEnumerable<PredictiveSuggestion> Parse(IEnumerable<Parameter> parameters, DictionaryParsingContext context, IEnumerable<Parameter> additionalParameters)
     {
@@ -149,7 +147,7 @@ internal class DictionarySuggestor : ISuggestor
         return repeat(perfectMatch);
     }
 
-    private IEnumerable<PredictiveSuggestion> GetAllSourceMatches(DictionaryParsingContext context, PowerShellString currentArgument, ValueParameter valueParameter)
+    private static IEnumerable<PredictiveSuggestion> GetAllSourceMatches(DictionaryParsingContext context, PowerShellString currentArgument, ValueParameter valueParameter)
     {
         if (valueParameter.Source != null)
         {
@@ -160,14 +158,14 @@ internal class DictionarySuggestor : ISuggestor
         return Enumerable.Empty<PredictiveSuggestion>();
     }
 
-    private IEnumerable<PredictiveSuggestion> GetPartialSourceMatches(DictionaryParsingContext context, Source source, PowerShellString value) => source
+    private static IEnumerable<PredictiveSuggestion> GetPartialSourceMatches(DictionaryParsingContext context, Source source, PowerShellString value) => source
                             .GetItems()
                             .Where(x => x.Name.Contains(value.RawValue, StringComparison.OrdinalIgnoreCase))
                             .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(value.Type, x.Name)), x.Description));
     private static bool IsValueDone(bool isLast, PowerShellString value) =>
         !isLast || (value.Type != StringConstantType.BareWord && value.IsEscapedOpened() && value.IsEscapedClosed());
 
-    private IEnumerable<PredictiveSuggestion> GetPartialMatches(DictionaryParsingContext context, IEnumerable<Parameter> parameters, PowerShellString currentArgument)
+    private static IEnumerable<PredictiveSuggestion> GetPartialMatches(DictionaryParsingContext context, IEnumerable<Parameter> parameters, PowerShellString currentArgument)
     {
         foreach (var parameter in parameters)
         {
@@ -195,7 +193,7 @@ internal class DictionarySuggestor : ISuggestor
         }
     }
 
-    private PowerShellString GetFromRawWithPreferredType(StringConstantType preferredType, string rawValue)
+    private static PowerShellString GetFromRawWithPreferredType(StringConstantType preferredType, string rawValue)
     {
         if (preferredType == StringConstantType.BareWord && rawValue.Contains(' '))
         {

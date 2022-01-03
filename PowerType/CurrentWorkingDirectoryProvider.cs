@@ -4,6 +4,7 @@ namespace PowerType;
 
 public class CurrentWorkingDirectoryProvider : ICurrentWorkingDirectoryProvider
 {
+    private bool disposed;
     private volatile string currentWorkingDirectory;
     private readonly SessionState sessionState;
 
@@ -23,6 +24,24 @@ public class CurrentWorkingDirectoryProvider : ICurrentWorkingDirectoryProvider
 
     public void Dispose()
     {
-        sessionState.InvokeCommand.LocationChangedAction -= LocationChanged;
+        // Dispose of unmanaged resources.
+        Dispose(true);
+        // Suppress finalization.
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            sessionState.InvokeCommand.LocationChangedAction -= LocationChanged;
+        }
+
+        disposed = true;
     }
 }

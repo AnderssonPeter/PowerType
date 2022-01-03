@@ -16,7 +16,7 @@ internal partial class ExecutionEngine
         {
             return thread.IsHealthy(out exception);
         }
-        exception = new Exception("No execution thread is running");
+        exception = new ThreadStateException("No execution thread is running");
         return false;
     }
 
@@ -24,7 +24,7 @@ internal partial class ExecutionEngine
     {
         if (executionEngineThread != null)
         {
-            throw new Exception("Already started");
+            throw new InvalidOperationException("Already started");
         }
         executionEngineThread = new ExecutionEngineThread(threadQueue);
     }
@@ -33,7 +33,7 @@ internal partial class ExecutionEngine
     {
         if (executionEngineThread == null)
         {
-            throw new Exception("Not started");
+            throw new InvalidOperationException("Not started");
         }
         executionEngineThread.Dispose();
         executionEngineThread = null;
