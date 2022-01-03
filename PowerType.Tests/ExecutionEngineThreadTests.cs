@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FluentAssertions;
 using PowerType.BackgroundProcessing;
 using Xunit;
 
@@ -44,6 +45,29 @@ public class ExecutionEngineThreadTests
         }
     }
 
+    [Fact]
+    public void GetSuggestors()
+    {
+        var queue = new ThreadQueue<Command>();
+        using var executionEngineThread = new ExecutionEngineThread(queue);
+        SendAndWaitForCommand(new InitializeDictionaryCommand(Path.Combine(Environment.CurrentDirectory, "Dictionaries", "test.ps1")), queue, executionEngineThread);
+        executionEngineThread.GetSuggestors().Count.Should().Be(1);
+    }
+
+    [Fact]
+    public void DontCrachOnUnkownDrive()
+    {
+        var queue = new ThreadQueue<Command>();
+        using var executionEngineThread = new ExecutionEngineThread(queue);
+        SendAndWaitForCommand(new InitializeDictionaryCommand(Path.Combine(Environment.CurrentDirectory, "Dictionaries", "test.ps1")), queue, executionEngineThread);
+
+        var dictionary = executionEngineThread.GetDictionaries().Single();
+        SendAndWaitForCommand(new CacheDictionaryDynamicSources(dictionary, @"Z:\DoesNotExist"), queue, executionEngineThread);
+        if (!executionEngineThread.IsHealthy(out var exception))
+        {
+            throw new Exception("execution engine thread was not healthy", exception);
+        }
+    }
 
     private static void SendAndWaitForCommand(Command command, ThreadQueue<Command> queue, ExecutionEngineThread executionEngineThread)
     {
