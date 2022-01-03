@@ -13,11 +13,11 @@ function Send-Keys ($KeyStrokes, $KeyPressSleep = 30, $LongSleep = 1500) {
         {
             $KeyPress = '%'
         }
-        else if ($KeyPress -eq '{SHIFT}')
+        elseif ($KeyPress -eq '{SHIFT}')
         {
             $KeyPress = '+'
         }
-        else if ($KeyPress -eq '{CTRL}')
+        elseif ($KeyPress -eq '{CTRL}')
         {
             $KeyPress = '^'
         }
