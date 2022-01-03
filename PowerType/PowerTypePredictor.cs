@@ -74,7 +74,8 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            Console.WriteLine("input: {0}", context.InputAst);
+            Console.WriteLine("exception: {0}", ex);
             return default;
         }
     }
