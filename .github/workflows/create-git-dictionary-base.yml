@@ -37,7 +37,9 @@ jobs:
     - name: Transform asciidoc to powershell
       shell: pwsh
       run: |
-        Copy-Item '$pwd/git/Documentation/' -Destination '$pwd/PowerType/generate dictionaries/git' -Include '*.xml'
+        ls git/Documentation
+        ls git/Documentation/*.xml
+        Copy-Item 'git/Documentation/' -Destination 'PowerType/generate dictionaries/git' -Include '*.xml'
         cd 'PowerType/generate dictionaries/git'
         ./asciidoc.to.dictionary.ps1
 
