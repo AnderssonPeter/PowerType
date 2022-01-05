@@ -26,9 +26,9 @@ jobs:
         ref: 'refs/tags/${{ github.event.inputs.gitTag }}'
         path: 'git'
 
-    - name: Install git dependencies
-      run: git/ci/install-dependencies.sh
-      
+    - name: Install dependencies
+      run: sudo apt-get install -y build-essential asciidoc
+
     - name: Create documentation
       run: |
         cd git/Documentation
