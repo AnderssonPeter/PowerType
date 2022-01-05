@@ -1,4 +1,4 @@
-$files = ls *.xml
+$files = ls (Join-Path $PSScriptRoot "*.xml")
 $transformationFile = Join-Path $PSScriptRoot "asciidoc.to.dictionary.xlts"
 $xslt = New-Object System.Xml.Xsl.XslCompiledTransform
 
@@ -10,7 +10,7 @@ $result = ""
 foreach ($file in $files)
 {
 	Write-Host "Processing $file"
-	$inputStream = [System.IO.File]::OpenRead($file)
+	$inputStream = [System.IO.File]::OpenRead($file.FullName)
 	$reader = New-Object System.Xml.XmlTextReader($inputStream)
 	$reader.DtdProcessing = [System.Xml.DtdProcessing]::Ignore
 	
@@ -27,4 +27,5 @@ foreach ($file in $files)
 }
 
 Write-Host "Writing"
-Set-Content "output.ps1" $result
+$outputPath = Join-Path $PSScriptRoot "output.ps1"
+Set-Content $outputPath $result

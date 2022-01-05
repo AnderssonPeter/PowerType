@@ -41,7 +41,8 @@ jobs:
         cd 'PowerType/generate dictionaries/git'
         ./asciidoc.to.dictionary.ps1
 
-    - uses: actions/upload-artifact@v2
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
       with:
         name: git dictionary base
         path: 'PowerType/generate dictionaries/git/output.ps1'
