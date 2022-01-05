@@ -1,5 +1,5 @@
 Write-Host "Enumerating files"
-$files = Get-ChildItem -Include *.xml
+$files = Get-ChildItem -Filter '*.xml'
 $transformationFile = Join-Path $pwd.Path "asciidoc.to.dictionary.xlts"
 $xslt = New-Object System.Xml.Xsl.XslCompiledTransform
 
