@@ -1,4 +1,5 @@
-$files = ls "*.xml"
+Write-Host "Enumerating files"
+$files = ls *.xml
 $transformationFile = Join-Path $pwd.Path "asciidoc.to.dictionary.xlts"
 $xslt = New-Object System.Xml.Xsl.XslCompiledTransform
 
