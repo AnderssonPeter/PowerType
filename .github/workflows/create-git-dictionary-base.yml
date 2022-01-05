@@ -47,6 +47,7 @@ jobs:
         Write-Host $pwd
         cd 'PowerType/GenerateDictionaries/git'
         Write-Host $pwd
+        ls
         ./asciidoc.to.dictionary.ps1
 
     - name: Upload artifact
