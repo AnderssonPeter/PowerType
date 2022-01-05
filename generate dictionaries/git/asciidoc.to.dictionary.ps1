@@ -1,5 +1,5 @@
-$files = ls (Join-Path $PSScriptRoot "*.xml")
-$transformationFile = Join-Path $PSScriptRoot "asciidoc.to.dictionary.xlts"
+$files = ls (Join-Path $pwd.Path "*.xml")
+$transformationFile = Join-Path $pwd.Path "asciidoc.to.dictionary.xlts"
 $xslt = New-Object System.Xml.Xsl.XslCompiledTransform
 
 Write-Host "Loading transformation file"
@@ -27,5 +27,5 @@ foreach ($file in $files)
 }
 
 Write-Host "Writing"
-$outputPath = Join-Path $PSScriptRoot "output.ps1"
+$outputPath = Join-Path $pwd.Path "output.ps1"
 Set-Content $outputPath $result
