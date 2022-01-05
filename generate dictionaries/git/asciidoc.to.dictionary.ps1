@@ -1,4 +1,4 @@
-$files = ls (Join-Path $PSScriptRoot "*.xml")
+$files = ls "*.xml"
 $transformationFile = Join-Path $PSScriptRoot "asciidoc.to.dictionary.xlts"
 $xslt = New-Object System.Xml.Xsl.XslCompiledTransform
 
