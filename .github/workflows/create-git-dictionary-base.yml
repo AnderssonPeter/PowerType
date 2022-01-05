@@ -36,10 +36,11 @@ jobs:
       
     - name: Transform asciidoc to powershell
       shell: pwsh
-        run: |
-          copy git/Documentation/*.xml 'PowerType/generate dictionaries/git'
-          cd 'PowerType/generate dictionaries/git'
-          ./asciidoc.to.dictionary.ps1
+      run: |
+        copy git/Documentation/*.xml 'PowerType/generate dictionaries/git'
+        cd 'PowerType/generate dictionaries/git'
+        ./asciidoc.to.dictionary.ps1
+
     - uses: actions/upload-artifact@v2
       with:
         name: git dictionary base
