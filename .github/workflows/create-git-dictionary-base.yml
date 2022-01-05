@@ -1,0 +1,46 @@
+name: create git dictionary base
+
+on:
+  workflow_dispatch:
+    inputs:
+      gitTag:
+        description: 'git cli repository tag'     
+        required: true
+        default: 'v2.34.1'     
+
+jobs:
+  create-base:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout local
+      uses: actions/checkout@v2
+      with:
+        path: 'PowerType'
+      
+    - name: Checkout github
+      uses: actions/checkout@v2
+      with:
+        repository: 'git/git'
+        ref: 'refs/tags/${{ github.event.inputs.gitTag }}'
+        path: 'git'
+
+    - name: Install git dependencies
+      run: git/ci/install-dependencies.sh
+      
+    - name: Create documentation
+      run: |
+        cd git/Documentation
+        make
+      
+    - name: Transform asciidoc to powershell
+      shell: pwsh
+        run: |
+          copy git/Documentation/*.xml 'PowerType/generate dictionaries/git'
+          cd 'PowerType/generate dictionaries/git'
+          ./asciidoc.to.dictionary.ps1
+    - uses: actions/upload-artifact@v2
+      with:
+        name: git dictionary base
+        path: 'PowerType/generate dictionaries/git/output.ps1'
