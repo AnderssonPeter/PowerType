@@ -33,14 +33,15 @@ jobs:
       run: |
         cd git/Documentation
         make
+    
+    - name: move xml documentation
+      run: |
+        mv git/Documentation/*.xml PowerType/GenerateDictionaries/git/
       
     - name: Transform asciidoc to powershell
       shell: pwsh
       run: |
-        ls git/Documentation/*.xml
-        Copy-Item 'git/Documentation/' -Destination 'PowerType/generate dictionaries/git' -Include '*.xml'
-        ls 'PowerType/generate dictionaries/git/*.xml'
-        cd 'PowerType/generate dictionaries/git'
+        cd 'PowerType/GenerateDictionaries/git'
         ./asciidoc.to.dictionary.ps1
 
     - name: Upload artifact
