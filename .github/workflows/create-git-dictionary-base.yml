@@ -39,7 +39,7 @@ jobs:
       run: |
         ls git/Documentation/*.xml
         Copy-Item 'git/Documentation/' -Destination 'PowerType/generate dictionaries/git' -Include '*.xml'
-        ls PowerType/generate dictionaries/git/*.xml
+        ls 'PowerType/generate dictionaries/git/*.xml'
         cd 'PowerType/generate dictionaries/git'
         ./asciidoc.to.dictionary.ps1
 
