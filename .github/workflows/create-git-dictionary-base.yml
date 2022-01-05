@@ -31,17 +31,22 @@ jobs:
 
     - name: Create documentation
       run: |
+        echo $PWD
         cd git/Documentation
         make
+        echo $PWD
     
-    - name: move xml documentation
+    - name: Move xml documentation
       run: |
+        echo $PWD
         mv git/Documentation/*.xml PowerType/GenerateDictionaries/git/
       
     - name: Transform asciidoc to powershell
       shell: pwsh
       run: |
+        Write-Host $pwd
         cd 'PowerType/GenerateDictionaries/git'
+        Write-Host $pwd
         ./asciidoc.to.dictionary.ps1
 
     - name: Upload artifact
