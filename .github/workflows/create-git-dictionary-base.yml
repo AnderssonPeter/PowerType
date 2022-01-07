@@ -36,7 +36,7 @@ jobs:
     
     - name: Move xml documentation
       run: |
-        mv -v git/Documentation/*.xml PowerType/GenerateDictionaries/git/
+        mv -v git/Documentation/git-*.xml PowerType/GenerateDictionaries/git/
       
     - name: Transform asciidoc to powershell
       shell: pwsh
