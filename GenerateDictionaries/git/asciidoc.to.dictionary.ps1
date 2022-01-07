@@ -1,5 +1,11 @@
 Write-Host "Enumerating files"
 $files = Get-ChildItem -Filter '*.xml'
+
+$highPriorityCommands = @('add', 'commit', 'checkout', 'stash', 'merge', 'clone', 'rebase', 'status')
+$lowPrioritycommands = @('am', 'instaweb')
+
+# todo: sort using lists above
+
 $transformationFile = Join-Path $pwd.Path "asciidoc.to.dictionary.xlts"
 $xslt = New-Object System.Xml.Xsl.XslCompiledTransform
 
