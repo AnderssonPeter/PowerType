@@ -6,21 +6,28 @@ $lowPriorityCommands = @('am', 'instaweb', 'bugreport', 'daemon', 'update-server
 
 for ($i = $highPriorityCommands.length-1; $i -ge 0; $i--) {
 	$command = 'git-' + $highPriorityCommands[$i] + '.xml'
-	if ($files.Contains($command))
+	$match = $files | Where { $_.Name -eq $command } | Select -First 1
+	if ($match -eq $null)
 	{
-		$files.Remove($command)
-		$files.Insert(0, $command)
+		Write-Error "The file '$command' did not exist"
+		exit 1
 	}
+	$files.Remove($match)
+	$files.Insert(0, $match)
 }
 
 foreach ($lowPriorityCommand in $lowPriorityCommand)
 {
 	$command = 'git-' + $lowPriorityCommand + '.xml'
-	if ($files.Contains($command))
+	$match = $files | Where { $_.Name -eq $command } | Select -First 1
+	if ($match -eq $null)
 	{
-		$files.Remove($command)
-		$files.Add($command)
-	}
+		Write-Error "The file '$command' did not exist"
+		exit 1
+	}	
+	$files.Remove($match)
+	$files.Add($match)
+	
 }
 
 $transformationFile = Join-Path $pwd.Path "asciidoc.to.dictionary.xlts"
