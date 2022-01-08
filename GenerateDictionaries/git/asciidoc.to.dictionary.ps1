@@ -1,10 +1,31 @@
 Write-Host "Enumerating files"
-$files = Get-ChildItem -Filter '*.xml'
+[System.Collections.ArrayList] $files = Get-ChildItem -Filter '*.xml'
 
-$highPriorityCommands = @('add', 'commit', 'checkout', 'stash', 'merge', 'clone', 'rebase', 'status')
-$lowPrioritycommands = @('am', 'instaweb')
+$highPriorityCommands = @('add', 'commit', 'checkout', 'stash', 'merge', 'clone', 'rebase', 'status', 'push', 'fetch', 'log', 'diff', 'branch', 'blame', 'cherry-pick', 'revert', 'tag')
+$lowPriorityCommands = @('am', 'instaweb', 'bugreport', 'daemon', 'update-server-info', 'format-patch', 'send-email', 'request-pull', 'svn')
 
-# todo: sort using lists above
+for ($i = $highPriorityCommands.length-1; $i -ge 0; $i--) {
+	$command = 'git-' + $highPriorityCommands[$i] + '.xml'
+	if (-not $files.Contains($command))
+	{
+		Write-Error "The file list did not contain '$command'"
+		exit 1
+	}
+	$files.Remove($command)
+	$files.Insert(0, $command)
+}
+
+foreach ($lowPriorityCommand in $lowPriorityCommand)
+{
+	$command = 'git-' + $lowPriorityCommand + '.xml'
+	if (-not $files.Contains($command))
+	{
+		Write-Error "The file list did not contain '$command'"
+		exit 1
+	}
+	$files.Remove($command)
+	$files.Add($command)
+}
 
 $transformationFile = Join-Path $pwd.Path "asciidoc.to.dictionary.xlts"
 $xslt = New-Object System.Xml.Xsl.XslCompiledTransform

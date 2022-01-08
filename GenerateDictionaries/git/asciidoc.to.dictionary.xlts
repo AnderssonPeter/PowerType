@@ -21,7 +21,7 @@
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="$text" />
+                <xsl:value-of disable-output-escaping="yes" select="$text" />
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -39,13 +39,13 @@
     <xsl:template match="/">
         <xsl:text>    [CommandParameter]@{
         Keys = @("</xsl:text>
-        <xsl:value-of select="substring-after(normalize-space(./refentry/refmeta/refentrytitle), '-')"/>
+        <xsl:value-of disable-output-escaping="yes" select="substring-after(normalize-space(./refentry/refmeta/refentrytitle), '-')"/>
         <xsl:text>");
         Name = "</xsl:text>
-        <xsl:value-of select="substring-after(normalize-space(./refentry/refmeta/refentrytitle), '-')"/>
+        <xsl:value-of disable-output-escaping="yes" select="substring-after(normalize-space(./refentry/refmeta/refentrytitle), '-')"/>
         <xsl:text>";
         Description = "</xsl:text>
-        <xsl:value-of select="normalize-space(./refentry/refnamediv/refpurpose)"/>
+        <xsl:value-of disable-output-escaping="yes" select="normalize-space(./refentry/refnamediv/refpurpose)"/>
         <xsl:text>";
         Parameters = @{
 </xsl:text>
@@ -67,10 +67,10 @@
                 <xsl:text>"</xsl:text>
                 <xsl:choose>
                     <xsl:when test="contains(., '=')">
-                        <xsl:value-of select="substring-before(normalize-space(.), '=')"/>
+                        <xsl:value-of disable-output-escaping="yes" select="substring-before(normalize-space(.), '=')"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="normalize-space(.)"/>
+                        <xsl:value-of disable-output-escaping="yes" select="normalize-space(.)"/>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:text>"</xsl:text>
@@ -82,10 +82,10 @@
                 Name = "</xsl:text>
             <xsl:choose>
                 <xsl:when test="contains(./term[last()], '=')">
-                    <xsl:value-of select="substring-before(substring-after(normalize-space(./term[last()]), '--'), '=')"/>
+                    <xsl:value-of disable-output-escaping="yes" select="substring-before(substring-after(normalize-space(./term[last()]), '--'), '=')"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="substring-after(normalize-space(./term[last()]), '--')"/>
+                    <xsl:value-of disable-output-escaping="yes" select="substring-after(normalize-space(./term[last()]), '--')"/>
                 </xsl:otherwise>
             </xsl:choose>
             <xsl:text>";
