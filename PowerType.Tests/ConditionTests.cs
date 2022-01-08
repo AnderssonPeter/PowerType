@@ -103,7 +103,7 @@ public class ConditionTests
     [Theory]
     public void LargerThanCondition(object firstValue, object secondValue, bool expected)
     {
-        var condition = new LargerThanCondition(firstValue, secondValue);
+        var condition = new LargerCondition(firstValue, secondValue);
         condition.Evaluate(parameters).Should().Be(expected);
     }
 
@@ -113,7 +113,7 @@ public class ConditionTests
     [Theory]
     public void LargerOrEqualThanCondition(object firstValue, object secondValue, bool expected)
     {
-        var condition = new LargerOrEqualThanCondition(firstValue, secondValue);
+        var condition = new LargerOrEqualCondition(firstValue, secondValue);
         condition.Evaluate(parameters).Should().Be(expected);
     }
 
@@ -123,7 +123,7 @@ public class ConditionTests
     [Theory]
     public void LesserThanCondition(object firstValue, object secondValue, bool expected)
     {
-        var condition = new LesserThanCondition(firstValue, secondValue);
+        var condition = new LesserCondition(firstValue, secondValue);
         condition.Evaluate(parameters).Should().Be(expected);
     }
 
@@ -133,7 +133,7 @@ public class ConditionTests
     [Theory]
     public void LesserOrEqualThanCondition(object firstValue, object secondValue, bool expected)
     {
-        var condition = new LesserOrEqualThanCondition(firstValue, secondValue);
+        var condition = new LesserOrEqualCondition(firstValue, secondValue);
         condition.Evaluate(parameters).Should().Be(expected);
     }
 }

@@ -47,7 +47,7 @@
         Description = "</xsl:text>
         <xsl:value-of disable-output-escaping="yes" select="normalize-space(./refentry/refnamediv/refpurpose)"/>
         <xsl:text>";
-        Parameters = @{
+        Parameters = @(
 </xsl:text>
         <xsl:for-each select="refentry/*[@id='_options']/variablelist/varlistentry">
             <xsl:text>            [</xsl:text>
@@ -100,7 +100,7 @@
             <xsl:text>            },
 </xsl:text>
         </xsl:for-each>
-        <xsl:text>        },
+        <xsl:text>        ),
 </xsl:text>
         <xsl:text>    },</xsl:text>
     </xsl:template>
