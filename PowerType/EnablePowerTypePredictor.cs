@@ -18,15 +18,13 @@ namespace PowerType;
 [Cmdlet("Enable", "PowerType"), OutputType(typeof(bool))]
 public class EnablePowerTypePredictor : PowerTypeCmdlet
 {
-    private static readonly string enableStatement = "Set-PSReadLineOption -PredictionSource Plugin";
-
+    private const string enableStatement = "Set-PSReadLineOption -PredictionSource Plugin";
 
     /// <summary>
     /// <para type="description">Indicates whether the user would like to receive output. </para>
     /// </summary>
     [Parameter(Mandatory = false, HelpMessage = "Indicates whether the user would like to receive output.")]
     public SwitchParameter PassThru { get; set; }
-
 
     /// <summary>
     /// <para type="description">Lazy load prediction dictionaries. </para>
@@ -46,19 +44,19 @@ public class EnablePowerTypePredictor : PowerTypeCmdlet
     [Parameter(Mandatory = false, HelpMessage = "List of dictionaries to load, if not provided all are loaded.")]
     public string[]? DictionariesToIgnore { get; set; }
 
-
     /// <inheritdoc/>
     protected override void ProcessRecord()
     {
         var scriptToRun = new StringBuilder();
-        var _ = scriptToRun.Append(EnablePowerTypePredictor.enableStatement);
+        scriptToRun.Append(enableStatement);
 
         InvokeCommand.InvokeScript(scriptToRun.ToString());
 
         var currentWorkingDirectoryProvider = new CurrentWorkingDirectoryProvider(SessionState);
         var predictor = new PowerTypePredictor(currentWorkingDirectoryProvider, GetDictionaries());
         SubsystemManager.RegisterSubsystem<ICommandPredictor, PowerTypePredictor>(predictor);
-        
+        PowerTypePredictor.Instance = predictor;
+
         if (PassThru.IsPresent)
         {
             WriteObject(true);
@@ -70,8 +68,8 @@ public class EnablePowerTypePredictor : PowerTypeCmdlet
         get
         {
             string codeBase = Assembly.GetExecutingAssembly().Location;
-            UriBuilder uri = new UriBuilder(codeBase);
-            return Uri.UnescapeDataString(uri.Path);;
+            UriBuilder uri = new(codeBase);
+            return Uri.UnescapeDataString(uri.Path);
         }
     }
 

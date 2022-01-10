@@ -125,8 +125,6 @@ internal class ExecutionEngineThread : IDisposable
             throw new InvalidOperationException("Didn't receive a PowerTypeDictionary or ISuggestor");
         }
 
-
-
         lock (dictionariesLocker)
         {
             dictionaries.Add(new DictionaryInformation(command.File, runspace, suggestor));
@@ -183,7 +181,6 @@ internal class ExecutionEngineThread : IDisposable
 
         if (disposing)
         {
-
             cancellationTokenSource.Cancel();
             //While we wait for the background thread to exit lets do some cleanup
 

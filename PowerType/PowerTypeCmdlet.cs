@@ -9,7 +9,6 @@ namespace PowerType;
 
 public abstract class PowerTypeCmdlet : PSCmdlet
 {
-
 #if DEBUG
     /// <inheritdoc/>
     protected override void BeginProcessing()

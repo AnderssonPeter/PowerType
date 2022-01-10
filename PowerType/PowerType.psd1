@@ -34,6 +34,8 @@ Description = 'Module providing recommendations for common tools - This module r
 Suggestions must be activated:
 - Enable-PowerType:        Activate the suggestions
 - Disable-PowerType:       Disable the suggestions
+- Get-PowerTypeStatus      Gets the status of PowerType, this is useful for troubleshooting issues
+- Get-PowerTypeHistory     Gets the prediction history of PowerType, this is useful for troubleshooting issues
 
 For more information on PowerType, please visit the following: https://github.com/AnderssonPeter/PowerType'
 
@@ -45,7 +47,7 @@ PowerShellVersion = '7.2'
 
 NestedModules = @("PowerType.dll")
 
-CmdletsToExport = @("Enable-PowerType", "Disable-PowerType")
+CmdletsToExport = @("Enable-PowerType", "Disable-PowerType", "Get-PowerTypeStatus", "Get-PowerTypeHistory")
 
 # Format files (.ps1xml) to be loaded when importing this module
 

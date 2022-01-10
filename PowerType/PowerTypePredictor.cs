@@ -1,5 +1,6 @@
 ﻿using PowerType.BackgroundProcessing;
 using PowerType.Parsing;
+using System.Diagnostics;
 using System.Management.Automation.Language;
 using System.Management.Automation.Subsystem.Prediction;
 
@@ -7,7 +8,11 @@ namespace PowerType;
 
 public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 {
-    private readonly ExecutionEngine executionEngine;
+    //Ugly hack to allow cmdlets access the instance after it has been created
+    public static volatile PowerTypePredictor? Instance;
+
+    internal ExecutionEngine ExecutionEngine { get; }
+    internal PowerTypePredictionSummaryCollector PredictionSummaryCollector { get; }
     public string Description => "Provides suggestions for common command tools";
 
     public Guid Id => Identifier;
@@ -19,11 +24,12 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     public PowerTypePredictor(ICurrentWorkingDirectoryProvider currentWorkingDirectoryProvider, IEnumerable<string> dictionaryFiles)
     {
-        executionEngine = new ExecutionEngine();
-        executionEngine.Start();
-        foreach(var dictionaryFile in dictionaryFiles)
+        ExecutionEngine = new ExecutionEngine();
+        ExecutionEngine.Start();
+        PredictionSummaryCollector = new PowerTypePredictionSummaryCollector();
+        foreach (var dictionaryFile in dictionaryFiles)
         {
-            executionEngine.InitialDictionary(dictionaryFile);
+            ExecutionEngine.InitialDictionary(dictionaryFile);
         }
 
         this.currentWorkingDirectoryProvider = currentWorkingDirectoryProvider;
@@ -42,6 +48,10 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     public SuggestionPackage GetSuggestion(PredictionClient client, PredictionContext context, CancellationToken cancellationToken)
     {
+        var when = DateTime.Now;
+        var watch = Stopwatch.StartNew();
+        Exception? exception = null;
+        SuggestionPackage suggestionPackage = default;
         try
         {
             var relatedAsts = context.RelatedAsts;
@@ -56,28 +66,29 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
                 }
             }
 
-            if (commandAst == null)
+            if (commandAst != null)
             {
-                return new SuggestionPackage();
+                var commandName = commandAst.GetCommandName();
+                var arguments = commandAst.CommandElements.Select(x => new PowerShellString(x));
+                var prefix = ConstructCommandPrefix(commandAst);
+                var dictionaryParsingContext = new DictionaryParsingContext(prefix, arguments);
+                var result = GetSuggestions(dictionaryParsingContext).ToList();
+                if (result.Count > 0)
+                {
+                    suggestionPackage = new SuggestionPackage(result);
+                }
             }
-
-            var commandName = commandAst.GetCommandName();
-            var arguments = commandAst.CommandElements.Select(x => new PowerShellString(x));
-            var prefix = ConstructCommandPrefix(commandAst);
-            var dictionaryParsingContext = new DictionaryParsingContext(prefix, arguments);
-            var result = GetSuggestions(dictionaryParsingContext).ToList();
-            if (result.Count == 0)
-            {
-                return default;
-            }
-            return new SuggestionPackage(result);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("input: {0}", context.InputAst);
-            Console.WriteLine("exception: {0}", ex);
-            return default;
+            exception = ex;
         }
+        watch.Stop();
+        if (exception != null || suggestionPackage.SuggestionEntries != null)
+        {
+            this.PredictionSummaryCollector.Add(when, context, exception, suggestionPackage, watch.Elapsed);
+        }
+        return suggestionPackage;
     }
 
     private IEnumerable<PredictiveSuggestion> GetSuggestions(DictionaryParsingContext dictionaryParsingContext)
@@ -97,7 +108,7 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         if (TryGetSuggestor(commandName, out var key, out var suggestor))
         {
             dictionaryParsingContext.Command = new Parsing.Command(key, suggestor.Dictionary);
-            executionEngine.Cache(suggestor.Dictionary, currentWorkingDirectoryProvider.CurrentWorkingDirectory);
+            ExecutionEngine.Cache(suggestor.Dictionary, currentWorkingDirectoryProvider.CurrentWorkingDirectory);
             foreach (var result in suggestor.GetPredictions(dictionaryParsingContext))
             {
                 yield return result;
@@ -107,7 +118,7 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     private bool TryGetSuggestor(PowerShellString command, out string key, out DictionarySuggestor suggestor)
     {
-        var suggestors = executionEngine.GetSuggestors();
+        var suggestors = ExecutionEngine.GetSuggestors();
         foreach (var innerSuggestor in suggestors)
         {
             foreach (var suggestorKey in innerSuggestor.Keys)
@@ -127,7 +138,7 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     private IEnumerable<PredictiveSuggestion> GetDictrionaryPredictons(PowerShellString commandName)
     {
-        var suggestors = executionEngine.GetSuggestors();
+        var suggestors = ExecutionEngine.GetSuggestors();
         foreach (var suggestor in suggestors)
         {
             var key = suggestor.Keys.FirstOrDefault(x => x.Contains(commandName.RawValue, StringComparison.OrdinalIgnoreCase));
@@ -160,7 +171,7 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     public void Dispose()
     {
-        executionEngine.Stop();
+        ExecutionEngine.Stop();
         currentWorkingDirectoryProvider.Dispose();
     }
 }
