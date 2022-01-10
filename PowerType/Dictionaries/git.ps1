@@ -54,6 +54,18 @@ $allBranches = [DynamicSource]@{
     }
 }
 
+$stashes = [DynamicSource]@{
+    Name = "Stashes";
+    Description = "Stashes";
+    CommandExpression = {
+        git --no-optional-locks stash list -a --no-color | Select -Unique
+    };
+    Cache = [Cache]@{
+        ByCurrentWorkingDirectory = $true;
+        ByTime = New-TimeSpan -Seconds 10
+    }
+}
+
 # Should we remove the Parameter part? CommandParameter -> Command?
 [PowerTypeDictionary]@{
     Keys = @("git");
@@ -571,6 +583,147 @@ $allBranches = [DynamicSource]@{
                     Name = "pathspec";
                     Description = "Limits the paths affected by the operation.";
                     #Source = Not 100% sure file glob?
+                }
+            )
+        },
+        [CommandParameter]@{
+            Keys = @("stash");
+            Name = "stash";
+            Description = "Stash the changes in a dirty working directory away";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("list");
+                    Name = "list";
+                },
+                [CommandParameter]@{
+                    Keys = @("show");
+                    Name = "show";
+                    Parameters = @(
+                        [FlagParameter]@{
+                            Keys = @("--include-untracked", "--no-include-untracked", "-u");
+                            Name = "no-include-untracked";
+                            Description = "All untracked files are also stashed and then cleaned up with git clean.";
+                        },
+                        [ValueParameter]@{
+                            Name = "stash";
+                            Source = $stashes
+                        }
+                    )
+                },
+                [CommandParameter]@{
+                    Keys = @("drop");
+                    Name = "drop";
+                    Parameters = @(
+                        [FlagParameter]@{
+                            Keys = @("--quiet", "-q");
+                            Name = "quiet";
+                        },					
+                        [ValueParameter]@{
+                            Name = "stash";
+                            Source = $stashes
+                        }
+                    )
+                },
+                [CommandParameter]@{
+                    Keys = @("pop", "apply");
+                    Name = "pop";
+                    Parameters = @(
+                        [FlagParameter]@{
+                            Keys = @("--index");
+                            Name = "index";
+                        },
+                        [FlagParameter]@{
+                            Keys = @("--quiet", "-q");
+                            Name = "quiet";
+                        },
+                        [ValueParameter]@{
+                            Name = "stash";
+                            Source = $stashes
+                        }
+                    )
+                },
+                [CommandParameter]@{
+                    Keys = @("branch");
+                    Name = "branch";
+                    Parameters = @(
+                        [ValueParameter]@{
+                            Name = "branch";
+                            Source = $allBranches
+                        },
+                        [ValueParameter]@{
+                            Name = "stash";
+                            Source = $stashes
+                        }
+                    )
+                },
+                [CommandParameter]@{
+                    Keys = @("push");
+                    Name = "push";
+                    Parameters = @(
+                        #lägg samma på root nivå
+                        [FlagParameter]@{
+                            Keys = @("--patch", "-p");
+                            Name = "patch";
+                            Description = "This option is only valid for push and save commands.";
+                        },
+                        [FlagParameter]@{
+                            Keys = @("--keep-index", "--no-keep-index", "-k");
+                            Name = "no-keep-index";
+                            Description = "This option is only valid for push and save commands.";
+                        },
+                        [FlagParameter]@{
+                            Keys = @("--include-untracked", "--no-include-untracked", "-u");
+                            Name = "no-include-untracked";
+                            Description = "All untracked files are also stashed and then cleaned up with git clean.";
+                        },
+                        [FlagParameter]@{
+                            Keys = @("--all", "-a");
+                            Name = "all";
+                        },
+                        [FlagParameter]@{
+                            Keys = @("--quiet", "-q");
+                            Name = "quiet";
+                        },
+                        [ValueParameter]@{
+                            Keys = @("--message", "-m");
+                            Name = "message";
+                        },
+                        [ValueParameter]@{
+                            Keys = @("--pathspec-from-file");
+                            Name = "pathspec-from-file";
+                            # Source = #File glob?;
+                        }
+                    )
+                },
+                [FlagParameter]@{
+                    Keys = @("clear");
+                    Name = "clear";
+                },
+                [CommandParameter]@{
+                    Keys = @("create");
+                    Name = "create";
+                    Parameters = @(
+                        [ValueParameter]@{
+                            Name = "message";
+                        }
+                    )
+                },
+                [CommandParameter]@{
+                    Keys = @("store");
+                    Name = "store";
+                    Parameters = @(
+                        [ValueParameter]@{
+                            Keys = @("--message", "-m");
+                            Name = "message";
+                        },
+                        [FlagParameter]@{
+                            Keys = @("--quiet", "-q");
+                            Name = "quiet";
+                        },
+                        [ValueParameter]@{
+                            Name = "commit";
+                        }
+                    )
                 }
             )
         }
