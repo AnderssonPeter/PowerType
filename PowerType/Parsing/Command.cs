@@ -1,6 +1,8 @@
-﻿namespace PowerType.Parsing;
+﻿using PowerType.Model;
 
-public record Command(string Key, ISuggestor Suggestor)
+namespace PowerType.Parsing;
+
+public record Command(string Key, PowerTypeDictionary Dictionary)
 {
     public int Size { get; set; } = 1;
 

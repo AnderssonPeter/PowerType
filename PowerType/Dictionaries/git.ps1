@@ -55,7 +55,7 @@ $allBranches = [DynamicSource]@{
 }
 
 # Should we remove the Parameter part? CommandParameter -> Command?
-$dictionary = [PowerTypeDictionary]@{
+[PowerTypeDictionary]@{
     Keys = @("git");
     Name = "git";
     Description = "fast, scalable, distributed revision control system";
@@ -576,5 +576,3 @@ $dictionary = [PowerTypeDictionary]@{
         }
     )
 }
-
-Add-PowerTypeDictionary -Dictionary $dictionary

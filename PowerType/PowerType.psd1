@@ -34,7 +34,6 @@ Description = 'Module providing recommendations for common tools - This module r
 Suggestions must be activated:
 - Enable-PowerType:        Activate the suggestions
 - Disable-PowerType:       Disable the suggestions
-- Add-PowerTypeDictionary: Adds a power type dictionary, this is used internally and should not be called manually
 
 For more information on PowerType, please visit the following: https://github.com/AnderssonPeter/PowerType'
 
@@ -46,7 +45,7 @@ PowerShellVersion = '7.2'
 
 NestedModules = @("PowerType.dll")
 
-CmdletsToExport = @("Enable-PowerType", "Disable-PowerType", "Add-PowerTypeDictionary")
+CmdletsToExport = @("Enable-PowerType", "Disable-PowerType")
 
 # Format files (.ps1xml) to be loaded when importing this module
 

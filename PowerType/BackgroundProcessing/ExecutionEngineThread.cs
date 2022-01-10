@@ -107,9 +107,25 @@ internal class ExecutionEngineThread : IDisposable
             var errors = string.Join(Environment.NewLine, powershell.Streams.Error.Select(x => x.ToString()));
             throw new Exception("Failed to initialize dictionary, errors: " + errors);
         }
-        var suggestor = result.Select(x => x.BaseObject)
-            .Cast<DictionarySuggestor>()
-            .Single();
+
+        DictionarySuggestor suggestor;
+        var resultObject = result.Single().BaseObject;
+        if (resultObject is PowerTypeDictionary dictionary)
+        {
+            dictionary.Initialize(SystemTime.Instance);
+            dictionary.Validate();
+            suggestor = new DictionarySuggestor(dictionary);
+        }
+        else if (resultObject is DictionarySuggestor suggestorTmp)
+        {
+            suggestor = suggestorTmp;
+        }
+        else
+        {
+            throw new InvalidOperationException("Didn't receive a PowerTypeDictionary or ISuggestor");
+        }
+
+
 
         lock (dictionariesLocker)
         {
@@ -146,9 +162,10 @@ internal class ExecutionEngineThread : IDisposable
     {
         lock (dictionariesLocker)
         {
-            return this.dictionaries.Single(x => x.Suggestor.Dictionary == dictionary);
+            return this.dictionaries.Single(x => x.Suggestor is DictionarySuggestor suggestor && suggestor.Dictionary == dictionary);
         }
     }
+
     public void Dispose()
     {
         // Dispose of unmanaged resources.

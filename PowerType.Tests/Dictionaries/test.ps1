@@ -39,7 +39,7 @@ $allRepositories = [DynamicSource]@{
 
 
 # Should we remove the Parameter part? CommandParameter -> Command?
-$dictionary = [PowerTypeDictionary]@{
+[PowerTypeDictionary]@{
 	Keys = @("test");
 	Name = "test";
 	Description = "fast, scalable, distributed revision control system";
@@ -105,5 +105,3 @@ $dictionary = [PowerTypeDictionary]@{
 		}	
 	)
 }
-
-Add-PowerTypeDictionary -Dictionary $dictionary

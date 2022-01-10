@@ -5,7 +5,7 @@ using System.Management.Automation.Subsystem.Prediction;
 
 namespace PowerType;
 
-internal class DictionarySuggestor : ISuggestor
+internal class DictionarySuggestor
 {
     private readonly List<DynamicSource> dynamicSources;
     public PowerTypeDictionary Dictionary { get; }

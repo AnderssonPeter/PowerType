@@ -96,7 +96,7 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         }
         if (TryGetSuggestor(commandName, out var key, out var suggestor))
         {
-            dictionaryParsingContext.Command = new Parsing.Command(key, suggestor);
+            dictionaryParsingContext.Command = new Parsing.Command(key, suggestor.Dictionary);
             executionEngine.Cache(suggestor.Dictionary, currentWorkingDirectoryProvider.CurrentWorkingDirectory);
             foreach (var result in suggestor.GetPredictions(dictionaryParsingContext))
             {
