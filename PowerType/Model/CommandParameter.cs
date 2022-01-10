@@ -18,7 +18,7 @@ namespace PowerType.Model
         internal override void Validate()
         {
             base.Validate();
-            if (Parameters == null || Parameters.Count == 0)
+            if (Parameters == null)
             {
                 throw new ArgumentNullException(nameof(Parameters));
             }

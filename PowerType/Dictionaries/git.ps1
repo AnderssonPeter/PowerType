@@ -97,7 +97,7 @@ $stashes = [DynamicSource]@{
                     Keys = @("--sparse");
                     Name = "sparse";
                     Description = "Allow updating index entries outside of the sparse-checkout cone. Normally, git add refuses to update index entries whose paths do not fit within the sparse-checkout cone, since those files might be removed from the working tree without warning. See git-sparse-checkout1 for more details.";
-                    Condition = [LargerOrEqualCondition]::new($version, [Version]::'2.34.0')
+                    Condition = [LargerOrEqualCondition]::new($version, [Version]'2.34.0')
                 },
                 [FlagParameter]@{
                     Keys = @("--interactive", "-i");
@@ -307,7 +307,7 @@ $stashes = [DynamicSource]@{
                     Keys = @("--trailer");
                     Name = "trailer";
                     Description = "Specify a (<token>, <value>) pair that should be applied as a trailer. (e.g. git commit --trailer `"Signed-off-by:C O Mitter \ &lt;committer@example.com&gt;`" --trailer `"Helped-by:C O Mitter \ &lt;committer@example.com&gt;`" will add the `"Signed-off-by`" trailer and the `"Helped-by`" trailer to the commit message.) The trailer.* configuration variables ( git-interpret-trailers1 ) can be used to define if a duplicated trailer is omitted, where in the run of trailers each trailer would appear, and other details.";
-                    Condition = [LargerOrEqualCondition]::new($version, [Version]::'2.32.0')
+                    Condition = [LargerOrEqualCondition]::new($version, [Version]'2.32.0')
                 },
                 [FlagParameter]@{
                     Keys = @("--verify", "--no-verify", "-n");
@@ -591,9 +591,10 @@ $stashes = [DynamicSource]@{
             Name = "stash";
             Description = "Stash the changes in a dirty working directory away";
             Parameters = @(
-                [FlagParameter]@{
+                [CommandParameter]@{
                     Keys = @("list");
                     Name = "list";
+                    Parameters = @()
                 },
                 [CommandParameter]@{
                     Keys = @("show");
@@ -695,9 +696,10 @@ $stashes = [DynamicSource]@{
                         }
                     )
                 },
-                [FlagParameter]@{
+                [CommandParameter]@{
                     Keys = @("clear");
                     Name = "clear";
+                    Parameters = @()
                 },
                 [CommandParameter]@{
                     Keys = @("create");
