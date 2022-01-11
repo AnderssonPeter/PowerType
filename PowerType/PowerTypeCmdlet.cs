@@ -27,7 +27,7 @@ public abstract class PowerTypeCmdlet : PSCmdlet
             parameters.Remove(parameters.Length - 1, 1);
         }
 
-        parameters.Append("}");
+        parameters.Append('}');
         WriteDebug($"command name: {command.Name}, parameters: {parameters}");
         base.BeginProcessing();
     }

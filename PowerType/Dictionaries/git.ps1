@@ -123,11 +123,13 @@ $stashes = [DynamicSource]@{
                     Keys = @("--all", "-A", "--no-ignore-removal");
                     Name = "no-ignore-removal";
                     Description = "Update the index not only where the working tree has a file matching <pathspec> but also where the index already has an entry. This adds, modifies, and removes index entries to match the working tree.";
+                    Condition = [ExclusiveParameterCondition]::new("ignore-removal")
                 },
                 [FlagParameter]@{
                     Keys = @("--ignore-removal", "--no-all");
                     Name = "ignore-removal";
                     Description = "Update the index by adding new files that are unknown to the index and files modified in the working tree, but ignore files that have been removed from the working tree. This option is a no-op when no <pathspec> is used.";
+                    Condition = [ExclusiveParameterCondition]::new("no-ignore-removal")
                 },
                 [FlagParameter]@{
                     Keys = @("--intent-to-add", "-N");
@@ -306,13 +308,20 @@ $stashes = [DynamicSource]@{
                 [ValueParameter]@{
                     Keys = @("--trailer");
                     Name = "trailer";
-                    Description = "Specify a (<token>, <value>) pair that should be applied as a trailer. (e.g. git commit --trailer `"Signed-off-by:C O Mitter \ &lt;committer@example.com&gt;`" --trailer `"Helped-by:C O Mitter \ &lt;committer@example.com&gt;`" will add the `"Signed-off-by`" trailer and the `"Helped-by`" trailer to the commit message.) The trailer.* configuration variables ( git-interpret-trailers1 ) can be used to define if a duplicated trailer is omitted, where in the run of trailers each trailer would appear, and other details.";
+                    Description = "Specify a (<token>, <value>) pair that should be applied as a trailer. (e.g. git commit --trailer `"Signed-off-by:C O Mitter \ <committer@example.com>`" --trailer `"Helped-by:C O Mitter \ &lt;committer@example.com&gt;`" will add the `"Signed-off-by`" trailer and the `"Helped-by`" trailer to the commit message.) The trailer.* configuration variables ( git-interpret-trailers1 ) can be used to define if a duplicated trailer is omitted, where in the run of trailers each trailer would appear, and other details.";
                     Condition = [LargerOrEqualCondition]::new($version, [Version]'2.32.0')
                 },
                 [FlagParameter]@{
-                    Keys = @("--verify", "--no-verify", "-n");
+                    Keys = @("--verify");
                     Name = "verify";
-                    Description = "By default, the pre-commit and commit-msg hooks are run. When any of --no-verify or -n is given, these are bypassed. See also githooks5 .";
+                    Description = "By default, the pre-commit and commit-msg hooks are run. When any of --no-verify or -n is given, these are bypassed. See also githooks.";
+                    Condition = [ExclusiveParameterCondition]::new("no verify")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-verify", "-n");
+                    Name = "no verify";
+                    Description = "By default, the pre-commit and commit-msg hooks are run. When any of --no-verify or -n is given, these are bypassed. See also githooks.";
+                    Condition = [ExclusiveParameterCondition]::new("verify")
                 },
                 [FlagParameter]@{
                     Keys = @("--allow-empty");
@@ -334,11 +343,13 @@ $stashes = [DynamicSource]@{
                     Keys = @("--edit", "-e");
                     Name = "edit";
                     Description = "The message taken from file with -F, command line with -m, and from commit object with -C are usually used as the commit log message unmodified. This option lets you further edit the message taken from these sources.";
+                    Condition = [ExclusiveParameterCondition]::new("no-edit")
                 },
                 [FlagParameter]@{
                     Keys = @("--no-edit");
                     Name = "no-edit";
                     Description = "Use the selected commit message without launching an editor. For example, git commit --amend --no-edit amends a commit without changing its commit message.";
+                    Condition = [ExclusiveParameterCondition]::new("edit")
                 },
                 [FlagParameter]@{
                     Keys = @("--amend");
@@ -412,21 +423,25 @@ $stashes = [DynamicSource]@{
                     Keys = @("--status");
                     Name = "status";
                     Description = "Include the output of git-status1 in the commit message template when using an editor to prepare the commit message. Defaults to on, but can be used to override configuration variable commit.status.";
+                    Condition = [ExclusiveParameterCondition]::new("no-status")
                 },
                 [FlagParameter]@{
                     Keys = @("--no-status");
                     Name = "no-status";
                     Description = "Do not include the output of git-status1 in the commit message template when using an editor to prepare the default commit message.";
+                    Condition = [ExclusiveParameterCondition]::new("status")
                 },
                 [ValueParameter]@{
                     Keys = @("--gpg-sign", "-S");
                     Name = "gpg-sign";
                     Description = "GPG-sign commits. The keyid argument is optional and defaults to the committer identity; if specified, it must be stuck to the option without a space. --no-gpg-sign is useful to countermand both commit.gpgSign configuration variable, and earlier --gpg-sign.";
+                    Condition = [ExclusiveParameterCondition]::new("no-gpg-sign")
                 },
                 [FlagParameter]@{
                     Keys = @("--no-gpg-sign");
                     Name = "no-gpg-sign";
                     Description = "Don't gpg sign";
+                    Condition = [ExclusiveParameterCondition]::new("gpg-sign")
                 },
                 [FlagParameter]@{
                     Keys = @("--");
@@ -481,16 +496,25 @@ $stashes = [DynamicSource]@{
                     Keys = @("--track", "-t");
                     Name = "track";
                     Description = "When creating a new branch, set up `"upstream`" configuration. See `"--track`" in git-branch1 for details.";
+                    Condition = [ExclusiveParameterCondition]::new("no-track")
                 },
                 [FlagParameter]@{
                     Keys = @("--no-track");
                     Name = "no-track";
                     Description = "Do not set up `"upstream`" configuration, even if the branch.autoSetupMerge configuration variable is true.";
+                    Condition = [ExclusiveParameterCondition]::new("track")
                 },
                 [FlagParameter]@{
-                    Keys = @("--no-guess", "--guess");
+                    Keys = @("--guess");
                     Name = "guess";
                     Description = "If <branch> is not found but there does exist a tracking branch in exactly one remote (call it <remote>) with a matching name, treat as equivalent to";
+                    Condition = [ExclusiveParameterCondition]::new("no-guess")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-guess");
+                    Name = "no-guess";
+                    Description = "If <branch> is not found but there does exist a tracking branch in exactly one remote (call it <remote>) with a matching name, treat as equivalent to";
+                    Condition = [ExclusiveParameterCondition]::new("guess")
                 },
                 [FlagParameter]@{
                     Keys = @("-l");
@@ -554,9 +578,16 @@ $stashes = [DynamicSource]@{
                     Description = "Using --recurse-submodules will update the content of all active submodules according to the commit recorded in the superproject. If local modifications in a submodule would be overwritten the checkout will fail unless -f is used. If nothing (or --no-recurse-submodules) is used, submodules working trees will not be updated. Just like git-submodule1 , this will detach HEAD of the submodule.";
                 },
                 [FlagParameter]@{
-                    Keys = @("--overlay", "--no-overlay");
+                    Keys = @("--overlay");
                     Name = "overlay";
                     Description = "In the default overlay mode, git checkout never removes files from the index or the working tree. When specifying --no-overlay, files that appear in the index and working tree, but not in <tree-ish> are removed, to make them match <tree-ish> exactly.";
+                    Condition = [ExclusiveParameterCondition]::new("no-overlay")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-overlay");
+                    Name = "no-overlay";
+                    Description = "In the default overlay mode, git checkout never removes files from the index or the working tree. When specifying --no-overlay, files that appear in the index and working tree, but not in <tree-ish> are removed, to make them match <tree-ish> exactly.";
+                    Condition = [ExclusiveParameterCondition]::new("overlay")
                 },
                 [ValueParameter]@{
                     Keys = @("--pathspec-from-file");
@@ -601,9 +632,16 @@ $stashes = [DynamicSource]@{
                     Name = "show";
                     Parameters = @(
                         [FlagParameter]@{
-                            Keys = @("--include-untracked", "--no-include-untracked", "-u");
-                            Name = "no-include-untracked";
+                            Keys = @("--include-untracked", "-u");
+                            Name = "include-untracked";
                             Description = "All untracked files are also stashed and then cleaned up with git clean.";
+                            Condition = [ExclusiveParameterCondition]::new("no-include-untracked")
+                        },
+                        [FlagParameter]@{
+                            Keys = @("--no-include-untracked");
+                            Name = "no-include-untracked";
+                            Description = "No untracked files are stashed and then cleaned up with git clean.";
+                            Condition = [ExclusiveParameterCondition]::new("include-untracked")
                         },
                         [ValueParameter]@{
                             Name = "stash";
@@ -665,17 +703,29 @@ $stashes = [DynamicSource]@{
                         [FlagParameter]@{
                             Keys = @("--patch", "-p");
                             Name = "patch";
-                            Description = "This option is only valid for push and save commands.";
                         },
                         [FlagParameter]@{
-                            Keys = @("--keep-index", "--no-keep-index", "-k");
+                            Keys = @("--keep-index", "-k");
+                            Name = "keep-index";
+                            Description = "All changes already added to the index are left intact.";
+                            Condition = [ExclusiveParameterCondition]::new("no-keep-index")
+                        },
+                        [FlagParameter]@{
+                            Keys = @("--no-keep-index");
                             Name = "no-keep-index";
-                            Description = "This option is only valid for push and save commands.";
+                            Condition = [ExclusiveParameterCondition]::new("keep-index")
                         },
                         [FlagParameter]@{
-                            Keys = @("--include-untracked", "--no-include-untracked", "-u");
-                            Name = "no-include-untracked";
+                            Keys = @("--include-untracked", "-u");
+                            Name = "include-untracked";
                             Description = "All untracked files are also stashed and then cleaned up with git clean.";
+                            Condition = [ExclusiveParameterCondition]::new("no-include-untracked")
+                        },
+                        [FlagParameter]@{
+                            Keys = @("--no-include-untracked");
+                            Name = "no-include-untracked";
+                            Description = "No untracked files are stashed and then cleaned up with git clean.";
+                            Condition = [ExclusiveParameterCondition]::new("include-untracked")
                         },
                         [FlagParameter]@{
                             Keys = @("--all", "-a");

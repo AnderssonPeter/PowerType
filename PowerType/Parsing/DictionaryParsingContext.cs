@@ -29,7 +29,6 @@ public class DictionaryParsingContext
     public PowerShellString CurrentArgument => Arguments[ParsedArguments];
     public PowerShellString NextArgument => Arguments[ParsedArguments + 1];
 
-
     public string Reconstruct(string? argument)
     {
         PowerShellString? powerShellString = argument == null ? null : PowerShellString.FromRaw(StringConstantType.BareWord, argument);

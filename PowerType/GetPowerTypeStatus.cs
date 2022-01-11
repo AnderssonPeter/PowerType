@@ -12,7 +12,6 @@ public record PowerTypeStatus(bool ExecutionEngineIsRunning, Exception? Executio
 [Cmdlet("Get", "PowerTypeStatus"), OutputType(typeof(bool))]
 public class GetPowerTypeStatus : PowerTypeCmdlet
 {
-
     /// <inheritdoc/>
     protected override void ProcessRecord()
     {

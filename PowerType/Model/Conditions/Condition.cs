@@ -37,6 +37,5 @@ public abstract class Condition
 
     public virtual void Validate()
     {
-
     }
 }

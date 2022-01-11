@@ -130,6 +130,9 @@ public class PowerShellString
         return FromRaw(StringConstantType.BareWord, rawValue);
     }
 
+    public static IEnumerable<PowerShellString> FromRawSmart(IEnumerable<string> rawValues) =>
+        rawValues.Select(rawValue => FromRawSmart(rawValue));
+
     public static PowerShellString FromEscaped(StringConstantType type, string escapedValue)
     {
         var rawValue = Unescape(type, escapedValue);

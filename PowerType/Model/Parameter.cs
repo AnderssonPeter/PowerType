@@ -7,7 +7,6 @@ using PowerType.Parsing;
 
 namespace PowerType.Model;
 
-
 [DebuggerDisplay("{Name}")]
 public abstract class Parameter
 {
@@ -32,18 +31,15 @@ public abstract class Parameter
         {
             throw new ArgumentNullException(nameof(Name));
         }
-        if (Condition != null)
-        {
-            Condition.Validate();
-        }
+        Condition?.Validate();
     }
 
     internal bool IsAvailable(DictionaryParsingContext dictionaryParsingContext) =>
-        Condition == null || Condition.Evaluate(new Dictionary<string, object>
+        Condition?.Evaluate(new Dictionary<string, object>
         {
-            { "DictionaryParsingContext", dictionaryParsingContext },
-            { "Parameter", this }
-        });
+            { nameof(DictionaryParsingContext), dictionaryParsingContext },
+            { nameof(Parameter), this }
+        }) != false;
 
     internal bool HasKeys => Keys?.Count > 0;
 

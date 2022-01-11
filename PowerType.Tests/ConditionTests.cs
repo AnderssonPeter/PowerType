@@ -136,4 +136,47 @@ public class ConditionTests
         var condition = new LesserOrEqualCondition(firstValue, secondValue);
         condition.Evaluate(parameters).Should().Be(expected);
     }
+
+
+    [InlineData(new string[] { "message" }, false)]
+    [InlineData(new string[] { "test", "message" }, false)]
+    [InlineData(new string[] { "test" }, true)]
+    [Theory]
+    public void ExclusiveParameterConditionTrue(string[] parameterNames, bool expected)
+    {
+        var condition = new ExclusiveParameterCondition(parameterNames);
+        var arguments = PowerShellString.FromRawSmart(new string[] { "git", "checkout", "-m", "'message'" }).ToArray();
+        var dictionaryParsingContext = new DictionaryParsingContext("", arguments)
+        {
+            Command = new Command("git", null)
+        };
+        dictionaryParsingContext.Parameters.Add(new ParameterWithValue(arguments[1], new CommandParameter() { Name = "checkout" }));
+        dictionaryParsingContext.Parameters.Add(new ParameterWithValue(arguments[2], new ValueParameter() { Name = "message" }, arguments[3]));
+        var result = condition.Evaluate(new Dictionary<string, object>
+        {
+            { nameof(DictionaryParsingContext),  dictionaryParsingContext}
+        });
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void ExclusiveParameterConditionArgumentNullException()
+    {
+        var a = () =>
+        {
+            new ExclusiveParameterCondition((string[])null);
+        };
+        a.Should().Throw<ArgumentNullException>();
+    }
+
+
+    [Fact]
+    public void ExclusiveParameterConditionArgumentOutOfRangeException()
+    {
+        var a = () =>
+        {
+            new ExclusiveParameterCondition();
+        };
+        a.Should().Throw<ArgumentOutOfRangeException>();
+    }
 }

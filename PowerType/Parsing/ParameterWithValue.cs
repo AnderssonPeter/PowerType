@@ -8,6 +8,12 @@ public record ParameterWithValue(PowerShellString Key, Parameter? Parameter)
 {
     public ParameterWithValue(string key, Parameter? parameter) : this(PowerShellString.FromRawSmart(key), parameter)
     { }
+
+    public ParameterWithValue(PowerShellString key, Parameter? parameter, PowerShellString value) : this(key, parameter)
+    {
+        this.Value = value;
+    }
+
     public PowerShellString? Value { get; set; }
     public bool UsedEqualSign { get; set; }
     public int Size => Parameter is ValueParameter && Parameter.HasKeys && Value != null && !UsedEqualSign ? 2 : 1;
