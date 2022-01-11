@@ -699,7 +699,6 @@ $stashes = [DynamicSource]@{
                     Keys = @("push");
                     Name = "push";
                     Parameters = @(
-                        #lägg samma på root nivå
                         [FlagParameter]@{
                             Keys = @("--patch", "-p");
                             Name = "patch";
@@ -776,6 +775,254 @@ $stashes = [DynamicSource]@{
                             Name = "commit";
                         }
                     )
+                }
+            )
+        },
+        [CommandParameter]@{
+            Keys = @("merge");
+            Name = "merge";
+            Description = "Join two or more development histories together";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("--commit");
+                    Name = "commit";
+                    Description = "Perform the merge and commit the result. This option can be used to override --no-commit.";
+                    Condition = [ExclusiveParameterCondition]::new("no-commit")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-commit");
+                    Name = "no-commit";
+                    Condition = [ExclusiveParameterCondition]::new("commit")
+                },
+                [FlagParameter]@{
+                    Keys = @("--edit", "-e");
+                    Name = "edit";
+                    Description = "Invoke an editor before committing successful mechanical merge to further edit the auto-generated merge message, so that the user can explain and justify the merge. The --no-edit option can be used to accept the auto-generated message (this is generally discouraged). The --edit (or -e) option is still useful if you are giving a draft message with the -m option from the command line and want to edit it in the editor.";
+                    Condition = [ExclusiveParameterCondition]::new("no-edit")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-edit");
+                    Name = "no-edit";
+                    Description = "Invoke an editor before committing successful mechanical merge to further edit the auto-generated merge message, so that the user can explain and justify the merge. The --no-edit option can be used to accept the auto-generated message (this is generally discouraged). The --edit (or -e) option is still useful if you are giving a draft message with the -m option from the command line and want to edit it in the editor.";
+                    Condition = [ExclusiveParameterCondition]::new("edit")
+                },
+                [ValueParameter]@{
+                    Keys = @("--cleanup");
+                    Name = "cleanup";
+                    Description = "This option determines how the merge message will be cleaned up before committing. See git-commit1 for more details. In addition, if the <mode> is given a value of scissors, scissors will be appended to MERGE_MSG before being passed on to the commit machinery in the case of a merge conflict.";
+                    Source = $cleanupMode
+                },
+                [FlagParameter]@{
+                    Keys = @("--ff", "--no-ff", "--ff-only");
+                    Name = "ff-only";
+                    Description = "Specifies how a merge is handled when the merged-in history is already a descendant of the current history. --ff is the default unless merging an annotated (and possibly signed) tag that is not stored in its natural place in the refs/tags/ hierarchy, in which case --no-ff is assumed.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--gpg-sign", "-S");
+                    Name = "gpg-sign";
+                    Description = "GPG-sign the resulting merge commit. The keyid argument is optional and defaults to the committer identity; if specified, it must be stuck to the option without a space. --no-gpg-sign is useful to countermand both commit.gpgSign configuration variable, and earlier --gpg-sign.";
+                    Condition = [ExclusiveParameterCondition]::new("no-pg-sign")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-gpg-sign");
+                    Name = "no-gpg-sign";
+                    Condition = [ExclusiveParameterCondition]::new("pg-sign")
+                },
+                [ValueParameter]@{
+                    Keys = @("--log");
+                    Name = "log";
+                    Description = "In addition to branch names, populate the log message with one-line descriptions from at most <n> actual commits that are being merged. See also git-fmt-merge-msg1.";
+                    Condition = [ExclusiveParameterCondition]::new("no-log")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-log");
+                    Name = "no-log";
+                    Condition = [ExclusiveParameterCondition]::new("log")
+                },
+                [FlagParameter]@{
+                    Keys = @("--signoff");
+                    Name = "signoff";
+                    Description = "Add a Signed-off-by trailer by the committer at the end of the commit log message. The meaning of a signoff depends on the project to which you’re committing. For example, it may certify that the committer has the rights to submit the work under the project’s license or agrees to some contributor representation, such as a Developer Certificate of Origin. (See http://developercertificate.org for the one used by the Linux kernel and Git projects.) Consult the documentation or leadership of the project to which you’re contributing to understand how the signoffs are used in that project.";
+                    Condition = [ExclusiveParameterCondition]::new("no-signoff")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-signoff");
+                    Name = "no-signoff";
+                    Condition = [ExclusiveParameterCondition]::new("signoff")
+                },
+                [FlagParameter]@{
+                    Keys = @("--stat");
+                    Name = "stat";
+                    Description = "Show a diffstat at the end of the merge. The diffstat is also controlled by the configuration option merge.stat.";
+                    Condition = [ExclusiveParameterCondition]::new("no-stat")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-stat", "-n");
+                    Name = "no-stat";
+                    Condition = [ExclusiveParameterCondition]::new("stat")
+                },
+                [FlagParameter]@{
+                    Keys = @("--squash");
+                    Name = "squash";
+                    Description = 'Produce the working tree and index state as if a real merge happened (except for the merge information), but do not actually make a commit, move the HEAD, or record $GIT_DIR/MERGE_HEAD (to cause the next git commit command to create a merge commit). This allows you to create a single commit on top of the current branch whose effect is the same as merging another branch (or more in case of an octopus).';
+                    Condition = [ExclusiveParameterCondition]::new("no-squash")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-squash");
+                    Name = "no-squash";
+                    Condition = [ExclusiveParameterCondition]::new("squash")
+                },
+                [FlagParameter]@{
+                    Keys = @("--verify");
+                    Name = "verify";
+                    Description = "By default, the pre-merge and commit-msg hooks are run. When --no-verify is given, these are bypassed. See also githooks5 .";
+                    Condition = [ExclusiveParameterCondition]::new("no-verify")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-verify");
+                    Name = "no-verify";
+                    Description = "By default, the pre-merge and commit-msg hooks are run. When --no-verify is given, these are bypassed. See also githooks5 .";
+                    Condition = [ExclusiveParameterCondition]::new("verify")
+                },
+                [ValueParameter]@{
+                    Keys = @("--strategy", "-s");
+                    Name = "strategy";
+                    Description = "Use the given merge strategy; can be supplied more than once to specify them in the order they should be tried. If there is no -s option, a built-in list of strategies is used instead (ort when merging a single head, octopus otherwise).";
+                    Source = [StaticSource]@{
+                        Name = "Merge strategy";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "ort"
+                            },
+                            [SourceItem]@{
+                                Name = "recursive"
+                            },
+                            [SourceItem]@{
+                                Name = "resolve"
+                            },
+                            [SourceItem]@{
+                                Name = "octopus"
+                            },
+                            [SourceItem]@{
+                                Name = "ours"
+                            },
+                            [SourceItem]@{
+                                Name = "theirs"
+                            },
+                            [SourceItem]@{
+                                Name = "subtree"
+                            }
+                        )
+                    };
+                },
+                [ValueParameter]@{
+                    Keys = @("--strategy-option", "-X");
+                    Name = "strategy-option";
+                    Description = "Pass merge strategy specific option through to the merge strategy.";
+                    Condition = [NotCondition]::new([ExclusiveParameterCondition]::new("strategy")) # Only display this if strategy was used
+                    # Source = $???; # todo: Implement this later
+                },
+                [FlagParameter]@{
+                    Keys = @("--verify-signatures");
+                    Name = "verify-signatures";
+                    Description = "Verify that the tip commit of the side branch being merged is signed with a valid key, i.e. a key that has a valid uid: in the default trust model, this means the signing key has been signed by a trusted key. If the tip commit of the side branch is not signed with a valid key, the merge is aborted.";
+                    Condition = [ExclusiveParameterCondition]::new("no-verify-signatures")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-verify-signatures");
+                    Name = "no-verify-signatures";
+                    Description = "Verify that the tip commit of the side branch being merged is signed with a valid key, i.e. a key that has a valid uid: in the default trust model, this means the signing key has been signed by a trusted key. If the tip commit of the side branch is not signed with a valid key, the merge is aborted.";
+                    Condition = [ExclusiveParameterCondition]::new("verify-signatures")
+                },
+                [FlagParameter]@{
+                    Keys = @("--quiet", "-q");
+                    Name = "quiet";
+                    Description = "Operate quietly. Implies --no-progress.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--verbose", "-v");
+                    Name = "verbose";
+                    Description = "Be verbose.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--progress");
+                    Name = "progress";
+                    Description = "Turn progress on/off explicitly. If neither is specified, progress is shown if standard error is connected to a terminal. Note that not all merge strategies may support progress reporting.";
+                    Condition = [ExclusiveParameterCondition]::new("progress")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-progress");
+                    Name = "no-progress";
+                    Description = "Turn progress on/off explicitly. If neither is specified, progress is shown if standard error is connected to a terminal. Note that not all merge strategies may support progress reporting.";
+                    Condition = [ExclusiveParameterCondition]::new("no-progress")
+                },
+                [FlagParameter]@{
+                    Keys = @("--autostash");
+                    Name = "autostash";
+                    Description = "Automatically create a temporary stash entry before the operation begins, record it in the special ref MERGE_AUTOSTASH and apply it after the operation ends. This means that you can run the operation on a dirty worktree. However, use with care: the final stash application after a successful merge might result in non-trivial conflicts.";
+                    Condition = [ExclusiveParameterCondition]::new("no-autostash")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-autostash");
+                    Name = "no-autostash";
+                    Condition = [ExclusiveParameterCondition]::new("autostash")
+                },
+                [FlagParameter]@{
+                    Keys = @("--allow-unrelated-histories");
+                    Name = "allow-unrelated-histories";
+                    Description = "By default, git merge command refuses to merge histories that do not share a common ancestor. This option can be used to override this safety when merging histories of two projects that started their lives independently. As that is a very rare occasion, no configuration variable to enable this by default exists and will not be added.";
+                },
+                [ValueParameter]@{
+                    Keys = @("-m");
+                    Name = "message";
+                    Description = "Set the commit message to be used for the merge commit (in case one is created).";
+                },
+                [ValueParameter]@{
+                    Keys = @("--file", "-F");
+                    Name = "file";
+                    Description = "Read the commit message to be used for the merge commit (in case one is created).";
+                    #Source = File;
+                },
+                [FlagParameter]@{
+                    Keys = @("--rerere-autoupdate");
+                    Name = "rerere-autoupdate";
+                    Description = "Allow the rerere mechanism to update the index with the result of auto-conflict resolution if possible.";
+                    Condition = [ExclusiveParameterCondition]::new("no-rerere-autoupdate")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-rerere-autoupdate");
+                    Name = "no-rerere-autoupdate";
+                    Condition = [ExclusiveParameterCondition]::new("rerere-autoupdate")
+                },
+                [FlagParameter]@{
+                    Keys = @("--overwrite-ignore");
+                    Name = "overwrite-ignore";
+                    Description = "Silently overwrite ignored files from the merge result. This is the default behavior. Use --no-overwrite-ignore to abort.";
+                    Condition = [ExclusiveParameterCondition]::new("no-overwrite-ignore")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-overwrite-ignore");
+                    Name = "no-overwrite-ignore";
+                    Condition = [ExclusiveParameterCondition]::new("overwrite-ignore")
+                },
+                [FlagParameter]@{
+                    Keys = @("--abort");
+                    Name = "abort";
+                    Description = "Abort the current conflict resolution process, and try to reconstruct the pre-merge state. If an autostash entry is present, apply it to the worktree.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--quit");
+                    Name = "quit";
+                    Description = "Forget about the current merge in progress. Leave the index and the working tree as-is. If MERGE_AUTOSTASH is present, the stash entry will be saved to the stash list.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--continue");
+                    Name = "continue";
+                    Description = "After a git merge stops due to conflicts you can conclude the merge by running git merge --continue (see `"HOW TO RESOLVE CONFLICTS`" section below).";
+                },
+                [ValueParameter]@{
+                    Name = "commit";
+                    Description = "Commits, usually other branch heads, to merge into our branch. Specifying more than one commit will create a merge with more than two parents (affectionately called an Octopus merge).";
                 }
             )
         }
