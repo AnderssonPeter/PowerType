@@ -99,7 +99,7 @@ internal class ExecutionEngineThread : IDisposable
     {
         var runspace = CreateRunspace();
         using var powershell = PowerShell.Create(runspace);
-        powershell.AddScript($"using namespace PowerType.Model\nusing namespace PowerType.Model.Conditions\n{command.File}");
+        powershell.AddScript($"using namespace PowerType.Model\nusing namespace PowerType.Model.Conditions\n& '{command.File}'");
         runspace.Open();
         var result = powershell.Invoke();
         if (powershell.HadErrors)
