@@ -1,0 +1,64 @@
+{{func writeFlag
+Flag = $0
+Recursive = $1
+Longhand = Flag.Longhand
+Shorthand = Flag.Shorthand
+if Longhand != null
+Longhand = "--" + Longhand
+end
+if Shorthand != null
+Shorthand = "-" + Shorthand
+end
+}}[{{ if Flag.Type == "bool"
+"Flag"
+else
+"Value"
+end }}Parameter]@{
+Keys = @("{{ [ Longhand, Shorthand ] | array.compact | array.join "^", ^"" }}");
+Description = "{{ Flag.Description }}";{{if Recursive}}
+Recursive = $True;
+{{end}}{{ if Flag.Type != "bool" }}
+Source = $??{{ end }}
+}{{end}}
+
+{{func writeCommandParameters
+Command = $0
+for Flag in Command.LocalFlags
+	Flag.ElementType = 'LocalFlag'
+end
+for Flag in Command.PersistentFlags
+	Flag.ElementType = 'PersistentFlag'
+end
+for Flag in Command.Commands
+	Flag.ElementType = 'Command'
+end
+Elements = Command.LocalFlags | array.concat Command.PersistentFlags | array.concat Command.Commands | array.compact
+}}Keys = @("{{ Command.Name }}");
+Name = "{{ Command.Name }}";
+Description = "{{ Command.Description }}";{{if Elements != empty}}
+Parameters = @( {{ for Element in Elements }}
+    {{ Element | writeElement }}{{ if !for.last || Command.PersistentFlags != null }}, {{ end }}{{ end }}
+){{end}}{{end}}
+
+{{func writeCommand
+Command = $0
+}}[CommandParameter]@{
+{{ Command | writeCommandParameters }}
+}{{end}}
+
+{{ func writeElement
+Element = $0
+if Element.ElementType == "LocalFlag"
+Element | writeFlag
+end
+if Element.Elementype == "PersistentFlag"
+Element | writeFlag true
+end
+if Element.ElementType == "Command"
+Element | writeCommand
+end
+end
+}}
+[PowerTypeDictionary]@{
+Platforms = ([Platforms]::Linux -bor [Platforms]::MacOS);
+{{ this | writeCommandParameters }}}

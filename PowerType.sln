@@ -27,6 +27,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{CCD5A220-E10E-4D77-B753-E6423B9718E2}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
+		.github\workflows\create-dictionaries-from-carapace.yml = .github\workflows\create-dictionaries-from-carapace.yml
 		.github\workflows\create-git-dictionary-base.yml = .github\workflows\create-git-dictionary-base.yml
 		.github\workflows\powershell-analysis.yml = .github\workflows\powershell-analysis.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml

@@ -1,0 +1,35 @@
+name: create dictionaries from carapace
+
+on:
+  workflow_dispatch:   
+
+jobs:
+  create-base:
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout local
+      uses: actions/checkout@v2
+      with:
+        path: 'PowerType'
+
+    - name: Install dependencies
+      shell: pwsh
+      run: |
+        Install-Module 7Zip4Powershell
+        Install-Module PSScriptAnalyzer
+        Install-Module TextScript
+
+    - name: Generate
+      shell: pwsh
+      run: |
+        cd 'PowerType\GenerateDictionaries\carapace'
+        mkdir output
+        .\carapace.to.dictionary.ps1
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Carapace dictionaries
+        path: 'PowerType\GenerateDictionaries\carapace\*.ps1'
