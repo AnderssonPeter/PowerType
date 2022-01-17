@@ -17,9 +17,9 @@ jobs:
     - name: Install dependencies
       shell: pwsh
       run: |
-        Install-Module 7Zip4Powershell
-        Install-Module PSScriptAnalyzer
-        Install-Module TextScript
+        Install-Module 7Zip4Powershell -Force
+        Install-Module PSScriptAnalyzer -Force
+        Install-Module TextScript -Force
 
     - name: Generate
       shell: pwsh
