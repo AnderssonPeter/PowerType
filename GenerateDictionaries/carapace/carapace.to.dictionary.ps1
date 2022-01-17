@@ -24,6 +24,8 @@ foreach ($tool in $tools)
 	$json = &$carapace $tool export
 	$toolDefinition = ConvertFrom-Json $json
 	$result = $toolDefinition | ConvertFrom-Template -Template $template
+	# Force unix lineendings
+	$result = $result.Replace("`r`n", "`n")
 	$result = Invoke-Formatter $result
 	$result | Set-Content "output\$tool.ps1"
 	# Trim empty lines
