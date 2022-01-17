@@ -32,4 +32,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Carapace dictionaries
-        path: 'PowerType\GenerateDictionaries\carapace\*.ps1'
+        path: 'PowerType\GenerateDictionaries\carapace\output\*.ps1'
