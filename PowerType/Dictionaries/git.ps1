@@ -1025,6 +1025,208 @@ $stashes = [DynamicSource]@{
                     Description = "Commits, usually other branch heads, to merge into our branch. Specifying more than one commit will create a merge with more than two parents (affectionately called an Octopus merge).";
                 }
             )
-        }
+        },
+		[CommandParameter]@{
+			Keys = @("clone");
+			Name = "clone";
+			Description = "Clone a repository into a new directory";
+			Parameters = @(
+				[FlagParameter]@{
+					Keys = @("--local", "-l");
+					Name = "local";
+					Description = "When the repository to clone from is on a local machine, this flag bypasses the normal `"Git aware`" transport mechanism and clones the repository by making a copy of HEAD and everything under objects and refs directories. The files under .git/objects/ directory are hardlinked to save space when possible.";
+				},
+				[FlagParameter]@{
+					Keys = @("--no-hardlinks");
+					Name = "no-hardlinks";
+					Description = "Force the cloning process from a repository on a local filesystem to copy the files under the .git/objects directory instead of using hardlinks. This may be desirable if you are trying to make a back-up of your repository.";
+				},
+				[FlagParameter]@{
+					Keys = @("--shared", "-s");
+					Name = "shared";
+					Description = "When the repository to clone is on the local machine, instead of using hard links, automatically setup .git/objects/info/alternates to share the objects with the source repository. The resulting repository starts out without any object of its own.";
+				},
+				[ValueParameter]@{
+					Keys = @("--reference", "--reference-if-able");
+					Name = "reference";
+					Description = "If the reference repository is on the local machine, automatically setup .git/objects/info/alternates to obtain objects from the reference repository. Using an already existing repository as an alternate will require fewer objects to be copied from the repository being cloned, reducing network and local storage costs. When using the --reference-if-able, a non existing directory is skipped with a warning instead of aborting the clone.";
+				},
+				[FlagParameter]@{
+					Keys = @("--dissociate");
+					Name = "dissociate";
+					Description = "Borrow the objects from reference repositories specified with the --reference options only to reduce network transfer, and stop borrowing from them after a clone is made by making necessary local copies of borrowed objects. This option can also be used when cloning locally from a repository that already borrows objects from another repository—the new repository will borrow objects from the same repository, and this option can be used to stop the borrowing.";
+				},
+				[FlagParameter]@{
+					Keys = @("--quiet", "-q");
+					Name = "quiet";
+					Description = "Operate quietly. Progress is not reported to the standard error stream.";
+					Condition = [ExclusiveParameterCondition]::new("verbose");
+				},
+				[FlagParameter]@{
+					Keys = @("--verbose", "-v");
+					Name = "verbose";
+					Description = "Run verbosely. Does not affect the reporting of progress status to the standard error stream.";
+					Condition = [ExclusiveParameterCondition]::new("quiet");
+				},
+				[FlagParameter]@{
+					Keys = @("--progress");
+					Name = "progress";
+					Description = "Progress status is reported on the standard error stream by default when it is attached to a terminal, unless --quiet is specified. This flag forces progress status even if the standard error stream is not directed to a terminal.";
+				},
+				[ValueParameter]@{
+					Keys = @("--server-option");
+					Name = "server-option";
+					Description = "Transmit the given string to the server when communicating using protocol version 2. The given string must not contain a NUL or LF character. The server’s handling of server options, including unknown ones, is server-specific. When multiple --server-option=<option> are given, they are all sent to the other side in the order listed on the command line.";
+				},
+				[FlagParameter]@{
+					Keys = @("--no-checkout", "-n");
+					Name = "no-checkout";
+					Description = "No checkout of HEAD is performed after the clone is complete.";
+				},
+				[FlagParameter]@{
+					Keys = @("--reject-shallow");
+					Name = "reject-shallow";
+					Description = "Fail if the source repository is a shallow repository. The clone.rejectShallow configuration variable can be used to specify the default.";
+                    Condition = [ExclusiveParameterCondition]::new("no-reject-shallow")
+				},
+				[FlagParameter]@{
+					Keys = @("--no-reject-shallow");
+					Name = "no-reject-shallow";
+					Description = "Fail if the source repository is a shallow repository. The clone.rejectShallow configuration variable can be used to specify the default.";
+                    Condition = [ExclusiveParameterCondition]::new("reject-shallow")
+				},
+				[FlagParameter]@{
+					Keys = @("--bare");
+					Name = "bare";
+					Description = "Make a bare Git repository. That is, instead of creating <directory> and placing the administrative files in <directory>/.git, make the <directory> itself the $GIT_DIR. This obviously implies the --no-checkout because there is nowhere to check out the working tree. Also the branch heads at the remote are copied directly to corresponding local branch heads, without mapping them to refs/remotes/origin/. When this option is used, neither remote-tracking branches nor the related configuration variables are created.";
+				},
+				[FlagParameter]@{
+					Keys = @("--sparse");
+					Name = "sparse";
+					Description = "Initialize the sparse-checkout file so the working directory starts with only the files in the root of the repository. The sparse-checkout file can be modified to grow the working directory as needed.";
+				},
+				[ValueParameter]@{
+					Keys = @("--filter");
+					Name = "filter";
+					Description = "Use the partial clone feature and request that the server sends a subset of reachable objects according to a given object filter. When using --filter, the supplied <filter-spec> is used for the partial clone filter. For example, --filter=blob:none will filter out all blobs (file contents) until needed by Git. Also, --filter=blob:limit=<size> will filter out all blobs of size at least <size>. For more details on filter specifications, see the --filter option in git-rev-list1 .";
+				},
+				[FlagParameter]@{
+					Keys = @("--mirror");
+					Name = "mirror";
+					Description = "Set up a mirror of the source repository. This implies --bare. Compared to --bare, --mirror not only maps local branches of the source to local branches of the target, it maps all refs (including remote-tracking branches, notes etc.) and sets up a refspec configuration such that all these refs are overwritten by a git remote update in the target repository.";
+				},
+				[ValueParameter]@{
+					Keys = @("--origin", "-o");
+					Name = "origin";
+					Description = "Instead of using the remote name origin to keep track of the upstream repository, use <name>. Overrides clone.defaultRemoteName from the config.";
+				},
+				[ValueParameter]@{
+					Keys = @("--branch", "-b");
+					Name = "branch";
+					Description = "Instead of pointing the newly created HEAD to the branch pointed to by the cloned repository’s HEAD, point to <name> branch instead. In a non-bare repository, this is the branch that will be checked out. --branch can also take tags and detaches the HEAD at that commit in the resulting repository.";
+				},
+				[ValueParameter]@{
+					Keys = @("--upload-pack", "-u");
+					Name = "upload-pack";
+					Description = "When given, and the repository to clone from is accessed via ssh, this specifies a non-default path for the command run on the other end.";
+				},
+				[ValueParameter]@{
+					Keys = @("--template");
+					Name = "template";
+					Description = "Specify the directory from which templates will be used; (See the `"TEMPLATE DIRECTORY`" section of git-init1 .)";
+					# Source = Directory;
+				},
+				#todo we dont know how to handle --config key=value
+				#[ValueParameter]@{
+				#	Keys = @("--config <key>", "-c <key>");
+				#	Name = "config <key>";
+				#	Description = "Set a configuration variable in the newly-created repository; this takes effect immediately after the repository is initialized, but before the remote history is fetched or any files checked out. The key is in the same format as expected by git-config1 (e.g., core.eol=true). If multiple values are given for the same key, each value will be written to the config file. This makes it safe, for example, to add additional fetch refspecs to the origin remote.";
+				#	Source = $???;
+				#},
+				[ValueParameter]@{
+					Keys = @("--depth");
+					Name = "depth";
+					Description = "Create a shallow clone with a history truncated to the specified number of commits. Implies --single-branch unless --no-single-branch is given to fetch the histories near the tips of all branches. If you want to clone submodules shallowly, also pass --shallow-submodules.";
+				},
+				[ValueParameter]@{
+					Keys = @("--shallow-since");
+					Name = "shallow-since";
+					Description = "Create a shallow clone with a history after the specified time.";
+				},
+				[ValueParameter]@{
+					Keys = @("--shallow-exclude");
+					Name = "shallow-exclude";
+					Description = "Create a shallow clone with a history, excluding commits reachable from a specified remote branch or tag. This option can be specified multiple times.";
+				},
+				[FlagParameter]@{
+					Keys = @("--single-branch");
+					Name = "single-branch";
+					Description = "Clone only the history leading to the tip of a single branch, either specified by the --branch option or the primary branch remote’s HEAD points at. Further fetches into the resulting repository will only update the remote-tracking branch for the branch this option was used for the initial cloning. If the HEAD at the remote did not point at any branch when --single-branch clone was made, no remote-tracking branch is created.";
+					Condition = [ExclusiveParameterCondition]::new("no-single-branch");
+				},
+				[FlagParameter]@{
+					Keys = @("--no-single-branch");
+					Name = "no-single-branch";
+					Description = "Clone only the history leading to the tip of a single branch, either specified by the --branch option or the primary branch remote’s HEAD points at. Further fetches into the resulting repository will only update the remote-tracking branch for the branch this option was used for the initial cloning. If the HEAD at the remote did not point at any branch when --single-branch clone was made, no remote-tracking branch is created.";
+					Condition = [ExclusiveParameterCondition]::new("single-branch");
+				},
+				[FlagParameter]@{
+					Keys = @("--no-tags");
+					Name = "no-tags";
+					Description = "Don’t clone any tags, and set remote.<remote>.tagOpt=--no-tags in the config, ensuring that future git pull and git fetch operations won’t follow any tags. Subsequent explicit tag fetches will still work, (see git-fetch1 ).";
+				},
+				[ValueParameter]@{
+					Keys = @("--recurse-submodules");
+					Name = "recurse-submodules";
+					Description = "After the clone is created, initialize and clone submodules within based on the provided pathspec. If no pathspec is provided, all submodules are initialized and cloned. This option can be given multiple times for pathspecs consisting of multiple entries. The resulting clone has submodule.active set to the provided pathspec, or `".`" (meaning all submodules) if no pathspec is provided.";
+				},
+				[FlagParameter]@{
+					Keys = @("--shallow-submodules");
+					Name = "shallow-submodules";
+					Description = "All submodules which are cloned will be shallow with a depth of 1.";
+					Condition = [ExclusiveParameterCondition]::new("no-shallow-submodules");
+				},
+				[FlagParameter]@{
+					Keys = @("--no-shallow-submodules");
+					Name = "no-shallow-submodules";
+					Description = "All submodules which are cloned will be shallow with a depth of 1.";
+					Condition = [ExclusiveParameterCondition]::new("shallow-submodules");
+				},
+				[FlagParameter]@{
+					Keys = @("--remote-submodules");
+					Name = "remote-submodules";
+					Description = "All submodules which are cloned will use the status of the submodule’s remote-tracking branch to update the submodule, rather than the superproject’s recorded SHA-1. Equivalent to passing --remote to git submodule update.";
+					Condition = [ExclusiveParameterCondition]::new("no-remote-submodules");
+				},
+				[FlagParameter]@{
+					Keys = @("--no-remote-submodules");
+					Name = "no-remote-submodules";
+					Description = "All submodules which are cloned will use the status of the submodule’s remote-tracking branch to update the submodule, rather than the superproject’s recorded SHA-1. Equivalent to passing --remote to git submodule update.";
+					Condition = [ExclusiveParameterCondition]::new("remote-submodules");
+				},
+				[ValueParameter]@{
+					Keys = @("--separate-git-dir");
+					Name = "separate-git-dir";
+					Description = "Instead of placing the cloned repository where it is supposed to be, place the cloned repository at the specified directory, then make a filesystem-agnostic Git symbolic link to there. The result is Git repository can be separated from working tree.";
+					# Source = Directory;
+				},
+				[ValueParameter]@{
+					Keys = @("--jobs", "-j");
+					Name = "jobs";
+					Description = "The number of submodules fetched at the same time. Defaults to the submodule.fetchJobs option.";
+				},
+				[ValueParameter]@{
+					Keys = @("repository");
+					Name = "repository";
+					Description = "The (possibly remote) repository to clone from. See the GIT URLS section below for more information on specifying repositories.";
+				},
+				[ValueParameter]@{
+					Keys = @("directory");
+					Name = "directory";
+					Description = "The name of a new directory to clone into. The `"humanish`" part of the source repository is used if no directory is explicitly given (repo for /path/to/repo.git and foo for host.xz:foo/.git). Cloning into an existing directory is only allowed if the directory is empty.";
+					# Source = Directory
+				}
+			)
+		}
     )
 }
