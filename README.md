@@ -29,10 +29,9 @@
 [![asciicast](https://asciinema.org/a/458149.svg)](https://asciinema.org/a/458149?autoplay=1)
 
 # Installation
-I don't recommend using PowerType in its current state and form but if you want to try it out run the following:
+It's not feature complete yet but if you want to try it out run the following:
 ```PowerShell
 Install-Module PowerType -AllowPrerelease
-Import-Module PowerType
 Enable-PowerType
 ```
 
