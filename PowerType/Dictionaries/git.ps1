@@ -494,8 +494,8 @@ $stashes = [DynamicSource]@{
                 },
                 [FlagParameter]@{
                     Keys = @("-B");
-                    Name = "Create new branch";
-                    Description = "Creates the branch &lt;new_branch&gt; and start it at &lt;start_point&gt;; if it already exists, then reset it to &lt;start_point&gt;. This is equivalent to running `"git branch`" with `"-f`"; see git-branch1 for details.";
+                    Name = "Create new or reset branch";
+                    Description = "Creates the branch <new_branch> and start it at <start_point>; if it already exists, then reset it to <start_point>. This is equivalent to running `"git branch`" with `"-f`"; see git-branch1 for details.";
                     #Condition = Not contains -b
                 },
                 [FlagParameter]@{
@@ -1027,7 +1027,7 @@ $stashes = [DynamicSource]@{
                     Description = "After a git merge stops due to conflicts you can conclude the merge by running git merge --continue (see `"HOW TO RESOLVE CONFLICTS`" section below).";
                 },
                 [ValueParameter]@{
-                    Name = "commit";
+                    Name = "commit hash";
                     Description = "Commits, usually other branch heads, to merge into our branch. Specifying more than one commit will create a merge with more than two parents (affectionately called an Octopus merge).";
                 }
             )
@@ -1539,7 +1539,7 @@ $stashes = [DynamicSource]@{
                 },
                 [FlagParameter]@{
                     Keys = @("--no-reschedule-failed-exec");
-                    Name = "reschedule-failed-exec";
+                    Name = "no-reschedule-failed-exec";
                     Description = "Automatically reschedule exec commands that failed. This only makes sense in interactive mode (or when an --exec option was provided).";
                     Condition = [ExclusiveParameterCondition]::new("reschedule-failed-exec");
                 }
