@@ -1228,317 +1228,456 @@ $stashes = [DynamicSource]@{
                 }
             )
         },
-				[CommandParameter]@{
-			Keys = @("rebase");
-			Name = "rebase";
-			Description = "Reapply commits on top of another base tip";
-			Parameters = @(
-				[ValueParameter]@{
-					Keys = @("--onto");
-					Name = "onto";
-					Description = "Starting point at which to create the new commits. If the --onto option is not specified, the starting point is <upstream>. May be any valid commit, and not just an existing branch name.";
-				},
-				[FlagParameter]@{
-					Keys = @("--keep-base");
-					Name = "keep-base";
-					Description = "Set the starting point at which to create the new commits to the merge base of <upstream> <branch>. Running git rebase --keep-base <upstream> <branch> is equivalent to running git rebase --onto <upstream>… <upstream>.";
-				},
-				[ValueParameter]@{
-					Keys = @("upstream");
-					Name = "upstream";
-					Description = "Upstream branch to compare against. May be any valid commit, not just an existing branch name. Defaults to the configured upstream for the current branch.";
-				},
-				[ValueParameter]@{
-					Keys = @("branch");
-					Name = "branch";
-					Description = "Working branch; defaults to HEAD.";
-					Source = $allBranches
-				},
-				[FlagParameter]@{
-					Keys = @("--continue");
-					Name = "continue";
-					Description = "Restart the rebasing process after having resolved a merge conflict.";
-				},
-				[FlagParameter]@{
-					Keys = @("--abort");
-					Name = "abort";
-					Description = "Abort the rebase operation and reset HEAD to the original branch. If <branch> was provided when the rebase operation was started, then HEAD will be reset to <branch>. Otherwise HEAD will be reset to where it was when the rebase operation was started.";
-				},
-				[FlagParameter]@{
-					Keys = @("--quit");
-					Name = "quit";
-					Description = "Abort the rebase operation but HEAD is not reset back to the original branch. The index and working tree are also left unchanged as a result. If a temporary stash entry was created using --autostash, it will be saved to the stash list.";
-				},
-				[FlagParameter]@{
-					Keys = @("--apply");
-					Name = "apply";
-					Description = "Use applying strategies to rebase (calling git-am internally). This option may become a no-op in the future once the merge backend handles everything the apply one does.";
-				},
-				[ValueParameter]@{
-					Keys = @("--empty");
-					Name = "empty";
-					Description = "How to handle commits that are not empty to start and are not clean cherry-picks of any upstream commit, but which become empty after rebasing (because they contain a subset of already upstream changes). With drop (the default), commits that become empty are dropped. With keep, such commits are kept. With ask (implied by --interactive), the rebase will halt when an empty commit is applied allowing you to choose whether to drop it, edit files more, or just commit the empty changes. Other options, like --exec, will use the default of drop unless -i/--interactive is explicitly specified.";
-					Source = [StaticSource]@{
-						Name = "empty mode";
-						Description = "";
-						Items = @(
-							[SourceItem]@{ 
-								Name = "drop";
-								Description = "commits that become empty are dropped"
-							},
-							[SourceItem]@{
-								Name = "keep";
-								Description = "commits that become empty are kept"
-							},
-							[SourceItem]@{
-								Name = "ask";
-								Description = ""
-							}
-						)
-					}
-				},
-				[FlagParameter]@{
-					Keys = @("--keep-empty");
-					Name = "keep-empty";
-					Description = "Do not keep commits that start empty before the rebase (i.e. that do not change anything from its parent) in the result. The default is to keep commits which start empty, since creating such commits requires passing the --allow-empty override flag to git commit, signifying that a user is very intentionally creating such a commit and thus wants to keep it.";
-					Condition = [ExclusiveParameterCondition]::new("no-keep-empty");
-				},
-				[FlagParameter]@{
-					Keys = @("--no-keep-empty");
-					Name = "no-keep-empty";
-					Description = "Do not keep commits that start empty before the rebase (i.e. that do not change anything from its parent) in the result. The default is to keep commits which start empty, since creating such commits requires passing the --allow-empty override flag to git commit, signifying that a user is very intentionally creating such a commit and thus wants to keep it.";
-					Condition = [ExclusiveParameterCondition]::new("keep-empty");
-				},
-				[FlagParameter]@{
-					Keys = @("--reapply-cherry-picks");
-					Name = "reapply-cherry-picks";
-					Description = "Reapply all clean cherry-picks of any upstream commit instead of preemptively dropping them. (If these commits then become empty after rebasing, because they contain a subset of already upstream changes, the behavior towards them is controlled by the --empty flag.)";
-					Condition = [ExclusiveParameterCondition]::new("no-reapply-cherry-picks");
-				},
-				[FlagParameter]@{
-					Keys = @("--no-reapply-cherry-picks");
-					Name = "no-reapply-cherry-picks";
-					Description = "Reapply all clean cherry-picks of any upstream commit instead of preemptively dropping them. (If these commits then become empty after rebasing, because they contain a subset of already upstream changes, the behavior towards them is controlled by the --empty flag.)";
-					Condition = [ExclusiveParameterCondition]::new("reapply-cherry-picks");
-				},
-				[FlagParameter]@{
-					Keys = @("--allow-empty-message");
-					Name = "allow-empty-message";
-					Description = "No-op. Rebasing commits with an empty message used to fail and this option would override that behavior, allowing commits with empty messages to be rebased. Now commits with an empty message do not cause rebasing to halt.";
-				},
-				[FlagParameter]@{
-					Keys = @("--skip");
-					Name = "skip";
-					Description = "Restart the rebasing process by skipping the current patch.";
-				},
-				[FlagParameter]@{
-					Keys = @("--edit-todo");
-					Name = "edit-todo";
-					Description = "Edit the todo list during an interactive rebase.";
-				},
-				[FlagParameter]@{
-					Keys = @("--show-current-patch");
-					Name = "show-current-patch";
-					Description = "Show the current patch in an interactive rebase or when rebase is stopped because of conflicts. This is the equivalent of git show REBASE_HEAD.";
-				},
-				[FlagParameter]@{
-					Keys = @("--merge", "-m");
-					Name = "merge";
-					Description = "Using merging strategies to rebase (default).";
-				},
-				[ValueParameter]@{
-					Keys = @("--strategy", "-s");
-					Name = "strategy";
-					Description = "Use the given merge strategy, instead of the default ort. This implies --merge.";
-					# Source = $???;
-				},
-				[ValueParameter]@{
-					Keys = @("--strategy-option", "-X");
-					Name = "strategy-option";
-					Description = "Pass the <strategy-option> through to the merge strategy. This implies --merge and, if no strategy has been specified, -s ort. Note the reversal of ours and theirs as noted above for the -m option.";
-					# Source = $???;
-					Condition = [NotCondition]::new([ExclusiveParameterCondition]::new("strategy"));
-				},
-				[FlagParameter]@{
-					Keys = @("--rerere-autoupdate");
-					Name = "rerere-autoupdate";
-					Description = "Allow the rerere mechanism to update the index with the result of auto-conflict resolution if possible.";
-					Condition = [ExclusiveParameterCondition]::new("no-rerere-autoupdate");
-				},
-				[FlagParameter]@{
-					Keys = @("--no-rerere-autoupdate");
-					Name = "no-rerere-autoupdate";
-					Description = "Allow the rerere mechanism to update the index with the result of auto-conflict resolution if possible.";
-					Condition = [ExclusiveParameterCondition]::new("rerere-autoupdate");
-				},
-				[ValueParameter]@{
-					Keys = @("--gpg-sign", "-S");
-					Name = "gpg-sign";
-					Description = "GPG-sign commits. The keyid argument is optional and defaults to the committer identity; if specified, it must be stuck to the option without a space. --no-gpg-sign is useful to countermand both commit.gpgSign configuration variable, and earlier --gpg-sign.";
-					Condition = [ExclusiveParameterCondition]::new("no-gpg-sign");
-				},
-				[FlagParameter]@{
-					Keys = @("--no-gpg-sign");
-					Name = "no-gpg-sign";
-					Description = "GPG-sign commits. The keyid argument is optional and defaults to the committer identity; if specified, it must be stuck to the option without a space. --no-gpg-sign is useful to countermand both commit.gpgSign configuration variable, and earlier --gpg-sign.";
-					Condition = [ExclusiveParameterCondition]::new("gpg-sign");
-				},
-				[FlagParameter]@{
-					Keys = @("--quiet", "-q");
-					Name = "quiet";
-					Description = "Be quiet. Implies --no-stat.";
-					Condition = [ExclusiveParameterCondition]::new("verbose");
-				},
-				[FlagParameter]@{
-					Keys = @("--verbose", "-v");
-					Name = "verbose";
-					Description = "Be verbose. Implies --stat.";
-					Condition = [ExclusiveParameterCondition]::new("quiet");
-				},
-				[FlagParameter]@{
-					Keys = @("--stat");
-					Name = "stat";
-					Description = "Show a diffstat of what changed upstream since the last rebase. The diffstat is also controlled by the configuration option rebase.stat.";
-					Condition = [ExclusiveParameterCondition]::new("no-stat");
-				},
-				[FlagParameter]@{
-					Keys = @("--no-stat", "-n");
-					Name = "no-stat";
-					Description = "Do not show a diffstat as part of the rebase process.";
-					Condition = [ExclusiveParameterCondition]::new("stat");
-				},
-				[FlagParameter]@{
-					Keys = @("--no-verify");
-					Name = "no-verify";
-					Description = "This option bypasses the pre-rebase hook. See also githooks5 .";
-					Condition = [ExclusiveParameterCondition]::new("verify");
-				},
-				[FlagParameter]@{
-					Keys = @("--verify");
-					Name = "verify";
-					Description = "Allows the pre-rebase hook to run, which is the default. This option can be used to override --no-verify. See also githooks5 .";
-					Condition = [ExclusiveParameterCondition]::new("no-verify");
-				},
-				[ValueParameter]@{
-					Keys = @("-C");
-					Name = "ensure lines";
-					Description = "Ensure at least <n> lines of surrounding context match before and after each change. When fewer lines of surrounding context exist they all must match. By default no context is ever ignored. Implies --apply.";
-				},
-				[FlagParameter]@{
-					Keys = @("--no-ff", "--force-rebase", "-f");
-					Name = "force-rebase";
-					Description = "Individually replay all rebased commits instead of fast-forwarding over the unchanged ones. This ensures that the entire history of the rebased branch is composed of new commits.";
-				},
-				[FlagParameter]@{
-					Keys = @("--fork-point");
-					Name = "fork-point";
-					Description = "Use reflog to find a better common ancestor between <upstream> and <branch> when calculating which commits have been introduced by <branch>.";
-					Condition = [ExclusiveParameterCondition]::new("no-fork-point");
-				},
-				[FlagParameter]@{
-					Keys = @("--no-fork-point");
-					Name = "no-fork-point";
-					Description = "Use reflog to find a better common ancestor between <upstream> and <branch> when calculating which commits have been introduced by <branch>.";
-					Condition = [ExclusiveParameterCondition]::new("fork-point");
-				},
-				[FlagParameter]@{
-					Keys = @("--ignore-whitespace");
-					Name = "ignore-whitespace";
-					Description = "Ignore whitespace differences when trying to reconcile differences. Currently, each backend implements an approximation of this behavior:";
-				},
-				[ValueParameter]@{
-					Keys = @("--whitespace");
-					Name = "whitespace";
-					Description = "This flag is passed to the git apply program (see git-apply1 ) that applies the patch. Implies --apply.";
-					# Source = $???;
-				},
-				[FlagParameter]@{
-					Keys = @("--committer-date-is-author-date");
-					Name = "committer-date-is-author-date";
-					Description = "Instead of using the current time as the committer date, use the author date of the commit being rebased as the committer date. This option implies --force-rebase.";
-				},
-				[FlagParameter]@{
-					Keys = @("--reset-author-date", "--ignore-date");
-					Name = "reset-author-date";
-					Description = "Instead of using the author date of the original commit, use the current time as the author date of the rebased commit. This option implies --force-rebase.";
-				},
-				[FlagParameter]@{
-					Keys = @("--signoff");
-					Name = "signoff";
-					Description = "Add a Signed-off-by trailer to all the rebased commits. Note that if --interactive is given then only commits marked to be picked, edited or reworded will have the trailer added.";
-				},
-				[FlagParameter]@{
-					Keys = @("--interactive", "-i");
-					Name = "interactive";
-					Description = "Make a list of the commits which are about to be rebased. Let the user edit that list before rebasing. This mode can also be used to split commits (see SPLITTING COMMITS below).";
-				},
-				[ValueParameter]@{
-					Keys = @("--rebase-merges", "-r");
-					Name = "rebase-merges";
-					Description = "By default, a rebase will simply drop merge commits from the todo list, and put the rebased commits into a single, linear branch. With --rebase-merges, the rebase will instead try to preserve the branching structure within the commits that are to be rebased, by recreating the merge commits. Any resolved merge conflicts or manual amendments in these merge commits will have to be resolved/re-applied manually.";
-					Source = [StaticSource]@{
-						Name = "rebase-merges mode";
-						Description = "";
-						Items = @(
-							[SourceItem]@{
-								Name = "rebase-cousins";
-								Description = ""
-							},
-							[SourceItem]@{
-								Name = "no-rebase-cousins";
-								Description = ""
-							}
-							
-						)
-					}
-				},
-				[ValueParameter]@{
-					Keys = @("--exec", "-x");
-					Name = "exec";
-					Description = "Append `"exec <cmd>`" after each line creating a commit in the final history. <cmd> will be interpreted as one or more shell commands. Any command that fails will interrupt the rebase, with exit code 1.";
-				},
-				[FlagParameter]@{
-					Keys = @("--root");
-					Name = "root";
-					Description = "Rebase all commits reachable from <branch>, instead of limiting them with an <upstream>. This allows you to rebase the root commit(s) on a branch. When used with --onto, it will skip changes already contained in <newbase> (instead of <upstream>) whereas without --onto it will operate on every change.";
-				},
-				[FlagParameter]@{
-					Keys = @("--autosquash");
-					Name = "autosquash";
-					Description = "When the commit log message begins with `"squash! …`" or `"fixup! …`" or `"amend! …`", and there is already a commit in the todo list that matches the same ..., automatically modify the todo list of rebase -i, so that the commit marked for squashing comes right after the commit to be modified, and change the action of the moved commit from pick to squash or fixup or fixup -C respectively. A commit matches the ... if the commit subject matches, or if the ... refers to the commit’s hash. As a fall-back, partial matches of the commit subject work, too. The recommended way to create fixup/amend/squash commits is by using the --fixup, --fixup=amend: or --fixup=reword: and --squash options respectively of git-commit1 .";
-					Condition = [ExclusiveParameterCondition]::new("no-autosquash");
-				},
-				[FlagParameter]@{
-					Keys = @("--no-autosquash");
-					Name = "no-autosquash";
-					Description = "When the commit log message begins with `"squash! …`" or `"fixup! …`" or `"amend! …`", and there is already a commit in the todo list that matches the same ..., automatically modify the todo list of rebase -i, so that the commit marked for squashing comes right after the commit to be modified, and change the action of the moved commit from pick to squash or fixup or fixup -C respectively. A commit matches the ... if the commit subject matches, or if the ... refers to the commit’s hash. As a fall-back, partial matches of the commit subject work, too. The recommended way to create fixup/amend/squash commits is by using the --fixup, --fixup=amend: or --fixup=reword: and --squash options respectively of git-commit1 .";
-					Condition = [ExclusiveParameterCondition]::new("autosquash");
-				},
-				[FlagParameter]@{
-					Keys = @("--autostash");
-					Name = "autostash";
-					Description = "Automatically create a temporary stash entry before the operation begins, and apply it after the operation ends. This means that you can run rebase on a dirty worktree. However, use with care: the final stash application after a successful rebase might result in non-trivial conflicts.";
-					Condition = [ExclusiveParameterCondition]::new("autostash");
-				},
-				[FlagParameter]@{
-					Keys = @("--no-autostash");
-					Name = "no-autostash";
-					Description = "Automatically create a temporary stash entry before the operation begins, and apply it after the operation ends. This means that you can run rebase on a dirty worktree. However, use with care: the final stash application after a successful rebase might result in non-trivial conflicts.";
-					Condition = [ExclusiveParameterCondition]::new("no-autostash");
-				},
-				[FlagParameter]@{
-					Keys = @("--reschedule-failed-exec");
-					Name = "reschedule-failed-exec";
-					Description = "Automatically reschedule exec commands that failed. This only makes sense in interactive mode (or when an --exec option was provided).";
-					Condition = [ExclusiveParameterCondition]::new("no-reschedule-failed-exec");
-				},
-				[FlagParameter]@{
-					Keys = @("--no-reschedule-failed-exec");
-					Name = "reschedule-failed-exec";
-					Description = "Automatically reschedule exec commands that failed. This only makes sense in interactive mode (or when an --exec option was provided).";
-					Condition = [ExclusiveParameterCondition]::new("reschedule-failed-exec");
-				}
-			)
-		}
+        [CommandParameter]@{
+            Keys = @("rebase");
+            Name = "rebase";
+            Description = "Reapply commits on top of another base tip";
+            Parameters = @(
+                [ValueParameter]@{
+                    Keys = @("--onto");
+                    Name = "onto";
+                    Description = "Starting point at which to create the new commits. If the --onto option is not specified, the starting point is <upstream>. May be any valid commit, and not just an existing branch name.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--keep-base");
+                    Name = "keep-base";
+                    Description = "Set the starting point at which to create the new commits to the merge base of <upstream> <branch>. Running git rebase --keep-base <upstream> <branch> is equivalent to running git rebase --onto <upstream>… <upstream>.";
+                },
+                [ValueParameter]@{
+                    Keys = @("upstream");
+                    Name = "upstream";
+                    Description = "Upstream branch to compare against. May be any valid commit, not just an existing branch name. Defaults to the configured upstream for the current branch.";
+                },
+                [ValueParameter]@{
+                    Keys = @("branch");
+                    Name = "branch";
+                    Description = "Working branch; defaults to HEAD.";
+                    Source = $allBranches
+                },
+                [FlagParameter]@{
+                    Keys = @("--continue");
+                    Name = "continue";
+                    Description = "Restart the rebasing process after having resolved a merge conflict.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--abort");
+                    Name = "abort";
+                    Description = "Abort the rebase operation and reset HEAD to the original branch. If <branch> was provided when the rebase operation was started, then HEAD will be reset to <branch>. Otherwise HEAD will be reset to where it was when the rebase operation was started.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--quit");
+                    Name = "quit";
+                    Description = "Abort the rebase operation but HEAD is not reset back to the original branch. The index and working tree are also left unchanged as a result. If a temporary stash entry was created using --autostash, it will be saved to the stash list.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--apply");
+                    Name = "apply";
+                    Description = "Use applying strategies to rebase (calling git-am internally). This option may become a no-op in the future once the merge backend handles everything the apply one does.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--empty");
+                    Name = "empty";
+                    Description = "How to handle commits that are not empty to start and are not clean cherry-picks of any upstream commit, but which become empty after rebasing (because they contain a subset of already upstream changes). With drop (the default), commits that become empty are dropped. With keep, such commits are kept. With ask (implied by --interactive), the rebase will halt when an empty commit is applied allowing you to choose whether to drop it, edit files more, or just commit the empty changes. Other options, like --exec, will use the default of drop unless -i/--interactive is explicitly specified.";
+                    Source = [StaticSource]@{
+                        Name = "empty mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{ 
+                                Name = "drop";
+                                Description = "commits that become empty are dropped"
+                            },
+                            [SourceItem]@{
+                                Name = "keep";
+                                Description = "commits that become empty are kept"
+                            },
+                            [SourceItem]@{
+                                Name = "ask";
+                                Description = ""
+                            }
+                        )
+                    }
+                },
+                [FlagParameter]@{
+                    Keys = @("--keep-empty");
+                    Name = "keep-empty";
+                    Description = "Do not keep commits that start empty before the rebase (i.e. that do not change anything from its parent) in the result. The default is to keep commits which start empty, since creating such commits requires passing the --allow-empty override flag to git commit, signifying that a user is very intentionally creating such a commit and thus wants to keep it.";
+                    Condition = [ExclusiveParameterCondition]::new("no-keep-empty");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-keep-empty");
+                    Name = "no-keep-empty";
+                    Description = "Do not keep commits that start empty before the rebase (i.e. that do not change anything from its parent) in the result. The default is to keep commits which start empty, since creating such commits requires passing the --allow-empty override flag to git commit, signifying that a user is very intentionally creating such a commit and thus wants to keep it.";
+                    Condition = [ExclusiveParameterCondition]::new("keep-empty");
+                },
+                [FlagParameter]@{
+                    Keys = @("--reapply-cherry-picks");
+                    Name = "reapply-cherry-picks";
+                    Description = "Reapply all clean cherry-picks of any upstream commit instead of preemptively dropping them. (If these commits then become empty after rebasing, because they contain a subset of already upstream changes, the behavior towards them is controlled by the --empty flag.)";
+                    Condition = [ExclusiveParameterCondition]::new("no-reapply-cherry-picks");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-reapply-cherry-picks");
+                    Name = "no-reapply-cherry-picks";
+                    Description = "Reapply all clean cherry-picks of any upstream commit instead of preemptively dropping them. (If these commits then become empty after rebasing, because they contain a subset of already upstream changes, the behavior towards them is controlled by the --empty flag.)";
+                    Condition = [ExclusiveParameterCondition]::new("reapply-cherry-picks");
+                },
+                [FlagParameter]@{
+                    Keys = @("--allow-empty-message");
+                    Name = "allow-empty-message";
+                    Description = "No-op. Rebasing commits with an empty message used to fail and this option would override that behavior, allowing commits with empty messages to be rebased. Now commits with an empty message do not cause rebasing to halt.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--skip");
+                    Name = "skip";
+                    Description = "Restart the rebasing process by skipping the current patch.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--edit-todo");
+                    Name = "edit-todo";
+                    Description = "Edit the todo list during an interactive rebase.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--show-current-patch");
+                    Name = "show-current-patch";
+                    Description = "Show the current patch in an interactive rebase or when rebase is stopped because of conflicts. This is the equivalent of git show REBASE_HEAD.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--merge", "-m");
+                    Name = "merge";
+                    Description = "Using merging strategies to rebase (default).";
+                },
+                [ValueParameter]@{
+                    Keys = @("--strategy", "-s");
+                    Name = "strategy";
+                    Description = "Use the given merge strategy, instead of the default ort. This implies --merge.";
+                    # Source = $???;
+                },
+                [ValueParameter]@{
+                    Keys = @("--strategy-option", "-X");
+                    Name = "strategy-option";
+                    Description = "Pass the <strategy-option> through to the merge strategy. This implies --merge and, if no strategy has been specified, -s ort. Note the reversal of ours and theirs as noted above for the -m option.";
+                    # Source = $???;
+                    Condition = [NotCondition]::new([ExclusiveParameterCondition]::new("strategy"));
+                },
+                [FlagParameter]@{
+                    Keys = @("--rerere-autoupdate");
+                    Name = "rerere-autoupdate";
+                    Description = "Allow the rerere mechanism to update the index with the result of auto-conflict resolution if possible.";
+                    Condition = [ExclusiveParameterCondition]::new("no-rerere-autoupdate");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-rerere-autoupdate");
+                    Name = "no-rerere-autoupdate";
+                    Description = "Allow the rerere mechanism to update the index with the result of auto-conflict resolution if possible.";
+                    Condition = [ExclusiveParameterCondition]::new("rerere-autoupdate");
+                },
+                [ValueParameter]@{
+                    Keys = @("--gpg-sign", "-S");
+                    Name = "gpg-sign";
+                    Description = "GPG-sign commits. The keyid argument is optional and defaults to the committer identity; if specified, it must be stuck to the option without a space. --no-gpg-sign is useful to countermand both commit.gpgSign configuration variable, and earlier --gpg-sign.";
+                    Condition = [ExclusiveParameterCondition]::new("no-gpg-sign");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-gpg-sign");
+                    Name = "no-gpg-sign";
+                    Description = "GPG-sign commits. The keyid argument is optional and defaults to the committer identity; if specified, it must be stuck to the option without a space. --no-gpg-sign is useful to countermand both commit.gpgSign configuration variable, and earlier --gpg-sign.";
+                    Condition = [ExclusiveParameterCondition]::new("gpg-sign");
+                },
+                [FlagParameter]@{
+                    Keys = @("--quiet", "-q");
+                    Name = "quiet";
+                    Description = "Be quiet. Implies --no-stat.";
+                    Condition = [ExclusiveParameterCondition]::new("verbose");
+                },
+                [FlagParameter]@{
+                    Keys = @("--verbose", "-v");
+                    Name = "verbose";
+                    Description = "Be verbose. Implies --stat.";
+                    Condition = [ExclusiveParameterCondition]::new("quiet");
+                },
+                [FlagParameter]@{
+                    Keys = @("--stat");
+                    Name = "stat";
+                    Description = "Show a diffstat of what changed upstream since the last rebase. The diffstat is also controlled by the configuration option rebase.stat.";
+                    Condition = [ExclusiveParameterCondition]::new("no-stat");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-stat", "-n");
+                    Name = "no-stat";
+                    Description = "Do not show a diffstat as part of the rebase process.";
+                    Condition = [ExclusiveParameterCondition]::new("stat");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-verify");
+                    Name = "no-verify";
+                    Description = "This option bypasses the pre-rebase hook. See also githooks5 .";
+                    Condition = [ExclusiveParameterCondition]::new("verify");
+                },
+                [FlagParameter]@{
+                    Keys = @("--verify");
+                    Name = "verify";
+                    Description = "Allows the pre-rebase hook to run, which is the default. This option can be used to override --no-verify. See also githooks5 .";
+                    Condition = [ExclusiveParameterCondition]::new("no-verify");
+                },
+                [ValueParameter]@{
+                    Keys = @("-C");
+                    Name = "ensure lines";
+                    Description = "Ensure at least <n> lines of surrounding context match before and after each change. When fewer lines of surrounding context exist they all must match. By default no context is ever ignored. Implies --apply.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-ff", "--force-rebase", "-f");
+                    Name = "force-rebase";
+                    Description = "Individually replay all rebased commits instead of fast-forwarding over the unchanged ones. This ensures that the entire history of the rebased branch is composed of new commits.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--fork-point");
+                    Name = "fork-point";
+                    Description = "Use reflog to find a better common ancestor between <upstream> and <branch> when calculating which commits have been introduced by <branch>.";
+                    Condition = [ExclusiveParameterCondition]::new("no-fork-point");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-fork-point");
+                    Name = "no-fork-point";
+                    Description = "Use reflog to find a better common ancestor between <upstream> and <branch> when calculating which commits have been introduced by <branch>.";
+                    Condition = [ExclusiveParameterCondition]::new("fork-point");
+                },
+                [FlagParameter]@{
+                    Keys = @("--ignore-whitespace");
+                    Name = "ignore-whitespace";
+                    Description = "Ignore whitespace differences when trying to reconcile differences. Currently, each backend implements an approximation of this behavior:";
+                },
+                [ValueParameter]@{
+                    Keys = @("--whitespace");
+                    Name = "whitespace";
+                    Description = "This flag is passed to the git apply program (see git-apply1 ) that applies the patch. Implies --apply.";
+                    # Source = $???;
+                },
+                [FlagParameter]@{
+                    Keys = @("--committer-date-is-author-date");
+                    Name = "committer-date-is-author-date";
+                    Description = "Instead of using the current time as the committer date, use the author date of the commit being rebased as the committer date. This option implies --force-rebase.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--reset-author-date", "--ignore-date");
+                    Name = "reset-author-date";
+                    Description = "Instead of using the author date of the original commit, use the current time as the author date of the rebased commit. This option implies --force-rebase.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--signoff");
+                    Name = "signoff";
+                    Description = "Add a Signed-off-by trailer to all the rebased commits. Note that if --interactive is given then only commits marked to be picked, edited or reworded will have the trailer added.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--interactive", "-i");
+                    Name = "interactive";
+                    Description = "Make a list of the commits which are about to be rebased. Let the user edit that list before rebasing. This mode can also be used to split commits (see SPLITTING COMMITS below).";
+                },
+                [ValueParameter]@{
+                    Keys = @("--rebase-merges", "-r");
+                    Name = "rebase-merges";
+                    Description = "By default, a rebase will simply drop merge commits from the todo list, and put the rebased commits into a single, linear branch. With --rebase-merges, the rebase will instead try to preserve the branching structure within the commits that are to be rebased, by recreating the merge commits. Any resolved merge conflicts or manual amendments in these merge commits will have to be resolved/re-applied manually.";
+                    Source = [StaticSource]@{
+                        Name = "rebase-merges mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "rebase-cousins";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "no-rebase-cousins";
+                                Description = ""
+                            }
+                            
+                        )
+                    }
+                },
+                [ValueParameter]@{
+                    Keys = @("--exec", "-x");
+                    Name = "exec";
+                    Description = "Append `"exec <cmd>`" after each line creating a commit in the final history. <cmd> will be interpreted as one or more shell commands. Any command that fails will interrupt the rebase, with exit code 1.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--root");
+                    Name = "root";
+                    Description = "Rebase all commits reachable from <branch>, instead of limiting them with an <upstream>. This allows you to rebase the root commit(s) on a branch. When used with --onto, it will skip changes already contained in <newbase> (instead of <upstream>) whereas without --onto it will operate on every change.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--autosquash");
+                    Name = "autosquash";
+                    Description = "When the commit log message begins with `"squash! …`" or `"fixup! …`" or `"amend! …`", and there is already a commit in the todo list that matches the same ..., automatically modify the todo list of rebase -i, so that the commit marked for squashing comes right after the commit to be modified, and change the action of the moved commit from pick to squash or fixup or fixup -C respectively. A commit matches the ... if the commit subject matches, or if the ... refers to the commit’s hash. As a fall-back, partial matches of the commit subject work, too. The recommended way to create fixup/amend/squash commits is by using the --fixup, --fixup=amend: or --fixup=reword: and --squash options respectively of git-commit1 .";
+                    Condition = [ExclusiveParameterCondition]::new("no-autosquash");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-autosquash");
+                    Name = "no-autosquash";
+                    Description = "When the commit log message begins with `"squash! …`" or `"fixup! …`" or `"amend! …`", and there is already a commit in the todo list that matches the same ..., automatically modify the todo list of rebase -i, so that the commit marked for squashing comes right after the commit to be modified, and change the action of the moved commit from pick to squash or fixup or fixup -C respectively. A commit matches the ... if the commit subject matches, or if the ... refers to the commit’s hash. As a fall-back, partial matches of the commit subject work, too. The recommended way to create fixup/amend/squash commits is by using the --fixup, --fixup=amend: or --fixup=reword: and --squash options respectively of git-commit1 .";
+                    Condition = [ExclusiveParameterCondition]::new("autosquash");
+                },
+                [FlagParameter]@{
+                    Keys = @("--autostash");
+                    Name = "autostash";
+                    Description = "Automatically create a temporary stash entry before the operation begins, and apply it after the operation ends. This means that you can run rebase on a dirty worktree. However, use with care: the final stash application after a successful rebase might result in non-trivial conflicts.";
+                    Condition = [ExclusiveParameterCondition]::new("autostash");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-autostash");
+                    Name = "no-autostash";
+                    Description = "Automatically create a temporary stash entry before the operation begins, and apply it after the operation ends. This means that you can run rebase on a dirty worktree. However, use with care: the final stash application after a successful rebase might result in non-trivial conflicts.";
+                    Condition = [ExclusiveParameterCondition]::new("no-autostash");
+                },
+                [FlagParameter]@{
+                    Keys = @("--reschedule-failed-exec");
+                    Name = "reschedule-failed-exec";
+                    Description = "Automatically reschedule exec commands that failed. This only makes sense in interactive mode (or when an --exec option was provided).";
+                    Condition = [ExclusiveParameterCondition]::new("no-reschedule-failed-exec");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-reschedule-failed-exec");
+                    Name = "reschedule-failed-exec";
+                    Description = "Automatically reschedule exec commands that failed. This only makes sense in interactive mode (or when an --exec option was provided).";
+                    Condition = [ExclusiveParameterCondition]::new("reschedule-failed-exec");
+                }
+            )
+        },
+        [CommandParameter]@{
+            Keys = @("status");
+            Name = "status";
+            Description = "Show the working tree status";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("--short", "-s");
+                    Name = "short";
+                    Description = "Give the output in the short-format.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--branch", "-b");
+                    Name = "branch";
+                    Description = "Show the branch and tracking info even in short-format.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--show-stash");
+                    Name = "show-stash";
+                    Description = "Show the number of entries currently stashed away.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--porcelain");
+                    Name = "porcelain";
+                    Description = "Give the output in an easy-to-parse format for scripts. This is similar to the short output, but will remain stable across Git versions and regardless of user configuration. See below for details.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--long");
+                    Name = "long";
+                    Description = "Give the output in the long-format. This is the default.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--verbose", "-v");
+                    Name = "verbose";
+                    Description = "In addition to the names of files that have been changed, also show the textual changes that are staged to be committed (i.e., like the output of git diff --cached). If -v is specified twice, then also show the changes in the working tree that have not yet been staged (i.e., like the output of git diff).";
+                },
+                [ValueParameter]@{
+                    Keys = @("--untracked-files", "-u");
+                    Name = "untracked-files";
+                    Description = "Show untracked files.";
+                    Source = [StaticSource]@{
+                        Name = "untracked-files mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "no";
+                                Description = "Show no untracked files."
+                            },
+                            [SourceItem]@{
+                                Name = "normal";
+                                Description = "Shows untracked files and directories"
+                            },
+                            [SourceItem]@{
+                                Name = "all";
+                                Description = "Also shows individual files in untracked directories"
+                            }
+                        )
+                    }
+                },
+                [ValueParameter]@{
+                    Keys = @("--ignore-submodules");
+                    Name = "ignore-submodules";
+                    Description = "Ignore changes to submodules when looking for changes. &lt;when&gt; can be either `"none`", `"untracked`", `"dirty`" or `"all`", which is the default. Using `"none`" will consider the submodule modified when it either contains untracked or modified files or its HEAD differs from the commit recorded in the superproject and can be used to override any settings of the ignore option in git-config1 or gitmodules5 . When `"untracked`" is used submodules are not considered dirty when they only contain untracked content (but they are still scanned for modified content). Using `"dirty`" ignores all changes to the work tree of submodules, only changes to the commits stored in the superproject are shown (this was the behavior before 1.7.0). Using `"all`" hides all changes to submodules (and suppresses the output of submodule summaries when the config option status.submoduleSummary is set).";
+                },
+                [ValueParameter]@{
+                    Keys = @("--ignored");
+                    Name = "ignored";
+                    Description = "Show ignored files as well.";
+                    Source = [StaticSource]@{
+                        Name = "ignored mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "traditional";
+                                Description = "Shows ignored files and directories, unless --untracked-files=all is specified, in which case individual files in ignored directories are displayed."
+                            },
+                            [SourceItem]@{
+                                Name = "no";
+                                Description = "Show no ignored files."
+                            },
+                            [SourceItem]@{
+                                Name = "matching";
+                                Description = "Shows ignored files and directories matching an ignore pattern."
+                            }
+                        )
+                    }
+                },
+                [FlagParameter]@{
+                    Keys = @("-z");
+                    Name = "nul termination";
+                    Description = "Terminate entries with NUL, instead of LF. This implies the --porcelain=v1 output format if no other format is given.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--column");
+                    Name = "column";
+                    Description = "Display untracked files in columns. See configuration variable column.status for option syntax. --column and --no-column without options are equivalent to always and never respectively.";
+                    Condition = [ExclusiveParameterCondition]::new("no-column");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-column");
+                    Name = "no-column";
+                    Description = "Display untracked files in columns. See configuration variable column.status for option syntax. --column and --no-column without options are equivalent to always and never respectively.";
+                    Condition = [ExclusiveParameterCondition]::new("column");
+                },
+                [FlagParameter]@{
+                    Keys = @("--ahead-behind");
+                    Name = "ahead-behind";
+                    Description = "Display or do not display detailed ahead/behind counts for the branch relative to its upstream branch. Defaults to true.";
+                    Condition = [ExclusiveParameterCondition]::new("no-ahead-behind");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-ahead-behind");
+                    Name = "no-ahead-behind";
+                    Description = "Display or do not display detailed ahead/behind counts for the branch relative to its upstream branch. Defaults to true.";
+                    Condition = [ExclusiveParameterCondition]::new("ahead-behind");
+                },
+                [FlagParameter]@{
+                    Keys = @("--renames");
+                    Name = "renames";
+                    Description = "Turn on/off rename detection regardless of user configuration. See also git-diff1 --no-renames.";
+                    Condition = [ExclusiveParameterCondition]::new("no-renames");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-renames");
+                    Name = "no-renames";
+                    Description = "Turn on/off rename detection regardless of user configuration. See also git-diff1 --no-renames.";
+                    Condition = [ExclusiveParameterCondition]::new("renames");
+                },
+                [ValueParameter]@{
+                    Keys = @("--find-renames");
+                    Name = "find-renames";
+                    Description = "Turn on rename detection, optionally setting the similarity threshold. See also git-diff1 --find-renames.";
+                },
+                [ValueParameter]@{
+                    Name = "pathspec";
+                    Description = "See the pathspec entry in gitglossary7 .";
+                    # Source = FilePattern
+                }
+            )
+        }
     )
 }
