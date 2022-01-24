@@ -68,10 +68,14 @@ $stashes = [DynamicSource]@{
 
 # Should we remove the Parameter part? CommandParameter -> Command?
 [PowerTypeDictionary]@{
-    Keys = @("git");
-    Name = "git";
+    Keys        = @("git");
+    Name        = "git";
     Description = "fast, scalable, distributed revision control system";
-    Platforms = [Platforms]::All;
+    Platforms   = [Platforms]::All;
+    State       = [DictionaryState]::Generated -bor [DictionaryState]::Experimental -bor [DictionaryState]::Incomplete;
+    Source      = "Generated from manual with some manual fine tuning";
+    Url         = "https://git-scm.com/";
+    Version     = [Version]::Parse("2.34.1");
     Parameters = @(
         [CommandParameter]@{
             Keys = @("add");
@@ -1490,7 +1494,6 @@ $stashes = [DynamicSource]@{
                                 Name = "no-rebase-cousins";
                                 Description = ""
                             }
-                            
                         )
                     }
                 },
