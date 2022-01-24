@@ -408,11 +408,13 @@ $stashes = [DynamicSource]@{
                     Keys = @("--verbose", "-v");
                     Name = "verbose";
                     Description = "Show unified diff between the HEAD commit and what would be committed at the bottom of the commit message template to help the user describe the commit by reminding what changes the commit has. Note that this diff output doesn’t have its lines prefixed with #. This diff will not be a part of the commit message. See the commit.verbose configuration variable in git-config1 .";
+                    Condition = [ExclusiveParameterCondition]::new("quiet")
                 },
                 [FlagParameter]@{
                     Keys = @("--quiet", "-q");
                     Name = "quiet";
                     Description = "Suppress commit summary message.";
+                    Condition = [ExclusiveParameterCondition]::new("verbose")
                 },
                 [FlagParameter]@{
                     Keys = @("--dry-run");
@@ -1676,6 +1678,239 @@ $stashes = [DynamicSource]@{
                     Name = "pathspec";
                     Description = "See the pathspec entry in gitglossary7 .";
                     # Source = FilePattern
+                }
+            )
+        },
+        [CommandParameter]@{
+            Keys = @("push");
+            Name = "push";
+            Description = "Update remote refs along with associated objects";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("--all");
+                    Name = "all";
+                    Description = "Push all branches (i.e. refs under refs/heads/); cannot be used with other <refspec>.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--prune");
+                    Name = "prune";
+                    Description = "Remove remote branches that don’t have a local counterpart. For example a remote branch tmp will be removed if a local branch with the same name doesn’t exist any more";
+                },
+                [FlagParameter]@{
+                    Keys = @("--mirror");
+                    Name = "mirror";
+                    Description = "Instead of naming each ref to push, specifies that all refs under refs/ (which includes but is not limited to refs/heads/, refs/remotes/, and refs/tags/) ";
+                },
+                [FlagParameter]@{
+                    Keys = @("--dry-run", "-n");
+                    Name = "dry-run";
+                    Description = "Do everything except actually send the updates.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--porcelain");
+                    Name = "porcelain";
+                    Description = "Produce machine-readable output. The output status line for each ref will be tab-separated and sent to stdout instead of stderr. The full symbolic names of the refs will be given.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--delete", "-d");
+                    Name = "delete";
+                    Description = "All listed refs are deleted from the remote repository. This is the same as prefixing all refs with a colon.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--tags");
+                    Name = "tags";
+                    Description = "All refs under refs/tags are pushed, in addition to refspecs explicitly listed on the command line.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--follow-tags");
+                    Name = "follow-tags";
+                    Description = "Push all the refs that would be pushed without this option, and also push annotated tags in refs/tags that are missing from the remote but are pointing at commit-ish that are reachable from the refs being pushed.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--signed");
+                    Name = "signed";
+                    Description = "";
+                    Condition = [ExclusiveParameterCondition]::new("no-signed");
+                    Source = [StaticSource]@{
+                        Name = "signed mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "true";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "false";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "if-asked";
+                                Description = ""
+                            }
+                        )
+                    }
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-signed");
+                    Name = "no-signed";
+                    Description = "";
+                    Condition = [ExclusiveParameterCondition]::new("signed");
+                },
+                [FlagParameter]@{
+                    Keys = @("--atomic");
+                    Name = "atomic";
+                    Description = "Use an atomic transaction on the remote side if available. Either all refs are updated, or on error, no refs are updated. If the server does not support atomic pushes the push will fail.";
+                    Condition = [ExclusiveParameterCondition]::new("no-atomic");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-atomic");
+                    Name = "no-atomic";
+                    Description = "Use an atomic transaction on the remote side if available. Either all refs are updated, or on error, no refs are updated. If the server does not support atomic pushes the push will fail.";
+                    Condition = [ExclusiveParameterCondition]::new("atomic");
+                },
+                [ValueParameter]@{
+                    Keys = @("--push-option", "-o");
+                    Name = "push-option";
+                    Description = "Transmit the given string to the server, which passes them to the pre-receive as well as the post-receive hook. The given string must not contain a NUL or LF character. When multiple --push-option=<option> are given, they are all sent to the other side in the order listed on the command line. When no --push-option=<option> is given from the command line, the values of configuration variable push.pushOption are used instead.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--receive-pack", "--exec");
+                    Name = "receive-pack";
+                    Description = "Path to the git-receive-pack program on the remote end. Sometimes useful when pushing to a remote repository over ssh, and you do not have the program in a directory on the default $PATH.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--force-with-lease");
+                    Name = "force-with-lease";
+                    Description = "Usually, `"git push`" refuses to update a remote ref that is not an ancestor of the local ref used to overwrite it.";
+                    Condition = [ExclusiveParameterCondition]::new("no-force-with-lease");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-force-with-lease");
+                    Name = "no-force-with-lease";
+                    Description = "Usually, `"git push`" refuses to update a remote ref that is not an ancestor of the local ref used to overwrite it.";
+                    Condition = [ExclusiveParameterCondition]::new("force-with-lease");
+                },
+                [FlagParameter]@{
+                    Keys = @("--force", "-f");
+                    Name = "force";
+                    Description = "Usually, the command refuses to update a remote ref that is not an ancestor of the local ref used to overwrite it. Also, when --force-with-lease option is used, the command refuses to update a remote ref whose current value does not match what is expected.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--force-if-includes");
+                    Name = "force-if-includes";
+                    Description = "Force an update only if the tip of the remote-tracking ref has been integrated locally.";
+                    Condition = [ExclusiveParameterCondition]::new("no-force-if-includes");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-force-if-includes");
+                    Name = "no-force-if-includes";
+                    Description = "Force an update only if the tip of the remote-tracking ref has been integrated locally.";
+                    Condition = [ExclusiveParameterCondition]::new("force-if-includes");
+                },
+                [ValueParameter]@{
+                    Keys = @("--repo");
+                    Name = "repo";
+                    Description = "This option is equivalent to the <repository> argument. If both are specified, the command-line argument takes precedence.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--set-upstream", "-u");
+                    Name = "set-upstream";
+                    Description = "For every branch that is up to date or successfully pushed, add upstream (tracking) reference, used by argument-less git-pull[1] and other commands. For more information, see branch.<name>.merge in git-config[1].";
+                },
+                [FlagParameter]@{
+                    Keys = @("--thin");
+                    Name = "thin";
+                    Description = "These options are passed to git-send-pack[1]. A thin transfer significantly reduces the amount of sent data when the sender and receiver share many of the same objects in common. The default is --thin.";
+                    Condition = [ExclusiveParameterCondition]::new("no-thin");
+                },
+                [FlagParameter]@{
+                    Keys = @("no-thin");
+                    Name = "no-thin";
+                    Description = "These options are passed to git-send-pack[1]. A thin transfer significantly reduces the amount of sent data when the sender and receiver share many of the same objects in common. The default is --thin.";
+                    Condition = [ExclusiveParameterCondition]::new("thin");
+                },
+                [FlagParameter]@{
+                    Keys = @("--verbose", "-v");
+                    Name = "verbose";
+                    Description = "Run verbosely.";
+                    Condition = [ExclusiveParameterCondition]::new("quiet")
+                },
+                [FlagParameter]@{
+                    Keys = @("--quiet", "-q");
+                    Name = "quiet";
+                    Description = "Suppress all output, including the listing of updated refs, unless an error occurs. Progress is not reported to the standard error stream.";
+                    Condition = [ExclusiveParameterCondition]::new("verbose")
+                },
+                [FlagParameter]@{
+                    Keys = @("--progress");
+                    Name = "progress";
+                    Description = "Progress status is reported on the standard error stream by default when it is attached to a terminal, unless -q is specified. This flag forces progress status even if the standard error stream is not directed to a terminal.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--recurse-submodules");
+                    Name = "recurse-submodules";
+                    Description = "May be used to make sure all submodule commits used by the revisions to be pushed are available on a remote-tracking branch.";
+                    Condition = [ExclusiveParameterCondition]::new("no-recurse-submodules");
+                    Source = [StaticSource]@{
+                        Name = "recurse-submodules mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "check";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "on-demand";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "only";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "no";
+                                Description = ""
+                            }
+                        )
+                    }
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-recurse-submodules");
+                    Name = "no-recurse-submodules";
+                    Description = "May be used to make sure all submodule commits used by the revisions to be pushed are available on a remote-tracking branch.";
+                    Condition = [ExclusiveParameterCondition]::new("recurse-submodules");
+                },
+                [FlagParameter]@{
+                    Keys = @("--verify");
+                    Name = "verify";
+                    Description = "Toggle the pre-push hook (see githooks[5]). The default is --verify, giving the hook a chance to prevent the push. With --no-verify, the hook is bypassed completely.";
+                    Condition = [ExclusiveParameterCondition]::new("no-verify");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-verify");
+                    Name = "no-verify";
+                    Description = "Toggle the pre-push hook (see githooks[5]). The default is --verify, giving the hook a chance to prevent the push. With --no-verify, the hook is bypassed completely.";
+                    Condition = [ExclusiveParameterCondition]::new("verify");
+                },
+                [FlagParameter]@{
+                    Keys = @("--ipv4", "-4");
+                    Name = "ipv4";
+                    Description = "Use IPv4 addresses only, ignoring IPv6 addresses.";
+                    Condition = [ExclusiveParameterCondition]::new("ipv6");
+                },
+                [FlagParameter]@{
+                    Keys = @("--ipv6", "-6");
+                    Name = "ipv6";
+                    Description = "Use IPv6 addresses only, ignoring IPv4 addresses.";
+                    Condition = [ExclusiveParameterCondition]::new("ipv4");
+                }
+                [ValueParameter]@{
+                    Name = "repository";
+                    Description = "The `"remote`" repository that is destination of a push operation. This parameter can be either a URL (see the section GIT URLS below) or the name of a remote (see the section REMOTES below).";
+                }
+                [ValueParameter]@{
+                    Name = "refspec";
+                    Description = "Specify what destination ref to update with what source object. The format of a <refspec> parameter is an optional plus +, followed by the source object <src>, followed by a colon :, followed by the destination ref <dst>.";
                 }
             )
         }
