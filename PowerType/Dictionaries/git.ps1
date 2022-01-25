@@ -465,7 +465,12 @@ $stashes = [DynamicSource]@{
             Keys = @("checkout");
             Name = "checkout";
             Description = "Switch branches or restore working tree files";
-            Parameters = @(
+            Parameters = @(                
+                [ValueParameter]@{
+                    Name = "Branch to checkout or new_branch or start_point or tree-ish";
+                    Description = "Branch to checkout; if it refers to a branch (i.e., a name that, when prepended with `"refs/heads/`", is a valid ref), then that branch is checked out. Otherwise, if it refers to a valid commit, your HEAD becomes `"detached`" and you are no longer on any branch (see below for details).";
+                    Source = $allBranches
+                },
                 [FlagParameter]@{
                     Keys = @("--quiet", "-q");
                     Name = "quiet";
@@ -605,11 +610,6 @@ $stashes = [DynamicSource]@{
                     Keys = @("--pathspec-file-nul");
                     Name = "pathspec-file-nul";
                     Description = "Only meaningful with --pathspec-from-file. Pathspec elements are separated with NUL character and all other characters are taken literally (including newlines and quotes).";
-                },
-                [ValueParameter]@{
-                    Name = "Branch to checkout or new_branch or start_point or tree-ish";
-                    Description = "Branch to checkout; if it refers to a branch (i.e., a name that, when prepended with `"refs/heads/`", is a valid ref), then that branch is checked out. Otherwise, if it refers to a valid commit, your HEAD becomes `"detached`" and you are no longer on any branch (see below for details).";
-                    Source = $allBranches
                 },
                 [FlagParameter]@{
                     Keys = @("--");

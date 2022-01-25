@@ -9,7 +9,7 @@ namespace PowerType.BackgroundProcessing;
 internal class ExecutionEngineThread : IDisposable
 {
     private bool disposed;
-    record DictionaryInformation(string File, Runspace Runspace, DictionarySuggestor Suggestor);
+    record DictionaryInformation(string File, DictionarySuggestor Suggestor);
     private readonly object dictionariesLocker = new();
     private readonly List<DictionaryInformation> dictionaries = new();
     private readonly ThreadQueue<Command> queue;
@@ -17,6 +17,7 @@ internal class ExecutionEngineThread : IDisposable
     private readonly CancellationToken cancellationToken;
     private readonly Thread backgroundThread;
     private Exception? backgroundThreadException;
+    private readonly Runspace runspace;
 
     internal ExecutionEngineThread(ThreadQueue<Command> queue)
     {
@@ -25,6 +26,7 @@ internal class ExecutionEngineThread : IDisposable
         backgroundThread = new Thread(InnerLoop);
         backgroundThread.IsBackground = true;
         backgroundThread.Start();
+        runspace = CreateRunspace();
     }
 
     /// <summary>This method is thread safe</summary>
@@ -92,15 +94,25 @@ internal class ExecutionEngineThread : IDisposable
         initialState.Assemblies.Add(new SessionStateAssemblyEntry(assemblyName, assemblyPath));
         initialState.ImportPSModule(modulePath);
         initialState.ExecutionPolicy = ExecutionPolicy.Unrestricted;
-        return RunspaceFactory.CreateRunspace(initialState);
+        var runspace = RunspaceFactory.CreateRunspace(initialState);
+        runspace.Open();
+
+        using var powershell = PowerShell.Create(runspace);
+        powershell.AddScript("using namespace PowerType.Model\nusing namespace PowerType.Model.Conditions");
+
+        var result = powershell.Invoke();
+        if (powershell.HadErrors)
+        {
+            var errors = string.Join(Environment.NewLine, powershell.Streams.Error.Select(x => x.ToString()));
+            throw new Exception("Failed to initialize dictionary, errors: " + errors);
+        }
+        return runspace;
     }
 
     private void Handle(InitializeDictionaryCommand command)
     {
-        var runspace = CreateRunspace();
         using var powershell = PowerShell.Create(runspace);
-        powershell.AddScript($"using namespace PowerType.Model\nusing namespace PowerType.Model.Conditions\n& '{command.File}'");
-        runspace.Open();
+        powershell.AddScript($"& '{command.File}'", true);
         var result = powershell.Invoke();
         if (powershell.HadErrors)
         {
@@ -127,7 +139,7 @@ internal class ExecutionEngineThread : IDisposable
 
         lock (dictionariesLocker)
         {
-            dictionaries.Add(new DictionaryInformation(command.File, runspace, suggestor));
+            dictionaries.Add(new DictionaryInformation(command.File, suggestor));
         }
     }
 
@@ -141,7 +153,7 @@ internal class ExecutionEngineThread : IDisposable
             {
                 try
                 {
-                    dictionaryInformation.Runspace.SessionStateProxy.Path.SetLocation(command.CurrentWorkingDirectory);
+                    runspace.SessionStateProxy.Path.SetLocation(command.CurrentWorkingDirectory);
                     var result = dynamicSource.CommandExpression.Invoke();
                     var items = result.Select(x => x.BaseObject is string value ?
                         new SourceItem { Name = value } :
@@ -184,14 +196,7 @@ internal class ExecutionEngineThread : IDisposable
             cancellationTokenSource.Cancel();
             //While we wait for the background thread to exit lets do some cleanup
 
-            lock (dictionariesLocker)
-            {
-                foreach (var dictionary in dictionaries)
-                {
-                    dictionary.Runspace.Close();
-                    dictionary.Runspace.Dispose();
-                }
-            }
+            runspace.Dispose();
 
             if (!backgroundThread.Join(200))
             {
