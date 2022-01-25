@@ -9,6 +9,12 @@ namespace PowerType;
 [Cmdlet("Get", "PowerTypeHistory"), OutputType(typeof(bool))]
 public class GetPowerTypeHistory : PowerTypeCmdlet
 {
+    /// <summary>
+    /// <para type="description">Indicates whether the user would like to receive output. </para>
+    /// </summary>
+    [Parameter(Mandatory = false, HelpMessage = "Only return rows with exceptions")]
+    public SwitchParameter OnlyErrors { get; set; }
+
     /// <inheritdoc/>
     protected override void ProcessRecord()
     {
@@ -17,7 +23,7 @@ public class GetPowerTypeHistory : PowerTypeCmdlet
         {
             throw new InvalidOperationException("Please call 'Enable-PowerTypePredictor' first");
         }
-        this.WriteObject(instance.PredictionSummaryCollector.Get());
+        this.WriteObject(instance.PredictionSummaryCollector.Get().Where(x => !OnlyErrors.IsPresent || x.Exception != null));
     }
 }
 
