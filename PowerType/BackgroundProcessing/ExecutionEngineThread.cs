@@ -88,6 +88,7 @@ internal class ExecutionEngineThread : IDisposable
         var assembly = Assembly.GetExecutingAssembly();
         var assemblyName = assembly.GetName().Name;
         var assemblyPath = assembly.Location;
+        var assemblyDirectory = Path.GetDirectoryName(assembly.Location) ?? throw new InvalidOperationException("Failed to get assembly directory!");
         var modulePath = assembly.Location.Replace(".dll", ".psd1");
         var initialState = InitialSessionState.CreateDefault();
         initialState.ThrowOnRunspaceOpenError = true;
@@ -98,7 +99,7 @@ internal class ExecutionEngineThread : IDisposable
         runspace.Open();
 
         using var powershell = PowerShell.Create(runspace);
-        powershell.AddScript("using namespace PowerType.Model\nusing namespace PowerType.Model.Conditions");
+        powershell.AddScript($"using namespace PowerType.Model\nusing namespace PowerType.Model.Conditions\n. '{Path.Combine(assemblyDirectory, "HelperFunctions.ps1")}'");
 
         var result = powershell.Invoke();
         if (powershell.HadErrors)
@@ -112,7 +113,7 @@ internal class ExecutionEngineThread : IDisposable
     private void Handle(InitializeDictionaryCommand command)
     {
         using var powershell = PowerShell.Create(runspace);
-        powershell.AddScript($"& '{command.File}'", true);
+        powershell.AddScript($". '{command.File}'");
         var result = powershell.Invoke();
         if (powershell.HadErrors)
         {
