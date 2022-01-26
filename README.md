@@ -35,7 +35,7 @@ Install-Module PowerType -AllowPrerelease
 Enable-PowerType
 ```
 
-If you now type `git` you should get some basic autocompletion, the [dictionary for git](PowerType/Dictionaries/git.ps1) is far from complete and dosent know about all commands and parameters yet.
+If you now type `git` you should get some basic autocompletion, the [dictionary for git](PowerType/Dictionaries/git.ps1) is far from complete and dosen't know about all commands and parameters yet.
 
 To uninstall run
 ```Powershell
@@ -51,7 +51,7 @@ Uninstall-Module PowerType
 [![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/3?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/3)
 [![GitHub milestone](https://img.shields.io/github/milestones/progress/AnderssonPeter/PowerType/4?style=flat-square)](https://github.com/AnderssonPeter/PowerType/milestone/4)
 
-This project is far from done but has the aim to provide autocomplete for common cli tools like [git](PowerType/Dictionaries/git.ps1), docker, dotnet, node, npm and many more while using powershell. 
+This project is far from done but has the aim to provide autocomplete for common cli tools like [git](PowerType/Dictionaries/git.ps1), [npm](PowerType/Dictionaries/npm.ps1), [adb](PowerType/Dictionaries/adb.ps1), docker, dotnet, node and many more while using powershell. 
 
 
 # Acknowledgements
