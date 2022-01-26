@@ -25,12 +25,12 @@
         [CommandParameter]@{
             Keys = @("start");
             Name = "start";
-            Description = "Alias for npm run start";
+            Description = "Alias for 'npm run start'";
         }
         [CommandParameter]@{
             Keys        = @("run", "run-script", "rum", "urn");
             Name        = "run";
-            Description = "Alias for npm run start";
+            Description = "Run the specified npm script";
             Parameters  = @(
                 [ValueParameter]@{
                     Name = "script";
