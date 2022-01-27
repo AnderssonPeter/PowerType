@@ -10,18 +10,18 @@
       },
       "FluentAssertions": {
         "type": "Direct",
-        "requested": "[6.3.0, )",
-        "resolved": "6.3.0",
-        "contentHash": "f+ywjTSNhc1HDtzCqtYHB6/Xuf69pznR8eUPJs1CoaFq00sCIg6KjGcXHwdWslnmy4x5TAq3kRw1728CSaQ/zw==",
+        "requested": "[6.4.0, )",
+        "resolved": "6.4.0",
+        "contentHash": "KOJE1UD7ndxoZAdmOraiUFLdcdGTArGQW8WYN+vwrC3mdt2G/B7gmsMOozgXKiNSh3fpD/Xp/0mhonRh8vrZKw==",
         "dependencies": {
           "System.Configuration.ConfigurationManager": "4.4.0"
         }
       },
       "FluentAssertions.Analyzers": {
         "type": "Direct",
-        "requested": "[0.13.0, )",
-        "resolved": "0.13.0",
-        "contentHash": "KXUw4o+1I/pH9FS3olKgg6cvYX+wuOBupG/SH9dSAK4H693W9fKLeEJBXqDkSyqag88+FkrqeQfNy4m3F57AQw=="
+        "requested": "[0.15.0, )",
+        "resolved": "0.15.0",
+        "contentHash": "MYRXsvx5nWXg1Ja7CJeueHW0VSMxz0cXy16LxT9N7DVX5thcchoyi8vDYfErdYE/J6cORmhBCZAf1j7JUxacKw=="
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",

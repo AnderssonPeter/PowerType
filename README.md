@@ -34,8 +34,9 @@ It's not feature complete yet but if you want to try it out run the following:
 Install-Module PowerType -AllowPrerelease
 Enable-PowerType
 ```
+Ensure that you are running `PowerShell 7.2` and `PSReadLine 2.2.0-beta4` or newer!
 
-If you now type `git` you should get some basic autocompletion, the [dictionary for git](PowerType/Dictionaries/git.ps1) is far from complete and dosen't know about all commands and parameters yet.
+If you now type `git` you should get some basic autocompletion, the [dictionary for git](PowerType/Dictionaries/git.ps1) is far from complete and doesn't know about all commands and parameters yet.
 
 To uninstall run
 ```Powershell

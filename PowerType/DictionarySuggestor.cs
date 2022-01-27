@@ -160,7 +160,7 @@ internal class DictionarySuggestor
 
     private static IEnumerable<PredictiveSuggestion> GetPartialSourceMatches(DictionaryParsingContext context, Source source, PowerShellString value) => source
                             .GetItems()
-                            .Where(x => x.Name.Contains(value.RawValue, StringComparison.OrdinalIgnoreCase))
+                            .Where(x => x.IsPartialMatch(value))
                             .Select(x => new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(value.Type, x.Name)), x.Description));
     private static bool IsValueDone(bool isLast, PowerShellString value) =>
         !isLast || (value.Type != StringConstantType.BareWord && value.IsEscapedOpened() && value.IsEscapedClosed());
@@ -171,20 +171,13 @@ internal class DictionarySuggestor
         {
             if (parameter.IsAvailable(context))
             {
-                if (parameter.HasKeys)
+                if (parameter.TryGetPartialKeyMatch(currentArgument, out var key))
                 {
-                    foreach (var key in parameter.Keys)
-                    {
-                        if (key.Contains(currentArgument.RawValue, StringComparison.OrdinalIgnoreCase))
-                        {
-                            yield return new PredictiveSuggestion(context.Reconstruct(key), parameter.Description);
-                            break;
-                        }
-                    }
+                    yield return new PredictiveSuggestion(context.Reconstruct(key), parameter.Description);
                 }
-                else if (parameter is ValueParameter valueParameter && valueParameter.Source != null)
+                else if (parameter is ValueParameter valueParameter && !valueParameter.HasKeys && valueParameter.Source != null)
                 {
-                    foreach (var sourceItem in valueParameter.Source.GetItems().Where(item => item.Name.Contains(currentArgument.RawValue, StringComparison.OrdinalIgnoreCase)))
+                    foreach (var sourceItem in valueParameter.Source.GetItems().Where(item => item.IsPartialMatch(currentArgument)))
                     {
                         yield return new PredictiveSuggestion(context.Reconstruct(GetFromRawWithPreferredType(currentArgument.Type, sourceItem.Name)), sourceItem.Description);
                     }

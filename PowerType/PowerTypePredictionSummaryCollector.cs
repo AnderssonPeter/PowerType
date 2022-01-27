@@ -3,7 +3,7 @@ using System.Management.Automation.Subsystem.Prediction;
 
 namespace PowerType;
 
-public record struct PowerTypePredictionSummary(DateTime When, string Input, string? TokenAtCursor, Exception? Exception, string[] Suggestions, TimeSpan Duration);
+public record struct PowerTypePredictionSummary(DateTime When, string Input, string? TokenAtCursor, Exception? Exception, string[]? Suggestions, TimeSpan Duration);
 
 public class PowerTypePredictionSummaryCollector
 {
@@ -11,7 +11,7 @@ public class PowerTypePredictionSummaryCollector
     private readonly PowerTypePredictionSummary[] items;
     private int offset = 0;
 
-    public PowerTypePredictionSummaryCollector(int size = 20)
+    public PowerTypePredictionSummaryCollector(int size = 40)
     {
         items = new PowerTypePredictionSummary[size];
     }
@@ -21,7 +21,7 @@ public class PowerTypePredictionSummaryCollector
         lock (locker)
         {
             var index = offset++ % items.Length;
-            items[index] = new PowerTypePredictionSummary(when, predictionContext.InputAst.ToString(), predictionContext.TokenAtCursor?.ToString(), exception, suggestionPackage.SuggestionEntries.Select(x => x.SuggestionText).ToArray(), duration);
+            items[index] = new PowerTypePredictionSummary(when, predictionContext.InputAst.ToString(), predictionContext.TokenAtCursor?.ToString(), exception, suggestionPackage.SuggestionEntries?.Select(x => x.SuggestionText)?.ToArray(), duration);
         }
     }
 
