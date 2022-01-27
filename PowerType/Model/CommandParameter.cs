@@ -22,10 +22,6 @@ public class CommandParameter : Parameter
         {
             throw new ArgumentNullException(nameof(Parameters));
         }
-        foreach (var parameter in Parameters)
-        {
-            parameter.Validate();
-        }
         //Check for duplicate names
         var duplcateNames = Parameters.GroupBy(x => x.Name)
             .Where(x => x.Count() > 1)
@@ -44,6 +40,10 @@ public class CommandParameter : Parameter
         if (duplicateKeys.Any())
         {
             throw new ArgumentOutOfRangeException($"Parameters with duplicate keys where found, keys: {string.Join(", ", duplicateKeys)}");
+        }
+        foreach (var parameter in Parameters)
+        {
+            parameter.Validate();
         }
     }
 }

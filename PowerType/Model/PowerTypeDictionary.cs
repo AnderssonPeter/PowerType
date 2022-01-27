@@ -50,6 +50,26 @@ public class PowerTypeDictionary
             throw new ArgumentNullException(nameof(Parameters));
         }
 
+        //Check for duplicate names
+        var duplcateNames = Parameters.GroupBy(x => x.Name)
+            .Where(x => x.Count() > 1)
+            .Select(x => x.Key);
+        if (duplcateNames.Any())
+        {
+            throw new ArgumentOutOfRangeException($"Parameters with duplicate names where found, names: {string.Join(", ", duplcateNames)}");
+        }
+        //Check for duplicate keys
+        var duplicateKeys = Parameters.Where(x => x.HasKeys)
+            .SelectMany(x => x.Keys)
+            .GroupBy(x => x)
+            .Where(x => x.Count() > 1)
+            .Select(x => x.Key);
+
+        if (duplicateKeys.Any())
+        {
+            throw new ArgumentOutOfRangeException($"Parameters with duplicate keys where found, keys: {string.Join(", ", duplicateKeys)}");
+        }
+
         foreach (var parameter in Parameters)
         {
             parameter.Validate();
