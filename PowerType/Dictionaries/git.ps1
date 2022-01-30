@@ -54,6 +54,18 @@ $allBranches = [DynamicSource]@{
     }
 }
 
+$localBranches = [DynamicSource]@{
+    Name = "LocalBranches";
+    Description = "Local branches";
+    CommandExpression = {
+        git --no-optional-locks branch --no-color  | % { $_.trim(' *$(') } | % { $_.StartsWith("remotes/origin/") ? $_.Substring(15) : $_ } | Where-Object { !$_.StartsWith("HEAD") } | Select -Unique
+    };
+    Cache = [Cache]@{
+        ByCurrentWorkingDirectory = $true;
+        ByTime = New-TimeSpan -Seconds 10
+    }
+}
+
 $stashes = [DynamicSource]@{
     Name = "Stashes";
     Description = "Stashes";
@@ -789,6 +801,10 @@ $stashes = [DynamicSource]@{
             Name = "merge";
             Description = "Join two or more development histories together";
             Parameters = @(
+                [ValueParameter]@{
+                    Name = "local-branch";
+                    Source = $localBranches
+                },
                 [FlagParameter]@{
                     Keys = @("--commit");
                     Name = "commit";
