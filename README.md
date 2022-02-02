@@ -81,4 +81,4 @@ This project is far from done but has the aim to provide autocomplete for common
 
 
 # Acknowledgements
-This is heavily inspired by [Fish shell](https://fishshell.com/) and [fig autocomplete](https://github.com/withfig/autocomplete), some dictionaries are generated from the specifications in [Carapace-bin](https://https://github.com/rsteube/carapace-bin/) big thanks to [rsteube](https://github.com/rsteube) for his patience and help!
+This is heavily inspired by [Fish shell](https://fishshell.com/) and [fig autocomplete](https://github.com/withfig/autocomplete), some dictionaries are generated from the specifications in [Carapace-bin](https://github.com/rsteube/carapace-bin/) big thanks to [rsteube](https://github.com/rsteube) for his patience and help!
