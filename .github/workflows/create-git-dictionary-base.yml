@@ -34,6 +34,12 @@ jobs:
         cd git/Documentation
         make
     
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: git xml base
+        path: 'git/Documentation/git-*.xml'
+
     - name: Move xml documentation
       run: |
         mv -v git/Documentation/git-*.xml PowerType/GenerateDictionaries/git/
