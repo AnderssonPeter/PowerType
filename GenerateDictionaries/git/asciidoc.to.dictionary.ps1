@@ -80,7 +80,7 @@ $lowPriorityCommands = @('am', 'instaweb', 'bugreport', 'daemon', 'update-server
 
 for ($i = $highPriorityCommands.length-1; $i -ge 0; $i--) {
     $command = 'git-' + $highPriorityCommands[$i] + '.xml'
-    $match = $files | Where { $_.Name -eq $command } | Select -First 1
+    $match = $files | Where-Object { $_.Name -eq $command } | Select-Object -First 1
     if ($match -eq $null)
     {
         Write-Error "The file '$command' did not exist"
@@ -94,7 +94,7 @@ for ($i = $highPriorityCommands.length-1; $i -ge 0; $i--) {
 foreach ($lowPriorityCommand in $lowPriorityCommands)
 {
     $command = 'git-' + $lowPriorityCommand + '.xml'
-    $match = $files | Where { $_.Name -eq $command } | Select -First 1
+    $match = $files | Where-Object { $_.Name -eq $command } | Select-Object -First 1
     if ($match -eq $null)
     {
         Write-Error "The file '$command' did not exist"
@@ -118,7 +118,7 @@ foreach ($file in $files)
 {
     Write-Host "Processing $file"
     [xml]$xmlDocument = Get-Content $file.FullName
-    $options = $xmlDocument.refentry.refsect1 | where { $_.id -eq '_options' }
+    $options = $xmlDocument.refentry.refsect1 | Where-Object { $_.id -eq '_options' }
     $parameters = $options.variablelist.varlistentry
     $inlineNoRegex = '^([\s\S]*)\[(-?no-?)\]([\s\S]*)$'
 
@@ -140,7 +140,7 @@ foreach ($file in $files)
         {
             #Write-Host $term.InnerText.Replace("`n", "").Replace("`r", "")
         }
-        $term = $terms | where { $_.InnerText -match $inlineNoRegex }
+        $term = $terms | Where-Object { $_.InnerText -match $inlineNoRegex }
         if ($term)
         {
 
@@ -158,7 +158,7 @@ foreach ($file in $files)
             $parameterClone.PrependChild($clonedTerm)
             $parameter.ParentNode.InsertAfter($parameterClone, $parameter)
 
-            $term = $terms | where { (TrimInnerText $_.InnerText) -match '^-n$' }
+            $term = $terms | Where-Object { (TrimInnerText $_.InnerText) -match '^-n$' }
             if ($term) {
                 $parameter.RemoveChild($term)
                 $parameterClone.InsertAfter($term, $clonedTerm)
@@ -175,7 +175,7 @@ foreach ($file in $files)
         {
             $parameter.RemoveChild($term)
         }
-        foreach ($term in $terms | Sort -Property { Number-OfDashes $_.InnerText } )
+        foreach ($term in $terms | Sort-Object -Property { Number-OfDashes $_.InnerText } )
         {
             $parameter.PrependChild($term)
         }
@@ -185,13 +185,13 @@ foreach ($file in $files)
     foreach ($parameter in $parameters)
     {
         $terms = $parameter.SelectNodes("term");
-        $term = $terms | where { $_.InnerText -match '-no-' }
+        $term = $terms | Where-Object { $_.InnerText -match '-no-' }
         if ($term) {
             $value = $term.InnerText
             Write-Host "Handle $value"
             # Check if there is one without no
             $withoutNo = $value.Replace('-no-', '-')
-            $match = $terms | where { 
+            $match = $terms | Where-Object { 
                 $_.InnerText -like "$withoutNo*"
             }
             
@@ -207,7 +207,7 @@ foreach ($file in $files)
                 $parameter.ParentNode.InsertAfter($parameterClone, $parameter)
                 $parameter.RemoveChild($term)
 
-                $term = $terms | where { (TrimInnerText $_.InnerText) -match '^-n$' }
+                $term = $terms | Where-Object { (TrimInnerText $_.InnerText) -match '^-n$' }
                 if ($term) {
                     $parameter.RemoveChild($term)
                     $parameterClone.InsertAfter($term, $clonedTerm)
@@ -248,7 +248,7 @@ foreach ($file in $files)
         $name = $parameter.SelectSingleNode("name").InnerText
         
         if ($name.StartsWith("no-")) {
-            $other = $parameters | where { $_.SelectSingleNode("name").InnerText -eq $name.Substring(3) }
+            $other = $parameters | Where-Object { $_.SelectSingleNode("name").InnerText -eq $name.Substring(3) }
             
             if ($other) {
                 $excludingElement = $xmlDocument.CreateElement("excluding")
@@ -266,7 +266,7 @@ foreach ($file in $files)
         }
 
         if ($name -eq "verbose") {
-            $other = $parameters | where { $_.SelectSingleNode("name").InnerText -eq "quiet" }
+            $other = $parameters | Where-Object { $_.SelectSingleNode("name").InnerText -eq "quiet" }
             
             if ($other) {
                 $otherName = $other.SelectSingleNode("name").InnerText
@@ -284,7 +284,7 @@ foreach ($file in $files)
         }
 
         if ($name -eq "ipv4") {
-            $other = $parameters | where { $_.SelectSingleNode("name").InnerText -eq "ipv6" }
+            $other = $parameters | Where-Object { $_.SelectSingleNode("name").InnerText -eq "ipv6" }
             
             if ($other) {
                 $otherName = $other.SelectSingleNode("name").InnerText
