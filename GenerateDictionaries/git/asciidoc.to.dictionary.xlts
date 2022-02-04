@@ -51,28 +51,13 @@
 </xsl:text>
         <xsl:for-each select="refentry/*[@id='_options']/variablelist/varlistentry">
             <xsl:text>            [</xsl:text>
-            <xsl:choose>
-                <xsl:when test="contains(., '=')">
-                    <xsl:text>Value</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:text>Flag</xsl:text>
-                </xsl:otherwise>
-            </xsl:choose>
-            <xsl:text></xsl:text>
+            <xsl:value-of disable-output-escaping="yes" select="./type"/>
             <xsl:text>Parameter]@{</xsl:text>
             <xsl:text>
                 Keys = @(</xsl:text>
             <xsl:for-each select="term">
                 <xsl:text>"</xsl:text>
-                <xsl:choose>
-                    <xsl:when test="contains(., '=')">
-                        <xsl:value-of disable-output-escaping="yes" select="substring-before(normalize-space(.), '=')"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of disable-output-escaping="yes" select="normalize-space(.)"/>
-                    </xsl:otherwise>
-                </xsl:choose>
+                    <xsl:value-of disable-output-escaping="yes" select="normalize-space(.)"/>
                 <xsl:text>"</xsl:text>
                 <xsl:if test="position() != last()">
                     <xsl:text>, </xsl:text>
@@ -80,21 +65,20 @@
             </xsl:for-each>
             <xsl:text>);
                 Name = "</xsl:text>
-            <xsl:choose>
-                <xsl:when test="contains(./term[last()], '=')">
-                    <xsl:value-of disable-output-escaping="yes" select="substring-before(substring-after(normalize-space(./term[last()]), '--'), '=')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of disable-output-escaping="yes" select="substring-after(normalize-space(./term[last()]), '--')"/>
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of disable-output-escaping="yes" select="./name"/>
             <xsl:text>";
                 Description = </xsl:text>
             <xsl:call-template name="format-string">
                 <xsl:with-param name="text" select="listitem/simpara"/>
             </xsl:call-template>
-            <xsl:if test="contains(., '=')">
+            <xsl:if test="./type = 'Value'">
                 <xsl:text>                Source = $???;
+</xsl:text>
+            </xsl:if>
+            <xsl:if test="./excluding">
+                <xsl:text>                Condition = [ExclusiveParameterCondition]::new("</xsl:text>
+                <xsl:value-of disable-output-escaping="yes" select="./excluding"/>
+                <xsl:text>");
 </xsl:text>
             </xsl:if>
             <xsl:text>            },
