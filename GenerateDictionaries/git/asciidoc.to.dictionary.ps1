@@ -158,7 +158,7 @@ foreach ($file in $files)
             $parameterClone.PrependChild($clonedTerm)
             $parameter.ParentNode.InsertAfter($parameterClone, $parameter)
 
-            $term = $terms | Where-Object { (TrimInnerText $_.InnerText) -match '^-n$' }
+            $term = $terms | Where-Object { (Trim-TermInnerText $_.InnerText) -match '^-n$' }
             if ($term) {
                 $parameter.RemoveChild($term)
                 $parameterClone.InsertAfter($term, $clonedTerm)
