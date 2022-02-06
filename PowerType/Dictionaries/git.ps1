@@ -519,7 +519,7 @@ $stashes = [DynamicSource]@{
                     Description = "Quiet, suppress feedback messages.";
                 },
                 [FlagParameter]@{
-                    Keys = @("--progress", "--no-progress");
+                    Keys = @("--progress");
                     Name = "progress";
                     Description = "Progress status is reported on the standard error stream by default when it is attached to a terminal, unless --quiet is specified. This flag enables progress reporting even if not attached to a terminal, regardless of --quiet.";
                     Condition = [ExclusiveParameterCondition]::new("no-progress");
@@ -2324,13 +2324,13 @@ $stashes = [DynamicSource]@{
                     Name = "source";
                     Description = "Print out the ref name given on the command line by which each commit was reached.";
                 },
-                [FlagParameter]@{Found multiple no
+                [FlagParameter]@{
                     Keys = @("--mailmap", "--use-mailmap");
                     Name = "mailmap";
                     Description = "Use mailmap file to map author and committer names and email addresses to canonical real names and email addresses. See git-shortlog1.";
                     Condition = [ExclusiveParameterCondition]::new("no-mailmap");
                 },
-                [FlagParameter]@{Found multiple no
+                [FlagParameter]@{
                     Keys = @("--no-mailmap", "--no-use-mailmap");
                     Name = "no-mailmap";
                     Description = "Use mailmap file to map author and committer names and email addresses to canonical real names and email addresses. See git-shortlog1.";
@@ -2344,8 +2344,8 @@ $stashes = [DynamicSource]@{
                 [FlagParameter]@{
                     Keys = @("--log-size");
                     Name = "log-size";
-                    Description = "Include a line “log size <number>” in the output for each commit, where <number> is the length of that commit’s message in bytes. Intended to speed up tools that read log messages from git log output by allowing them to allocate space in advance.";
-                },
+                    Description = "Include a line `“log size <number>`” in the output for each commit, where <number> is the length of that commit’s message in bytes. Intended to speed up tools that read log messages from git log output by allowing them to allocate space in advance.";
+                }
                 # we can't handle this currently
                 #[ValueParameter]@{
                 #	Keys = @("-L:", "-L");
@@ -2353,6 +2353,512 @@ $stashes = [DynamicSource]@{
                 #	Description = "Trace the evolution of the line range given by <start>,<end>, or by the function name regex <funcname>, within the <file>. You may not give any pathspec limiters. This is currently limited to a walk starting from a single revision, i.e., you may only give zero or one positive revision arguments, and <start> and <end> (or <funcname>) must exist in the starting revision. You can specify this option more than once. Implies --patch. Patch output can be suppressed using --no-patch, but other diff formats (namely --raw, --numstat, --shortstat, --dirstat, --summary, --name-only, --name-status, --check) are not currently implemented.";
                 #	Source = $???;
                 #}
+            )
+        },
+        [CommandParameter]@{
+            Keys = @("diff");
+            Name = "diff";
+            Description = "Show changes between commits, commit and working tree, etc";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("--patch", "-u", "-p");
+                    Name = "patch";
+                    Description = "Generate patch (see section on generating patches). This is the default.";
+                    Condition = [ExclusiveParameterCondition]::new("no-patch");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-patch", "-s");
+                    Name = "no-patch";
+                    Description = "Suppress diff output. Useful for commands like git show that show the patch by default, or to cancel the effect of --patch.";
+                    Condition = [ExclusiveParameterCondition]::new("patch");
+                },
+                [ValueParameter]@{
+                    Keys = @("--unified", "-U");
+                    Name = "unified";
+                    Description = "Generate diffs with <n> lines of context instead of the usual three. Implies --patch.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--output");
+                    Name = "output";
+                    Description = "Output to a specific file instead of stdout.";
+                    #Source = File
+                },
+                [ValueParameter]@{
+                    Keys = @("--output-indicator-context", "--output-indicator-old", "--output-indicator-new");
+                    Name = "output-indicator-context";
+                    Description = "Specify the character used to indicate new, old or context lines in the generated patch. Normally they are +, - and ' ' respectively.";
+                    #Source = $???;
+                },
+                [FlagParameter]@{
+                    Keys = @("--raw");
+                    Name = "raw";
+                    Description = "Generate the diff in raw format.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--patch-with-raw");
+                    Name = "patch-with-raw";
+                    Description = "Synonym for -p --raw.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--indent-heuristic");
+                    Name = "indent-heuristic";
+                    Description = "Enable the heuristic that shifts diff hunk boundaries to make patches easier to read. This is the default.";
+                    Condition = [ExclusiveParameterCondition]::new("no-indent-heuristic");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-indent-heuristic");
+                    Name = "no-indent-heuristic";
+                    Description = "Disable the indent heuristic.";
+                    Condition = [ExclusiveParameterCondition]::new("indent-heuristic");
+                },
+                [FlagParameter]@{
+                    Keys = @("--minimal");
+                    Name = "minimal";
+                    Description = "Spend extra time to make sure the smallest possible diff is produced.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--patience");
+                    Name = "patience";
+                    Description = "Generate a diff using the `"patience diff`" algorithm.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--histogram");
+                    Name = "histogram";
+                    Description = "Generate a diff using the `"histogram diff`" algorithm.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--anchored");
+                    Name = "anchored";
+                    Description = "Generate a diff using the `"anchored diff`" algorithm.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--diff-algorithm");
+                    Name = "diff-algorithm";
+                    Description = "Choose a diff algorithm. The variants are as follows:";
+                    Source = [StaticSource]@{
+                        Name = "diff-algorithm mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "patience";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "minimal";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "histogram";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "myers";
+                                Description = ""
+                            }
+                        )
+                    };
+                },
+                #We cant handle this correctly currently
+                #[ValueParameter]@{
+                #    Keys = @("--stat");
+                #    Name = "stat";
+                #    Description = "Generate a diffstat. By default, as much space as necessary will be used for the filename part, and the rest for the graph part. Maximum width defaults to terminal width, or 80 columns if not connected to a terminal, and can be overridden by <width>. The width of the filename part can be limited by giving another width <name-width> after a comma. The width of the graph part can be limited by using --stat-graph-width=<width> (affects all commands generating a stat graph) or by setting diff.statGraphWidth=<width> (does not affect git format-patch). By giving a third parameter <count>, you can limit the output to the first <count> lines, followed by ... if there are more.";
+                #    Source = $???;
+                #},
+                [FlagParameter]@{
+                    Keys = @("--compact-summary");
+                    Name = "compact-summary";
+                    Description = "Output a condensed summary of extended header information such as file creations or deletions (`"new`" or `"gone`", optionally `"+l`" if it’s a symlink) and mode changes (`"+x`" or `"-x`" for adding or removing executable bit respectively) in diffstat. The information is put between the filename part and the graph part. Implies --stat.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--numstat");
+                    Name = "numstat";
+                    Description = "Similar to --stat, but shows number of added and deleted lines in decimal notation and pathname without abbreviation, to make it more machine friendly. For binary files, outputs two - instead of saying 0 0.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--shortstat");
+                    Name = "shortstat";
+                    Description = "Output only the last line of the --stat format containing total number of modified files, as well as number of added and deleted lines.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--dirstat", "-X");
+                    Name = "dirstat";
+                    Description = "Output the distribution of relative amount of changes for each sub-directory. The behavior of --dirstat can be customized by passing it a comma separated list of parameters. The defaults are controlled by the diff.dirstat configuration variable (see git-config1). The following parameters are available:";
+                    #Source = $???;
+                },
+                [FlagParameter]@{
+                    Keys = @("--cumulative");
+                    Name = "cumulative";
+                    Description = "Synonym for --dirstat=cumulative";
+                },
+                [ValueParameter]@{
+                    Keys = @("--dirstat-by-file");
+                    Name = "dirstat-by-file";
+                    Description = "Synonym for --dirstat=files,param1,param2…";
+                    #Source = $???;
+                },
+                [FlagParameter]@{
+                    Keys = @("--summary");
+                    Name = "summary";
+                    Description = "Output a condensed summary of extended header information such as creations, renames and mode changes.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--patch-with-stat");
+                    Name = "patch-with-stat";
+                    Description = "Synonym for -p --stat.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-z");
+                    Name = "z";
+                    Description = "When --raw, --numstat, --name-only or --name-status has been given, do not munge pathnames and use NULs as output field terminators.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--name-only");
+                    Name = "name-only";
+                    Description = "Show only names of changed files. The file names are often encoded in UTF-8. For more information see the discussion about encoding in the git-log1 manual page.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--name-status");
+                    Name = "name-status";
+                    Description = "Show only names and status of changed files. See the description of the --diff-filter option on what the status letters mean. Just like --name-only the file names are often encoded in UTF-8.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--submodule");
+                    Name = "submodule";
+                    Description = "Specify how differences in submodules are shown. When specifying --submodule=short the short format is used. This format just shows the names of the commits at the beginning and end of the range. When --submodule or --submodule=log is specified, the log format is used. This format lists the commits in the range like git-submodule1summary does. When --submodule=diff is specified, the diff format is used. This format shows an inline diff of the changes in the submodule contents between the commit range. Defaults to diff.submodule or the short format if the config option is unset.";
+                    #Source = $???;
+                },
+                [ValueParameter]@{
+                    Keys = @("--color");
+                    Name = "color";
+                    Description = "Show colored diff. --color (i.e. without =<when>) is the same as --color=always. <when> can be one of always, never, or auto. It can be changed by the color.ui and color.diff configuration settings.";
+                    #Source = $???;
+                    Condition = [ExclusiveParameterCondition]::new("no-color");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-color");
+                    Name = "no-color";
+                    Description = "Turn off colored diff. This can be used to override configuration settings. It is the same as --color=never.";
+                    Condition = [ExclusiveParameterCondition]::new("color");
+                },
+                [ValueParameter]@{
+                    Keys = @("--color-moved");
+                    Name = "color-moved";
+                    Description = "Moved lines of code are colored differently. It can be changed by the diff.colorMoved configuration setting. The <mode> defaults to no if the option is not given and to zebra if the option with no mode is given. The mode must be one of:";
+                    #Source = $???;
+                    Condition = [ExclusiveParameterCondition]::new("no-color-moved");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-color-moved");
+                    Name = "no-color-moved";
+                    Description = "Turn off move detection. This can be used to override configuration settings. It is the same as --color-moved=no.";
+                    Condition = [ExclusiveParameterCondition]::new("color-moved");
+                },
+                [ValueParameter]@{
+                    Keys = @("--color-moved-ws");
+                    Name = "color-moved-ws";
+                    Description = "This configures how whitespace is ignored when performing the move detection for --color-moved. It can be set by the diff.colorMovedWS configuration setting. These modes can be given as a comma separated list:";
+                    #Source = $???;
+                    Condition = [ExclusiveParameterCondition]::new("no-color-moved-ws");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-color-moved-ws");
+                    Name = "no-color-moved-ws";
+                    Description = "Do not ignore whitespace when performing move detection. This can be used to override configuration settings. It is the same as --color-moved-ws=no.";
+                    Condition = [ExclusiveParameterCondition]::new("color-moved-ws");
+                },
+                [ValueParameter]@{
+                    Keys = @("--word-diff");
+                    Name = "word-diff";
+                    Description = "Show a word diff, using the <mode> to delimit changed words. By default, words are delimited by whitespace; see --word-diff-regex below. The <mode> defaults to plain, and must be one of:";
+                    Source = [StaticSource]@{
+                        Name = "word-diff mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "color";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "plain";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "porcelain";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "none";
+                                Description = ""
+                            }
+                        )
+                    };
+                },
+                [ValueParameter]@{
+                    Keys = @("--word-diff-regex");
+                    Name = "word-diff-regex";
+                    Description = "Use <regex> to decide what a word is, instead of considering runs of non-whitespace to be a word. Also implies --word-diff unless it was already enabled.";
+                    #Source = regex;
+                },
+                [ValueParameter]@{
+                    Keys = @("--color-words");
+                    Name = "color-words";
+                    Description = "Equivalent to --word-diff=color plus (if a regex was specified) --word-diff-regex=<regex>.";
+                    #Source = regex;
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-renames");
+                    Name = "no-renames";
+                    Description = "Turn off rename detection, even when the configuration file gives the default to do so.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--rename-empty");
+                    Name = "rename-empty";
+                    Description = "Whether to use empty blobs as rename source.";
+                    Condition = [ExclusiveParameterCondition]::new("no-rename-empty");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-rename-empty");
+                    Name = "no-rename-empty";
+                    Description = "Whether to use empty blobs as rename source.";
+                    Condition = [ExclusiveParameterCondition]::new("rename-empty");
+                },
+                [FlagParameter]@{
+                    Keys = @("--check");
+                    Name = "check";
+                    Description = "Warn if changes introduce conflict markers or whitespace errors. What are considered whitespace errors is controlled by core.whitespace configuration. By default, trailing whitespaces (including lines that consist solely of whitespaces) and a space character that is immediately followed by a tab character inside the initial indent of the line are considered whitespace errors. Exits with non-zero status if problems are found. Not compatible with --exit-code.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--ws-error-highlight");
+                    Name = "ws-error-highlight";
+                    Description = "Highlight whitespace errors in the context, old or new lines of the diff. Multiple values are separated by comma, none resets previous values, default reset the list to new and all is a shorthand for old,new,context. When this option is not given, and the configuration variable diff.wsErrorHighlight is not set, only whitespace errors in new lines are highlighted. The whitespace errors are colored with color.diff.whitespace.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--full-index");
+                    Name = "full-index";
+                    Description = "Instead of the first handful of characters, show the full pre- and post-image blob object names on the `"index`" line when generating patch format output.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--binary");
+                    Name = "binary";
+                    Description = "In addition to --full-index, output a binary diff that can be applied with git-apply. Implies --patch.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--abbrev");
+                    Name = "abbrev";
+                    Description = "Instead of showing the full 40-byte hexadecimal object name in diff-raw format output and diff-tree header lines, show the shortest prefix that is at least <n> hexdigits long that uniquely refers the object. In diff-patch output format, --full-index takes higher precedence, i.e. if --full-index is specified, full blob names will be shown regardless of --abbrev. Non default number of digits can be specified with --abbrev=<n>.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--break-rewrites", "-B");
+                    Name = "break-rewrites";
+                    Description = "Break complete rewrite changes into pairs of delete and create. This serves two purposes:";
+                },
+                [ValueParameter]@{
+                    Keys = @("--find-renames", "-M");
+                    Name = "find-renames";
+                    Description = "Detect renames. If n is specified, it is a threshold on the similarity index (i.e. amount of addition/deletions compared to the file’s size). For example, -M90% means Git should consider a delete/add pair to be a rename if more than 90% of the file hasn’t changed. Without a % sign, the number is to be read as a fraction, with a decimal point before it. I.e., -M5 becomes 0.5, and is thus the same as -M50%. Similarly, -M05 is the same as -M5%. To limit detection to exact renames, use -M100%. The default similarity index is 50%.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--find-copies", "-C");
+                    Name = "find-copies";
+                    Description = "Detect copies as well as renames. See also --find-copies-harder. If n is specified, it has the same meaning as for -M<n>.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--find-copies-harder");
+                    Name = "find-copies-harder";
+                    Description = "For performance reasons, by default, -C option finds copies only if the original file of the copy was modified in the same changeset. This flag makes the command inspect unmodified files as candidates for the source of copy. This is a very expensive operation for large projects, so use it with caution. Giving more than one -C option has the same effect.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--irreversible-delete", "-D");
+                    Name = "irreversible-delete";
+                    Description = "Omit the preimage for deletes, i.e. print only the header but not the diff between the preimage and /dev/null. The resulting patch is not meant to be applied with patch or git apply; this is solely for people who want to just concentrate on reviewing the text after the change. In addition, the output obviously lacks enough information to apply such a patch in reverse, even manually, hence the name of the option.";
+                },
+                [ValueParameter]@{
+                    Keys = @("-l");
+                    Name = "l";
+                    Description = "The -M and -C options involve some preliminary steps that can detect subsets of renames/copies cheaply, followed by an exhaustive fallback portion that compares all remaining unpaired destinations to all relevant sources. (For renames, only remaining unpaired sources are relevant; for copies, all original sources are relevant.) For N sources and destinations, this exhaustive check is O(N^2). This option prevents the exhaustive portion of rename/copy detection from running if the number of source/destination files involved exceeds the specified number. Defaults to diff.renameLimit. Note that a value of 0 is treated as unlimited.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--diff-filter");
+                    Name = "diff-filter";
+                    Description = "Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R), have their type (i.e. regular file, symlink, submodule, …) changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B). Any combination of the filter characters (including none) can be used. When * (All-or-none) is added to the combination, all paths are selected if there is any file that matches other criteria in the comparison; if there is no file that matches other criteria, nothing is selected.";
+                },
+                [ValueParameter]@{
+                    Keys = @("-S");
+                    Name = "S";
+                    Description = "Look for differences that change the number of occurrences of the specified string (i.e. addition/deletion) in a file. Intended for the scripter’s use.";
+                },
+                [ValueParameter]@{
+                    Keys = @("-G");
+                    Name = "G";
+                    Description = "Look for differences whose patch text contains added/removed lines that match <regex>.";
+                    #Source = regex;
+                },
+                [ValueParameter]@{
+                    Keys = @("--find-object");
+                    Name = "find-object";
+                    Description = "Look for differences that change the number of occurrences of the specified object. Similar to -S, just the argument is different in that it doesn’t search for a specific string but for a specific object id.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--pickaxe-all");
+                    Name = "pickaxe-all";
+                    Description = "When -S or -G finds a change, show all the changes in that changeset, not just the files that contain the change in <string>.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--pickaxe-regex");
+                    Name = "pickaxe-regex";
+                    Description = "Treat the <string> given to -S as an extended POSIX regular expression to match.";
+                },
+                [ValueParameter]@{
+                    Keys = @("-O");
+                    Name = "O";
+                    Description = "Control the order in which files appear in the output. This overrides the diff.orderFile configuration variable (see git-config1). To cancel diff.orderFile, use -O/dev/null.";
+                    #Source = File ?;
+                },
+                [ValueParameter]@{
+                    Keys = @("--rotate-to", "--skip-to");
+                    Name = "rotate-to";
+                    Description = "Discard the files before the named <file> from the output (i.e. skip to), or move them to the end of the output (i.e. rotate to). These were invented primarily for use of the git difftool command, and may not be very useful otherwise.";
+                    #Source = File ?;
+                },
+                [FlagParameter]@{
+                    Keys = @("-R");
+                    Name = "R";
+                    Description = "Swap two inputs; that is, show differences from index or on-disk file to tree contents.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--relative");
+                    Name = "relative";
+                    Description = "When run from a subdirectory of the project, it can be told to exclude changes outside the directory and show pathnames relative to it with this option. When you are not in a subdirectory (e.g. in a bare repository), you can name which subdirectory to make the output relative to by giving a <path> as an argument. --no-relative can be used to countermand both diff.relative config option and previous --relative.";
+                    #Source = Path;
+                    Condition = [ExclusiveParameterCondition]::new("no-relative");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-relative");
+                    Name = "no-relative";
+                    Description = "When run from a subdirectory of the project, it can be told to exclude changes outside the directory and show pathnames relative to it with this option. When you are not in a subdirectory (e.g. in a bare repository), you can name which subdirectory to make the output relative to by giving a <path> as an argument. --no-relative can be used to countermand both diff.relative config option and previous --relative.";
+                    Condition = [ExclusiveParameterCondition]::new("relative");
+                },
+                [FlagParameter]@{
+                    Keys = @("--text", "-a");
+                    Name = "text";
+                    Description = "Treat all files as text.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--ignore-cr-at-eol");
+                    Name = "ignore-cr-at-eol";
+                    Description = "Ignore carriage-return at the end of line when doing a comparison.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--ignore-space-at-eol");
+                    Name = "ignore-space-at-eol";
+                    Description = "Ignore changes in whitespace at EOL.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--ignore-space-change", "-b");
+                    Name = "ignore-space-change";
+                    Description = "Ignore changes in amount of whitespace. This ignores whitespace at line end, and considers all other sequences of one or more whitespace characters to be equivalent.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--ignore-all-space", "-w");
+                    Name = "ignore-all-space";
+                    Description = "Ignore whitespace when comparing lines. This ignores differences even if one line has whitespace where the other line has none.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--ignore-blank-lines");
+                    Name = "ignore-blank-lines";
+                    Description = "Ignore changes whose lines are all blank.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--ignore-matching-lines", "-I");
+                    Name = "ignore-matching-lines";
+                    Description = "Ignore changes whose all lines match <regex>. This option may be specified more than once.";
+                    #Source = regex;
+                },
+                [ValueParameter]@{
+                    Keys = @("--inter-hunk-context");
+                    Name = "inter-hunk-context";
+                    Description = "Show the context between diff hunks, up to the specified number of lines, thereby fusing hunks that are close to each other. Defaults to diff.interHunkContext or 0 if the config option is unset.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--function-context", "-W");
+                    Name = "function-context";
+                    Description = "Show whole function as context lines for each change. The function names are determined in the same way as git diff works out patch hunk headers (see Defining a custom hunk-header in gitattributes5).";
+                },
+                [FlagParameter]@{
+                    Keys = @("--exit-code");
+                    Name = "exit-code";
+                    Description = "Make the program exit with codes similar to diff(1). That is, it exits with 1 if there were differences and 0 means no differences.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--quiet");
+                    Name = "quiet";
+                    Description = "Disable all output of the program. Implies --exit-code.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--ext-diff");
+                    Name = "ext-diff";
+                    Description = "Allow an external diff helper to be executed. If you set an external diff driver with gitattributes5, you need to use this option with git-log1 and friends.";
+                    Condition = [ExclusiveParameterCondition]::new("no-ext-diff");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-ext-diff");
+                    Name = "no-ext-diff";
+                    Description = "Disallow external diff drivers.";
+                    Condition = [ExclusiveParameterCondition]::new("ext-diff");
+                },
+                [FlagParameter]@{
+                    Keys = @("--textconv");
+                    Name = "textconv";
+                    Description = "Allow (or disallow) external text conversion filters to be run when comparing binary files. See gitattributes5 for details. Because textconv filters are typically a one-way conversion, the resulting diff is suitable for human consumption, but cannot be applied. For this reason, textconv filters are enabled by default only for git-diff1 and git-log1, but not for git-format-patch1 or diff plumbing commands.";
+                    Condition = [ExclusiveParameterCondition]::new("no-textconv");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-textconv");
+                    Name = "no-textconv";
+                    Description = "Allow (or disallow) external text conversion filters to be run when comparing binary files. See gitattributes5 for details. Because textconv filters are typically a one-way conversion, the resulting diff is suitable for human consumption, but cannot be applied. For this reason, textconv filters are enabled by default only for git-diff1 and git-log1, but not for git-format-patch1 or diff plumbing commands.";
+                    Condition = [ExclusiveParameterCondition]::new("textconv");
+                },
+                [ValueParameter]@{
+                    Keys = @("--ignore-submodules");
+                    Name = "ignore-submodules";
+                    Description = "Ignore changes to submodules in the diff generation. &lt;when&gt; can be either `"none`", `"untracked`", `"dirty`" or `"all`", which is the default. Using `"none`" will consider the submodule modified when it either contains untracked or modified files or its HEAD differs from the commit recorded in the superproject and can be used to override any settings of the ignore option in git-config1 or gitmodules5. When `"untracked`" is used submodules are not considered dirty when they only contain untracked content (but they are still scanned for modified content). Using `"dirty`" ignores all changes to the work tree of submodules, only changes to the commits stored in the superproject are shown (this was the behavior until 1.7.0). Using `"all`" hides all changes to submodules.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--src-prefix");
+                    Name = "src-prefix";
+                    Description = "Show the given source prefix instead of `"a/`".";
+                },
+                [ValueParameter]@{
+                    Keys = @("--dst-prefix");
+                    Name = "dst-prefix";
+                    Description = "Show the given destination prefix instead of `"b/`".";
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-prefix");
+                    Name = "no-prefix";
+                    Description = "Do not show any source or destination prefix.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--line-prefix");
+                    Name = "line-prefix";
+                    Description = "Prepend an additional prefix to every line of output.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--ita-invisible-in-index");
+                    Name = "ita-invisible-in-index";
+                    Description = "By default entries added by `"git add -N`" appear as an existing empty file in `"git diff`" and a new file in `"git diff --cached`". This option makes the entry appear as a new file in `"git diff`" and non-existent in `"git diff --cached`". This option could be reverted with --ita-visible-in-index. Both options are experimental and could be removed in future.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-0");
+                    Name = "0";
+                    Description = "Omit diff output for unmerged entries and just show `"Unmerged`". Can be used only when comparing the working tree with the index.";
+                },
+                [ValueParameter]@{
+                    Name = "path";
+                    Description = "The <paths> parameters, when given, are used to limit the diff to the named paths (you can give directory names and get diff for all files under them).";
+                    #Source = Path;
+                }
             )
         }
     )
