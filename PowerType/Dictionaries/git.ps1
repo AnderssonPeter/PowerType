@@ -2268,6 +2268,92 @@ $stashes = [DynamicSource]@{
                     Description = "Read refspecs, one per line, from stdin in addition to those provided as arguments. The `"tag &lt;name&gt;`" format is not supported.";
                 }
             )
+        },
+        [CommandParameter]@{
+            Keys = @("log");
+            Name = "log";
+            Description = "Show commit logs";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("--follow");
+                    Name = "follow";
+                    Description = "Continue listing the history of a file beyond renames (works only for a single file).";
+                },
+                [ValueParameter]@{
+                    Keys = @("--decorate");
+                    Name = "decorate";
+                    Description = "Print out the ref names of any commits that are shown. If short is specified, the ref name prefixes refs/heads/, refs/tags/ and refs/remotes/ will not be printed. If full is specified, the full ref name (including prefix) will be printed. If auto is specified, then if the output is going to a terminal, the ref names are shown as if short were given, otherwise no ref names are shown. The option --decorate is short-hand for --decorate=short. Default to configuration value of log.decorate if configured, otherwise, auto.";
+                    Source = [StaticSource]@{
+                        Name = "decorate mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "short";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "full";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "auto";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "no";
+                                Description = ""
+                            }
+                        )
+                    };
+                    Condition = [ExclusiveParameterCondition]::new("no-decorate");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-decorate");
+                    Name = "no-decorate";
+                    Description = "Print out the ref names of any commits that are shown. If short is specified, the ref name prefixes refs/heads/, refs/tags/ and refs/remotes/ will not be printed. If full is specified, the full ref name (including prefix) will be printed. If auto is specified, then if the output is going to a terminal, the ref names are shown as if short were given, otherwise no ref names are shown. The option --decorate is short-hand for --decorate=short. Default to configuration value of log.decorate if configured, otherwise, auto.";
+                    Condition = [ExclusiveParameterCondition]::new("decorate");
+                },
+                [ValueParameter]@{
+                    Keys = @("--decorate-refs-exclude", "--decorate-refs");
+                    Name = "decorate-refs-exclude";
+                    Description = "If no --decorate-refs is given, pretend as if all refs were included. For each candidate, do not use it for decoration if it matches any patterns given to --decorate-refs-exclude or if it doesn’t match any of the patterns given to --decorate-refs. The log.excludeDecoration config option allows excluding refs from the decorations, but an explicit --decorate-refs pattern will override a match in log.excludeDecoration.";
+                    # Source = pattern?;
+                },
+                [FlagParameter]@{
+                    Keys = @("--source");
+                    Name = "source";
+                    Description = "Print out the ref name given on the command line by which each commit was reached.";
+                },
+                [FlagParameter]@{Found multiple no
+                    Keys = @("--mailmap", "--use-mailmap");
+                    Name = "mailmap";
+                    Description = "Use mailmap file to map author and committer names and email addresses to canonical real names and email addresses. See git-shortlog1.";
+                    Condition = [ExclusiveParameterCondition]::new("no-mailmap");
+                },
+                [FlagParameter]@{Found multiple no
+                    Keys = @("--no-mailmap", "--no-use-mailmap");
+                    Name = "no-mailmap";
+                    Description = "Use mailmap file to map author and committer names and email addresses to canonical real names and email addresses. See git-shortlog1.";
+                    Condition = [ExclusiveParameterCondition]::new("mailmap");
+                },
+                [FlagParameter]@{
+                    Keys = @("--full-diff");
+                    Name = "full-diff";
+                    Description = "Without this flag, git log -p &lt;path&gt;... shows commits that touch the specified paths, and diffs about the same specified paths. With this, the full diff is shown for commits that touch the specified paths; this means that `"&lt;path&gt;…`" limits only commits, and doesn’t limit diff for those commits.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--log-size");
+                    Name = "log-size";
+                    Description = "Include a line “log size <number>” in the output for each commit, where <number> is the length of that commit’s message in bytes. Intended to speed up tools that read log messages from git log output by allowing them to allocate space in advance.";
+                },
+                # we can't handle this currently
+                #[ValueParameter]@{
+                #	Keys = @("-L:", "-L");
+                #	Name = "L:";
+                #	Description = "Trace the evolution of the line range given by <start>,<end>, or by the function name regex <funcname>, within the <file>. You may not give any pathspec limiters. This is currently limited to a walk starting from a single revision, i.e., you may only give zero or one positive revision arguments, and <start> and <end> (or <funcname>) must exist in the starting revision. You can specify this option more than once. Implies --patch. Patch output can be suppressed using --no-patch, but other diff formats (namely --raw, --numstat, --shortstat, --dirstat, --summary, --name-only, --name-status, --check) are not currently implemented.";
+                #	Source = $???;
+                #}
+            )
         }
     )
 }
