@@ -200,7 +200,7 @@ foreach ($file in $files)
             $value = $term.InnerText
             Write-Host "Handle $value"
             # Check if there is one without no
-            $withoutNo = $value.Replace('-no-', '-')
+            $withoutNo = Trim-TermInnerText $value.Replace('-no-', '-')
             $match = $terms | Where-Object { 
                 $_.InnerText -like "$withoutNo*"
             }
