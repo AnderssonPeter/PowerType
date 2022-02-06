@@ -141,11 +141,21 @@ foreach ($file in $files)
             #Write-Host $term.InnerText.Replace("`n", "").Replace("`r", "")
         }
         $term = $terms | Where-Object { $_.InnerText -match $inlineNoRegex }
+
+
+        if ($term -is [system.array]) {
+            $errorElement = $xmlDocument.CreateElement("error")
+            $errorElement.InnerText = "Found multiple no"
+            $parameter.AppendChild($errorElement)
+            continue
+        }
+
+        #Handle if there are multiple [-no-] matches
         if ($term)
         {
-
             $value = $term.InnerText
             #Write-Host "Fixing $value"
+            
             $term.InnerText = $value -replace $inlineNoRegex, '$1$3'
 
             $parameterClone = $parameter.CloneNode($true)
