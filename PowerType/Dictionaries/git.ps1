@@ -27,6 +27,29 @@ $cleanupMode = [StaticSource]@{
     )
 }
 
+$recurseSubmodulesMode = [StaticSource]@{
+    Name = "recurse-submodules mode";
+    Description = "";
+    Items = @(
+        [SourceItem]@{
+            Name = "check";
+            Description = ""
+        },
+        [SourceItem]@{
+            Name = "on-demand";
+            Description = ""
+        },
+        [SourceItem]@{
+            Name = "only";
+            Description = ""
+        },
+        [SourceItem]@{
+            Name = "no";
+            Description = ""
+        }
+    )
+}
+
 $executionBit = [StaticSource]@{
     Name = "executable bit";
     Description = "Allow the execution of file";
@@ -317,9 +340,16 @@ $stashes = [DynamicSource]@{
                     #Source = File;
                 },
                 [FlagParameter]@{
-                    Keys = @("--signoff", "--no-signoff", "-s");
+                    Keys = @("--signoff", "-s");
+                    Name = "signoff";
+                    Description = "Add a Signed-off-by trailer by the committer at the end of the commit log message. The meaning of a signoff depends on the project to which you’re committing. For example, it may certify that the committer has the rights to submit the work under the project’s license or agrees to some contributor representation, such as a Developer Certificate of Origin. (See http://developercertificate.org for the one used by the Linux kernel and Git projects.) Consult the documentation or leadership of the project to which you’re contributing to understand how the signoffs are used in that project.";
+                    Condition = [ExclusiveParameterCondition]::new("no-signoff")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-signoff");
                     Name = "no-signoff";
                     Description = "Add a Signed-off-by trailer by the committer at the end of the commit log message. The meaning of a signoff depends on the project to which you’re committing. For example, it may certify that the committer has the rights to submit the work under the project’s license or agrees to some contributor representation, such as a Developer Certificate of Origin. (See http://developercertificate.org for the one used by the Linux kernel and Git projects.) Consult the documentation or leadership of the project to which you’re contributing to understand how the signoffs are used in that project.";
+                    Condition = [ExclusiveParameterCondition]::new("signoff")
                 },
                 [ValueParameter]@{
                     Keys = @("--trailer");
@@ -492,6 +522,13 @@ $stashes = [DynamicSource]@{
                     Keys = @("--progress", "--no-progress");
                     Name = "progress";
                     Description = "Progress status is reported on the standard error stream by default when it is attached to a terminal, unless --quiet is specified. This flag enables progress reporting even if not attached to a terminal, regardless of --quiet.";
+                    Condition = [ExclusiveParameterCondition]::new("no-progress");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-progress");
+                    Name = "no-progress";
+                    Description = "Progress status is reported on the standard error stream by default when it is attached to a terminal, unless --quiet is specified. This flag enables progress reporting even if not attached to a terminal, regardless of --quiet.";
+                    Condition = [ExclusiveParameterCondition]::new("progress");
                 },
                 [FlagParameter]@{
                     Keys = @("--force", "-f");
@@ -503,17 +540,17 @@ $stashes = [DynamicSource]@{
                     Name = "ours";
                     Description = "When checking out paths from the index, check out stage #2 (ours) or #3 (theirs) for unmerged paths.";
                 },
-                [FlagParameter]@{
+                [ValueParameter]@{
                     Keys = @("-b");
                     Name = "Create new branch";
                     Description = "Create a new branch named <new_branch> and start it at <start_point>; see git-branch1 for details.";
-                    #Condition = Not contains -B
+                    Condition = [ExclusiveParameterCondition]::new("Create new or reset branch");
                 },
-                [FlagParameter]@{
+                [ValueParameter]@{
                     Keys = @("-B");
                     Name = "Create new or reset branch";
                     Description = "Creates the branch <new_branch> and start it at <start_point>; if it already exists, then reset it to <start_point>. This is equivalent to running `"git branch`" with `"-f`"; see git-branch1 for details.";
-                    #Condition = Not contains -b
+                    Condition = [ExclusiveParameterCondition]::new("Create new branch");
                 },
                 [FlagParameter]@{
                     Keys = @("--track", "-t");
@@ -591,14 +628,29 @@ $stashes = [DynamicSource]@{
                     Description = "git checkout refuses when the wanted ref is already checked out by another worktree. This option makes it check the ref out anyway. In other words, the ref can be held by more than one worktree.";
                 },
                 [FlagParameter]@{
-                    Keys = @("--overwrite-ignore", "--no-overwrite-ignore");
+                    Keys = @("--overwrite-ignore");
                     Name = "overwrite-ignore";
                     Description = "Silently overwrite ignored files when switching branches. This is the default behavior. Use --no-overwrite-ignore to abort the operation when the new branch contains ignored files.";
+                    Condition = [ExclusiveParameterCondition]::new("no-overwrite-ignore");
                 },
                 [FlagParameter]@{
-                    Keys = @("--recurse-submodules", "--no-recurse-submodules");
+                    Keys = @("--no-overwrite-ignore");
+                    Name = "no-overwrite-ignore";
+                    Description = "Silently overwrite ignored files when switching branches. This is the default behavior. Use --no-overwrite-ignore to abort the operation when the new branch contains ignored files.";
+                    Condition = [ExclusiveParameterCondition]::new("overwrite-ignore");
+                },
+
+                [FlagParameter]@{
+                    Keys = @("--recurse-submodules");
                     Name = "recurse-submodules";
                     Description = "Using --recurse-submodules will update the content of all active submodules according to the commit recorded in the superproject. If local modifications in a submodule would be overwritten the checkout will fail unless -f is used. If nothing (or --no-recurse-submodules) is used, submodules working trees will not be updated. Just like git-submodule1 , this will detach HEAD of the submodule.";
+                Condition = [ExclusiveParameterCondition]::new("no-recurse-submodules");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-recurse-submodules");
+                    Name = "no-recurse-submodules";
+                    Description = "Using --recurse-submodules will update the content of all active submodules according to the commit recorded in the superproject. If local modifications in a submodule would be overwritten the checkout will fail unless -f is used. If nothing (or --no-recurse-submodules) is used, submodules working trees will not be updated. Just like git-submodule1, this will detach HEAD of the submodule.";
+                    Condition = [ExclusiveParameterCondition]::new("recurse-submodules");
                 },
                 [FlagParameter]@{
                     Keys = @("--overlay");
@@ -751,6 +803,7 @@ $stashes = [DynamicSource]@{
                         [FlagParameter]@{
                             Keys = @("--quiet", "-q");
                             Name = "quiet";
+                            Description = "This option is only valid for apply, drop, pop, push, save, store commands.";
                         },
                         [ValueParameter]@{
                             Keys = @("--message", "-m");
@@ -814,6 +867,7 @@ $stashes = [DynamicSource]@{
                 [FlagParameter]@{
                     Keys = @("--no-commit");
                     Name = "no-commit";
+                    Description = "Perform the merge and commit the result. This option can be used to override --no-commit.";
                     Condition = [ExclusiveParameterCondition]::new("commit")
                 },
                 [FlagParameter]@{
@@ -835,9 +889,16 @@ $stashes = [DynamicSource]@{
                     Source = $cleanupMode
                 },
                 [FlagParameter]@{
-                    Keys = @("--ff", "--no-ff", "--ff-only");
+                    Keys = @("--ff", "--ff-only");
                     Name = "ff-only";
                     Description = "Specifies how a merge is handled when the merged-in history is already a descendant of the current history. --ff is the default unless merging an annotated (and possibly signed) tag that is not stored in its natural place in the refs/tags/ hierarchy, in which case --no-ff is assumed.";
+                    Condition = [ExclusiveParameterCondition]::new("no-ff")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-ff");
+                    Name = "no-ff";
+                    Description = "Specifies how a merge is handled when the merged-in history is already a descendant of the current history. --ff is the default unless merging an annotated (and possibly signed) tag that is not stored in its natural place in the refs/tags/ hierarchy, in which case --no-ff is assumed.";
+                    Condition = [ExclusiveParameterCondition]::new("ff-only")
                 },
                 [ValueParameter]@{
                     Keys = @("--gpg-sign", "-S");
@@ -848,7 +909,7 @@ $stashes = [DynamicSource]@{
                 [FlagParameter]@{
                     Keys = @("--no-gpg-sign");
                     Name = "no-gpg-sign";
-                    Condition = [ExclusiveParameterCondition]::new("pg-sign")
+                    Condition = [ExclusiveParameterCondition]::new("gpg-sign")
                 },
                 [ValueParameter]@{
                     Keys = @("--log");
@@ -859,6 +920,7 @@ $stashes = [DynamicSource]@{
                 [FlagParameter]@{
                     Keys = @("--no-log");
                     Name = "no-log";
+                    Description = "In addition to branch names, populate the log message with one-line descriptions from at most <n> actual commits that are being merged. See also git-fmt-merge-msg1.";
                     Condition = [ExclusiveParameterCondition]::new("log")
                 },
                 [FlagParameter]@{
@@ -870,6 +932,7 @@ $stashes = [DynamicSource]@{
                 [FlagParameter]@{
                     Keys = @("--no-signoff");
                     Name = "no-signoff";
+                    Description = "Add a Signed-off-by trailer by the committer at the end of the commit log message. The meaning of a signoff depends on the project to which you’re committing. For example, it may certify that the committer has the rights to submit the work under the project’s license or agrees to some contributor representation, such as a Developer Certificate of Origin. (See http://developercertificate.org for the one used by the Linux kernel and Git projects.) Consult the documentation or leadership of the project to which you’re contributing to understand how the signoffs are used in that project.";
                     Condition = [ExclusiveParameterCondition]::new("signoff")
                 },
                 [FlagParameter]@{
@@ -881,6 +944,7 @@ $stashes = [DynamicSource]@{
                 [FlagParameter]@{
                     Keys = @("--no-stat", "-n");
                     Name = "no-stat";
+                    Description = "Show a diffstat at the end of the merge. The diffstat is also controlled by the configuration option merge.stat.";
                     Condition = [ExclusiveParameterCondition]::new("stat")
                 },
                 [FlagParameter]@{
@@ -892,6 +956,7 @@ $stashes = [DynamicSource]@{
                 [FlagParameter]@{
                     Keys = @("--no-squash");
                     Name = "no-squash";
+                    Description = "Produce the working tree and index state as if a real merge happened (except for the merge information), but do not actually make a commit, move the HEAD, or record $GIT_DIR/MERGE_HEAD (to cause the next git commit command to create a merge commit). This allows you to create a single commit on top of the current branch whose effect is the same as merging another branch (or more in case of an octopus).";
                     Condition = [ExclusiveParameterCondition]::new("squash")
                 },
                 [FlagParameter]@{
@@ -957,26 +1022,40 @@ $stashes = [DynamicSource]@{
                     Condition = [ExclusiveParameterCondition]::new("verify-signatures")
                 },
                 [FlagParameter]@{
+                    Keys = @("--summary");
+                    Name = "summary";
+                    Description = "Synonyms to --stat and --no-stat; these are deprecated and will be removed in the future.";
+                    Condition = [ExclusiveParameterCondition]::new("no-summary");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-summary");
+                    Name = "no-summary";
+                    Description = "Synonyms to --stat and --no-stat; these are deprecated and will be removed in the future.";
+                    Condition = [ExclusiveParameterCondition]::new("summary");
+                },
+                [FlagParameter]@{
                     Keys = @("--quiet", "-q");
                     Name = "quiet";
                     Description = "Operate quietly. Implies --no-progress.";
+                    Condition = [ExclusiveParameterCondition]::new("verbose")
                 },
                 [FlagParameter]@{
                     Keys = @("--verbose", "-v");
                     Name = "verbose";
                     Description = "Be verbose.";
+                    Condition = [ExclusiveParameterCondition]::new("quiet")
                 },
                 [FlagParameter]@{
                     Keys = @("--progress");
                     Name = "progress";
                     Description = "Turn progress on/off explicitly. If neither is specified, progress is shown if standard error is connected to a terminal. Note that not all merge strategies may support progress reporting.";
-                    Condition = [ExclusiveParameterCondition]::new("progress")
+                    Condition = [ExclusiveParameterCondition]::new("no-progress")
                 },
                 [FlagParameter]@{
                     Keys = @("--no-progress");
                     Name = "no-progress";
                     Description = "Turn progress on/off explicitly. If neither is specified, progress is shown if standard error is connected to a terminal. Note that not all merge strategies may support progress reporting.";
-                    Condition = [ExclusiveParameterCondition]::new("no-progress")
+                    Condition = [ExclusiveParameterCondition]::new("progress")
                 },
                 [FlagParameter]@{
                     Keys = @("--autostash");
@@ -987,6 +1066,7 @@ $stashes = [DynamicSource]@{
                 [FlagParameter]@{
                     Keys = @("--no-autostash");
                     Name = "no-autostash";
+                    Description = "Automatically create a temporary stash entry before the operation begins, record it in the special ref MERGE_AUTOSTASH and apply it after the operation ends. This means that you can run the operation on a dirty worktree. However, use with care: the final stash application after a successful merge might result in non-trivial conflicts.";
                     Condition = [ExclusiveParameterCondition]::new("autostash")
                 },
                 [FlagParameter]@{
@@ -1014,6 +1094,7 @@ $stashes = [DynamicSource]@{
                 [FlagParameter]@{
                     Keys = @("--no-rerere-autoupdate");
                     Name = "no-rerere-autoupdate";
+                    Description = "Allow the rerere mechanism to update the index with the result of auto-conflict resolution if possible.";
                     Condition = [ExclusiveParameterCondition]::new("rerere-autoupdate")
                 },
                 [FlagParameter]@{
@@ -1025,6 +1106,7 @@ $stashes = [DynamicSource]@{
                 [FlagParameter]@{
                     Keys = @("--no-overwrite-ignore");
                     Name = "no-overwrite-ignore";
+                Description = "Silently overwrite ignored files from the merge result. This is the default behavior. Use --no-overwrite-ignore to abort.";
                     Condition = [ExclusiveParameterCondition]::new("overwrite-ignore")
                 },
                 [FlagParameter]@{
@@ -1539,13 +1621,13 @@ $stashes = [DynamicSource]@{
                     Keys = @("--autostash");
                     Name = "autostash";
                     Description = "Automatically create a temporary stash entry before the operation begins, and apply it after the operation ends. This means that you can run rebase on a dirty worktree. However, use with care: the final stash application after a successful rebase might result in non-trivial conflicts.";
-                    Condition = [ExclusiveParameterCondition]::new("autostash");
+                    Condition = [ExclusiveParameterCondition]::new("no-autostash");
                 },
                 [FlagParameter]@{
                     Keys = @("--no-autostash");
                     Name = "no-autostash";
                     Description = "Automatically create a temporary stash entry before the operation begins, and apply it after the operation ends. This means that you can run rebase on a dirty worktree. However, use with care: the final stash application after a successful rebase might result in non-trivial conflicts.";
-                    Condition = [ExclusiveParameterCondition]::new("no-autostash");
+                    Condition = [ExclusiveParameterCondition]::new("autostash");
                 },
                 [FlagParameter]@{
                     Keys = @("--reschedule-failed-exec");
@@ -1870,28 +1952,7 @@ $stashes = [DynamicSource]@{
                     Name = "recurse-submodules";
                     Description = "May be used to make sure all submodule commits used by the revisions to be pushed are available on a remote-tracking branch.";
                     Condition = [ExclusiveParameterCondition]::new("no-recurse-submodules");
-                    Source = [StaticSource]@{
-                        Name = "recurse-submodules mode";
-                        Description = "";
-                        Items = @(
-                            [SourceItem]@{
-                                Name = "check";
-                                Description = ""
-                            },
-                            [SourceItem]@{
-                                Name = "on-demand";
-                                Description = ""
-                            },
-                            [SourceItem]@{
-                                Name = "only";
-                                Description = ""
-                            },
-                            [SourceItem]@{
-                                Name = "no";
-                                Description = ""
-                            }
-                        )
-                    }
+                    Source = $recurseSubmodulesMode
                 },
                 [FlagParameter]@{
                     Keys = @("--no-recurse-submodules");
@@ -1930,6 +1991,281 @@ $stashes = [DynamicSource]@{
                 [ValueParameter]@{
                     Name = "refspec";
                     Description = "Specify what destination ref to update with what source object. The format of a <refspec> parameter is an optional plus +, followed by the source object <src>, followed by a colon :, followed by the destination ref <dst>.";
+                }
+            )
+        },
+        [CommandParameter]@{
+            Keys = @("fetch");
+            Name = "fetch";
+            Description = "Download objects and refs from another repository";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("--all");
+                    Name = "all";
+                    Description = "Fetch all remotes.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--append", "-a");
+                    Name = "append";
+                    Description = "Append ref names and object names of fetched refs to the existing contents of .git/FETCH_HEAD. Without this option old data in .git/FETCH_HEAD will be overwritten.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--atomic");
+                    Name = "atomic";
+                    Description = "Use an atomic transaction to update local refs. Either all refs are updated, or on error, no refs are updated.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--depth");
+                    Name = "depth";
+                    Description = "Limit fetching to the specified number of commits from the tip of each remote branch history. If fetching to a shallow repository created by git clone with --depth=<depth> option (see git-clone1 ), deepen or shorten the history to the specified number of commits. Tags for the deepened commits are not fetched.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--deepen");
+                    Name = "deepen";
+                    Description = "Similar to --depth, except it specifies the number of commits from the current shallow boundary instead of from the tip of each remote branch history.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--shallow-since");
+                    Name = "shallow-since";
+                    Description = "Deepen or shorten the history of a shallow repository to include all reachable commits after <date>.";
+                    # Source = timestamp
+                },
+                [ValueParameter]@{
+                    Keys = @("--shallow-exclude");
+                    Name = "shallow-exclude";
+                    Description = "Deepen or shorten the history of a shallow repository to exclude commits reachable from a specified remote branch or tag. This option can be specified multiple times.";
+                    # Source = revision?;
+                    #Repleatable = $true
+                },
+                [FlagParameter]@{
+                    Keys = @("--unshallow");
+                    Name = "unshallow";
+                    Description = "If the source repository is complete, convert a shallow repository to a complete one, removing all the limitations imposed by shallow repositories.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--update-shallow");
+                    Name = "update-shallow";
+                    Description = "By default when fetching from a shallow repository, git fetch refuses refs that require updating .git/shallow. This option updates .git/shallow and accept such refs.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--negotiation-tip");
+                    Name = "negotiation-tip";
+                    Description = "By default, Git will report, to the server, commits reachable from all local refs to find common commits in an attempt to reduce the size of the to-be-received packfile. If specified, Git will only report commits reachable from the given tips. This is useful to speed up fetches when the user knows which local ref is likely to have commits in common with the upstream ref being fetched.";
+                    Source = [StaticSource]@{
+                        Name = "negotiation mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "commit";
+                                Description = ""
+                            },
+                            [SourceItem]@{
+                                Name = "glob";
+                                Description = ""
+                            }
+                        )
+                    }
+                },
+                [FlagParameter]@{
+                    Keys = @("--negotiate-only");
+                    Name = "negotiate-only";
+                    Description = "Do not fetch anything from the server, and instead print the ancestors of the provided --negotiation-tip=* arguments, which we have in common with the server.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--dry-run");
+                    Name = "dry-run";
+                    Description = "Show what would be done, without making any changes.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--write-fetch-head");
+                    Name = "write-fetch-head";
+                    Description = "Write the list of remote refs fetched in the FETCH_HEAD file directly under $GIT_DIR. This is the default. Passing --no-write-fetch-head from the command line tells Git not to write the file. Under --dry-run option, the file is never written.";
+                    Condition = [ExclusiveParameterCondition]::new("no-write-fetch-head");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-write-fetch-head");
+                    Name = "no-write-fetch-head";
+                    Description = "Write the list of remote refs fetched in the FETCH_HEAD file directly under $GIT_DIR. This is the default. Passing --no-write-fetch-head from the command line tells Git not to write the file. Under --dry-run option, the file is never written.";
+                    Condition = [ExclusiveParameterCondition]::new("write-fetch-head");
+                },
+                [FlagParameter]@{
+                    Keys = @("--force", "-f");
+                    Name = "force";
+                    Description = "When git fetch is used with <src>:<dst> refspec it may refuse to update the local branch as discussed in the <refspec> part below. This option overrides that check.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--keep", "-k");
+                    Name = "keep";
+                    Description = "Keep downloaded pack.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--multiple");
+                    Name = "multiple";
+                    Description = "Allow several <repository> and <group> arguments to be specified. No <refspec>s may be specified.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--auto-maintenance", "--auto-gc");
+                    Name = "auto-maintenance";
+                    Description = "Run git maintenance run --auto at the end to perform automatic repository maintenance if needed. (--[no-]auto-gc is a synonym.) This is enabled by default.";
+                    Condition = [ExclusiveParameterCondition]::new("no-auto-maintenance");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-auto-maintenance", "--no-auto-gc");
+                    Name = "no-auto-maintenance";
+                    Description = "Run git maintenance run --auto at the end to perform automatic repository maintenance if needed. (--[no-]auto-gc is a synonym.) This is enabled by default.";
+                    Condition = [ExclusiveParameterCondition]::new("auto-maintenance");
+                },
+                [FlagParameter]@{
+                    Keys = @("--write-commit-graph");
+                    Name = "write-commit-graph";
+                    Description = "Write a commit-graph after fetching. This overrides the config setting fetch.writeCommitGraph.";
+                    Condition = [ExclusiveParameterCondition]::new("no-write-commit-graph");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-write-commit-graph");
+                    Name = "no-write-commit-graph";
+                    Description = "Write a commit-graph after fetching. This overrides the config setting fetch.writeCommitGraph.";
+                    Condition = [ExclusiveParameterCondition]::new("write-commit-graph");
+                },
+                [FlagParameter]@{
+                    Keys = @("--prefetch");
+                    Name = "prefetch";
+                    Description = "Modify the configured refspec to place all refs into the refs/prefetch/ namespace. See the prefetch task in git-maintenance1 .";
+                },
+                [FlagParameter]@{
+                    Keys = @("--prune", "-p");
+                    Name = "prune";
+                    Description = "Before fetching, remove any remote-tracking references that no longer exist on the remote. Tags are not subject to pruning if they are fetched only because of the default tag auto-following or due to a --tags option. However, if tags are fetched due to an explicit refspec (either on the command line or in the remote configuration, for example if the remote was cloned with the --mirror option), then they are also subject to pruning. Supplying --prune-tags is a shorthand for providing the tag refspec.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--prune-tags", "-P");
+                    Name = "prune-tags";
+                    Description = "Before fetching, remove any local tags that no longer exist on the remote if --prune is enabled. This option should be used more carefully, unlike --prune it will remove any local references (local tags) that have been created. This option is a shorthand for providing the explicit tag refspec along with --prune, see the discussion about that in its documentation.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-tags", "-n");
+                    Name = "no-tags";
+                    Description = "By default, tags that point at objects that are downloaded from the remote repository are fetched and stored locally. This option disables this automatic tag following. The default behavior for a remote may be specified with the remote.<name>.tagOpt setting. See git-config1 .";
+                    Condition = [ExclusiveParameterCondition]::new("tags");
+                },
+                [ValueParameter]@{
+                    Keys = @("--refmap");
+                    Name = "refmap";
+                    Description = "When fetching refs listed on the command line, use the specified refspec (can be given more than once) to map the refs to remote-tracking branches, instead of the values of remote.*.fetch configuration variables for the remote repository. Providing an empty &lt;refspec&gt; to the --refmap option causes Git to ignore the configured refspecs and rely entirely on the refspecs supplied as command-line arguments. See section on `"Configured Remote-tracking Branches`" for details.";
+                    # Source = $???;
+                },
+                [FlagParameter]@{
+                    Keys = @("--tags", "-t");
+                    Name = "tags";
+                    Description = "Fetch all tags from the remote (i.e., fetch remote tags refs/tags/* into local tags with the same name), in addition to whatever else would otherwise be fetched. Using this option alone does not subject tags to pruning, even if --prune is used (though tags may be pruned anyway if they are also the destination of an explicit refspec; see --prune).";
+                    Condition = [ExclusiveParameterCondition]::new("no-tags");
+                },
+                [ValueParameter]@{
+                    Keys = @("--recurse-submodules");
+                    Name = "recurse-submodules";
+                    Description = "This option controls if and under what conditions new commits of populated submodules should be fetched too. It can be used as a boolean option to completely disable recursion when set to no or to unconditionally recurse into all populated submodules when set to yes, which is the default when this option is used without any value. Use on-demand to only recurse into a populated submodule when the superproject retrieves a commit that updates the submodule’s reference to a commit that isn’t already in the local submodule clone. By default, on-demand is used, unless fetch.recurseSubmodules is set (see git-config1 ).";
+                    Source = $recurseSubmodulesMode;
+                    Condition = [ExclusiveParameterCondition]::new("no-recurse-submodules");
+                },
+                [ValueParameter]@{
+                    Keys = @("--jobs", "-j");
+                    Name = "jobs";
+                    Description = "Number of parallel children to be used for all forms of fetching.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-recurse-submodules");
+                    Name = "no-recurse-submodules";
+                    Description = "Disable recursive fetching of submodules (this has the same effect as using the --recurse-submodules=no option).";
+                    Condition = [ExclusiveParameterCondition]::new("recurse-submodules");
+                },
+                [FlagParameter]@{
+                    Keys = @("--set-upstream");
+                    Name = "set-upstream";
+                    Description = "If the remote is fetched successfully, add upstream (tracking) reference, used by argument-less git-pull1 and other commands. For more information, see branch.<name>.merge and branch.<name>.remote in git-config1 .";
+                },
+                [ValueParameter]@{
+                    Keys = @("--submodule-prefix");
+                    Name = "submodule-prefix";
+                    Description = "Prepend <path> to paths printed in informative messages such as `"Fetching submodule foo`". This option is used internally when recursing over submodules.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--recurse-submodules-default");
+                    Name = "recurse-submodules-default";
+                    Description = "This option is used internally to temporarily provide a non-negative default value for the --recurse-submodules option. All other methods of configuring fetch’s submodule recursion (such as settings in gitmodules5 and git-config1 ) override this option, as does specifying --[no-]recurse-submodules directly.";
+                    Source = $recurseSubmodulesMode;
+                },
+                [FlagParameter]@{
+                    Keys = @("--update-head-ok", "-u");
+                    Name = "update-head-ok";
+                    Description = "By default git fetch refuses to update the head which corresponds to the current branch. This flag disables the check. This is purely for the internal use for git pull to communicate with git fetch, and unless you are implementing your own Porcelain you are not supposed to use it.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--upload-pack");
+                    Name = "upload-pack";
+                    Description = "When given, and the repository to fetch from is handled by git fetch-pack, --exec=<upload-pack> is passed to the command to specify non-default path for the command run on the other end.";
+                },				
+                [FlagParameter]@{
+                    Keys = @("--verbose", "-v");
+                    Name = "verbose";
+                    Description = "Be verbose.";
+                    Condition = [ExclusiveParameterCondition]::new("quiet")
+                },
+                [FlagParameter]@{
+                    Keys = @("--quiet", "-q");
+                    Name = "quiet";
+                    Description = "Pass --quiet to git-fetch-pack and silence any other internally used git commands. Progress is not reported to the standard error stream.";
+                    Condition = [ExclusiveParameterCondition]::new("verbose")
+                },
+                [FlagParameter]@{
+                    Keys = @("--progress");
+                    Name = "progress";
+                    Description = "Progress status is reported on the standard error stream by default when it is attached to a terminal, unless -q is specified. This flag forces progress status even if the standard error stream is not directed to a terminal.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--server-option", "-o");
+                    Name = "server-option";
+                    Description = "Transmit the given string to the server when communicating using protocol version 2. The given string must not contain a NUL or LF character. The server’s handling of server options, including unknown ones, is server-specific. When multiple --server-option=<option> are given, they are all sent to the other side in the order listed on the command line.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--show-forced-updates");
+                    Name = "show-forced-updates";
+                    Description = "By default, git checks if a branch is force-updated during fetch. This can be disabled through fetch.showForcedUpdates, but the --show-forced-updates option guarantees this check occurs. See git-config1 .";
+                    Condition = [ExclusiveParameterCondition]::new("no-show-forced-updates")
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-show-forced-updates");
+                    Name = "no-show-forced-updates";
+                    Description = "By default, git checks if a branch is force-updated during fetch. Pass --no-show-forced-updates or set fetch.showForcedUpdates to false to skip this check for performance reasons. If used during git-pull the --ff-only option will still check for forced updates before attempting a fast-forward update. See git-config1 .";
+                    Condition = [ExclusiveParameterCondition]::new("show-forced-updates")
+                },
+                [FlagParameter]@{
+                    Keys = @("--ipv4", "-4");
+                    Name = "ipv4";
+                    Description = "Use IPv4 addresses only, ignoring IPv6 addresses.";
+                    Condition = [ExclusiveParameterCondition]::new("ipv6")
+                },
+                [FlagParameter]@{
+                    Keys = @("--ipv6", "-6");
+                    Name = "ipv6";
+                    Description = "Use IPv6 addresses only, ignoring IPv4 addresses.";
+                    Condition = [ExclusiveParameterCondition]::new("ipv4")
+                },
+                [ValueParameter]@{
+                    Name = "repository";
+                    Description = "The `"remote`" repository that is the source of a fetch or pull operation. This parameter can be either a URL (see the section GIT URLS below) or the name of a remote (see the section REMOTES below).";
+                },
+                [ValueParameter]@{
+                    Name = "group";
+                    Description = "A name referring to a list of repositories as the value of remotes.<group> in the configuration file. (See git-config1 ).";
+                },
+                [ValueParameter]@{
+                    Name = "refspec";
+                    Description = "Specifies which refs to fetch and which local refs to update. When no <refspec>s appear on the command line, the refs to fetch are read from remote.<repository>.fetch variables instead (see CONFIGURED REMOTE-TRACKING BRANCHES below).";
+                },
+                [FlagParameter]@{
+                    Keys = @("--stdin");
+                    Name = "stdin";
+                    Description = "Read refspecs, one per line, from stdin in addition to those provided as arguments. The `"tag &lt;name&gt;`" format is not supported.";
                 }
             )
         }
