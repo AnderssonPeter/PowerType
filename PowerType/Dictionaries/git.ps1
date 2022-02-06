@@ -2860,6 +2860,202 @@ $stashes = [DynamicSource]@{
                     #Source = Path;
                 }
             )
+        },
+        [CommandParameter]@{
+            Keys = @("branch");
+            Name = "branch";
+            Description = "List, create, or delete branches";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("--delete", "-d");
+                    Name = "delete";
+                    Description = "Delete a branch. The branch must be fully merged in its upstream branch, or in HEAD if no upstream was set with --track or --set-upstream-to.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-D");
+                    Name = "D";
+                    Description = "Shortcut for --delete --force.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--create-reflog");
+                    Name = "create-reflog";
+                    Description = "Create the branch’s reflog. This activates recording of all changes made to the branch ref, enabling use of date based sha1 expressions such as `"&lt;branchname&gt;@{yesterday}`". Note that in non-bare repositories, reflogs are usually enabled by default by the core.logAllRefUpdates config option. The negated form --no-create-reflog only overrides an earlier --create-reflog, but currently does not negate the setting of core.logAllRefUpdates.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--force", "-f");
+                    Name = "force";
+                    Description = "Reset <branchname> to <startpoint>, even if <branchname> exists already. Without -f, git branch refuses to change an existing branch. In combination with -d (or --delete), allow deleting the branch irrespective of its merged status, or whether it even points to a valid commit. In combination with -m (or --move), allow renaming the branch even if the new branch name already exists, the same applies for -c (or --copy).";
+                },
+                [FlagParameter]@{
+                    Keys = @("--move", "-m");
+                    Name = "move";
+                    Description = "Move/rename a branch, together with its config and reflog.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-M");
+                    Name = "M";
+                    Description = "Shortcut for --move --force.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--copy", "-c");
+                    Name = "copy";
+                    Description = "Copy a branch, together with its config and reflog.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-C");
+                    Name = "C";
+                    Description = "Shortcut for --copy --force.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--color");
+                    Name = "color";
+                    Description = "Color branches to highlight current, local, and remote-tracking branches. The value must be always (the default), never, or auto.";
+                    Condition = [ExclusiveParameterCondition]::new("no-color");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-color");
+                    Name = "no-color";
+                    Description = "Turn off branch colors, even when the configuration file gives the default to color output. Same as --color=never.";
+                    Condition = [ExclusiveParameterCondition]::new("color");
+                },
+                [FlagParameter]@{
+                    Keys = @("--ignore-case", "-i");
+                    Name = "ignore-case";
+                    Description = "Sorting and filtering branches are case insensitive.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--column");
+                    Name = "column";
+                    Description = "Display branch listing in columns. See configuration variable column.branch for option syntax. --column and --no-column without options are equivalent to always and never respectively.";
+                    Condition = [ExclusiveParameterCondition]::new("no-column");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-column");
+                    Name = "no-column";
+                    Description = "Display branch listing in columns. See configuration variable column.branch for option syntax. --column and --no-column without options are equivalent to always and never respectively.";
+                    Condition = [ExclusiveParameterCondition]::new("column");
+                },
+                [FlagParameter]@{
+                    Keys = @("--remotes", "-r");
+                    Name = "remotes";
+                    Description = "List or delete (if used with -d) the remote-tracking branches. Combine with --list to match the optional pattern(s).";
+                },
+                [FlagParameter]@{
+                    Keys = @("--all", "-a");
+                    Name = "all";
+                    Description = "List both remote-tracking branches and local branches. Combine with --list to match optional pattern(s).";
+                },
+                [FlagParameter]@{
+                    Keys = @("--list", "-l");
+                    Name = "list";
+                    Description = "List branches. With optional <pattern>..., e.g. git branch --list 'maint-*', list only the branches that match the pattern(s).";
+                },
+                [FlagParameter]@{
+                    Keys = @("--show-current");
+                    Name = "show-current";
+                    Description = "Print the name of the current branch. In detached HEAD state, nothing is printed.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--verbose", "-vv", "-v");
+                    Name = "verbose";
+                    Description = "When in list mode, show sha1 and commit subject line for each head, along with relationship to upstream branch (if any). If given twice, print the path of the linked worktree (if any) and the name of the upstream branch, as well (see also git remote show <remote>). Note that the current worktree’s HEAD will not have its path printed (it will always be your current directory).";
+                    Condition = [ExclusiveParameterCondition]::new("quiet");
+                },
+                [FlagParameter]@{
+                    Keys = @("--quiet", "-q");
+                    Name = "quiet";
+                    Description = "Be more quiet when creating or deleting a branch, suppressing non-error messages.";
+                    Condition = [ExclusiveParameterCondition]::new("verbose");
+                },
+                [ValueParameter]@{
+                    Keys = @("--abbrev");
+                    Name = "abbrev";
+                    Description = "In the verbose listing that show the commit object name, show the shortest prefix that is at least <n> hexdigits long that uniquely refers the object. The default value is 7 and can be overridden by the core.abbrev config option.";
+                    Condition = [ExclusiveParameterCondition]::new("no-abbrev");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-abbrev");
+                    Name = "no-abbrev";
+                    Description = "Display the full sha1s in the output listing rather than abbreviating them.";
+                    Condition = [ExclusiveParameterCondition]::new("abbrev");
+                },
+                [FlagParameter]@{
+                    Keys = @("--track", "-t");
+                    Name = "track";
+                    Description = "When creating a new branch, set up branch.&lt;name&gt;.remote and branch.&lt;name&gt;.merge configuration entries to mark the start-point branch as `"upstream`" from the new branch. This configuration will tell git to show the relationship between the two branches in git status and git branch -v. Furthermore, it directs git pull without arguments to pull from the upstream when the new branch is checked out.";
+                    Condition = [ExclusiveParameterCondition]::new("no-track");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-track");
+                    Name = "no-track";
+                    Description = "Do not set up `"upstream`" configuration, even if the branch.autoSetupMerge configuration variable is true.";
+                    Condition = [ExclusiveParameterCondition]::new("track");
+                },
+                [FlagParameter]@{
+                    Keys = @("--set-upstream");
+                    Name = "set-upstream";
+                    Description = "As this option had confusing syntax, it is no longer supported. Please use --track or --set-upstream-to instead.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--set-upstream-to", "-u");
+                    Name = "set-upstream-to";
+                    Description = "Set up <branchname>'s tracking information so <upstream> is considered <branchname>'s upstream branch. If no <branchname> is specified, then it defaults to the current branch.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--unset-upstream");
+                    Name = "unset-upstream";
+                    Description = "Remove the upstream information for <branchname>. If no branch is specified it defaults to the current branch.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--edit-description");
+                    Name = "edit-description";
+                    Description = "Open an editor and edit the text to explain what the branch is for, to be used by various other commands (e.g. format-patch, request-pull, and merge (if enabled)). Multi-line explanations may be used.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--contains");
+                    Name = "contains";
+                    Description = "Only list branches which contain the specified commit (HEAD if not specified). Implies --list.";
+                    Condition = [ExclusiveParameterCondition]::new("no-contains");
+                },
+                [ValueParameter]@{
+                    Keys = @("--no-contains");
+                    Name = "no-contains";
+                    Description = "Only list branches which don’t contain the specified commit (HEAD if not specified). Implies --list.";
+                    Condition = [ExclusiveParameterCondition]::new("contains");
+                },
+                [ValueParameter]@{
+                    Keys = @("--merged");
+                    Name = "merged";
+                    Description = "Only list branches whose tips are reachable from the specified commit (HEAD if not specified). Implies --list.";
+                    Condition = [ExclusiveParameterCondition]::new("no-merged");
+                },
+                [ValueParameter]@{
+                    Keys = @("--no-merged");
+                    Name = "no-merged";
+                    Description = "Only list branches whose tips are not reachable from the specified commit (HEAD if not specified). Implies --list.";
+                    Condition = [ExclusiveParameterCondition]::new("merged");
+                },
+                [ValueParameter]@{
+                    Name = "branchname";
+                    Description = "The name of the branch to create or delete. The new branch name must pass all checks defined by git-check-ref-format1. Some of these checks may restrict the characters allowed in a branch name.";
+                    Source = $allBranches;
+                },
+                [ValueParameter]@{
+                    Keys = @("--sort");
+                    Name = "sort";
+                    Description = "Sort based on the key given. Prefix - to sort in descending order of the value. You may use the --sort=<key> option multiple times, in which case the last key becomes the primary key. The keys supported are the same as those in git for-each-ref. Sort order defaults to the value configured for the branch.sort variable if exists, or to sorting based on the full refname (including refs/... prefix). This lists detached HEAD (if present) first, then local branches and finally remote-tracking branches. See git-config1.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--points-at");
+                    Name = "points-at";
+                    Description = "Only list branches of the given object.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--format");
+                    Name = "format";
+                    Description = "A string that interpolates %(fieldname) from a branch ref being shown and the object it points at. The format is the same as that of git-for-each-ref1.";
+                }
+            )
         }
     )
 }
