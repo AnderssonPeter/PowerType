@@ -101,6 +101,33 @@ $stashes = [DynamicSource]@{
     }
 }
 
+$mergeStrategy = [StaticSource]@{
+    Name = "Merge strategy";
+    Items = @(
+        [SourceItem]@{
+            Name = "ort"
+        },
+        [SourceItem]@{
+            Name = "recursive"
+        },
+        [SourceItem]@{
+            Name = "resolve"
+        },
+        [SourceItem]@{
+            Name = "octopus"
+        },
+        [SourceItem]@{
+            Name = "ours"
+        },
+        [SourceItem]@{
+            Name = "theirs"
+        },
+        [SourceItem]@{
+            Name = "subtree"
+        }
+    )
+}
+
 # Should we remove the Parameter part? CommandParameter -> Command?
 [PowerTypeDictionary]@{
     Keys        = @("git");
@@ -975,32 +1002,7 @@ $stashes = [DynamicSource]@{
                     Keys = @("--strategy", "-s");
                     Name = "strategy";
                     Description = "Use the given merge strategy; can be supplied more than once to specify them in the order they should be tried. If there is no -s option, a built-in list of strategies is used instead (ort when merging a single head, octopus otherwise).";
-                    Source = [StaticSource]@{
-                        Name = "Merge strategy";
-                        Items = @(
-                            [SourceItem]@{
-                                Name = "ort"
-                            },
-                            [SourceItem]@{
-                                Name = "recursive"
-                            },
-                            [SourceItem]@{
-                                Name = "resolve"
-                            },
-                            [SourceItem]@{
-                                Name = "octopus"
-                            },
-                            [SourceItem]@{
-                                Name = "ours"
-                            },
-                            [SourceItem]@{
-                                Name = "theirs"
-                            },
-                            [SourceItem]@{
-                                Name = "subtree"
-                            }
-                        )
-                    };
+                    Source = $mergeStrategy;
                 },
                 [ValueParameter]@{
                     Keys = @("--strategy-option", "-X");
@@ -1454,7 +1456,7 @@ $stashes = [DynamicSource]@{
                     Keys = @("--strategy", "-s");
                     Name = "strategy";
                     Description = "Use the given merge strategy, instead of the default ort. This implies --merge.";
-                    # Source = $???;
+                    Source = $mergeStrategy;
                 },
                 [ValueParameter]@{
                     Keys = @("--strategy-option", "-X");
@@ -3226,6 +3228,108 @@ $stashes = [DynamicSource]@{
                     Keys = @("--abbrev");
                     Name = "abbrev";
                     Description = "Instead of using the default 7+1 hexadecimal digits as the abbreviated object name, use <m>+1 digits, where <m> is at least <n> but ensures the commit object names are unique. Note that 1 column is used for a caret to mark the boundary commit.";
+                }
+            )
+        },
+        [CommandParameter]@{
+            Keys = @("cherry-pick");
+            Name = "cherry-pick";
+            Description = "Apply the changes introduced by some existing commits";
+            Parameters = @(
+                [ValueParameter]@{
+                    Name = "commit";
+                    Description = "Commits to cherry-pick. For a more complete list of ways to spell commits, see gitrevisions7. Sets of commits can be passed but no traversal is done by default, as if the --no-walk option was specified, see git-rev-list1. Note that specifying a range will feed all <commit>… arguments to a single revision walk (see a later example that uses maint master..next).";
+                },
+                [FlagParameter]@{
+                    Keys = @("--edit", "-e");
+                    Name = "edit";
+                    Description = "With this option, git cherry-pick will let you edit the commit message prior to committing.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--cleanup");
+                    Name = "cleanup";
+                    Description = "This option determines how the commit message will be cleaned up before being passed on to the commit machinery. See git-commit1 for more details. In particular, if the <mode> is given a value of scissors, scissors will be appended to MERGE_MSG before being passed on in the case of a conflict.";
+                    Source = $cleanupMode
+                },
+                [FlagParameter]@{
+                    Keys = @("-x");
+                    Name = "x";
+                    Description = "When recording the commit, append a line that says `"(cherry picked from commit …)`" to the original commit message in order to indicate which commit this change was cherry-picked from. This is done only for cherry picks without conflicts. Do not use this option if you are cherry-picking from your private branch because the information is useless to the recipient. If on the other hand you are cherry-picking between two publicly visible branches (e.g. backporting a fix to a maintenance branch for an older release from a development branch), adding this information can be useful.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-r");
+                    Name = "r";
+                    Description = "It used to be that the command defaulted to do -x described above, and -r was to disable it. Now the default is not to do -x so this option is a no-op.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--mainline", "-m");
+                    Name = "mainline parent-number";
+                    Description = "Usually you cannot cherry-pick a merge because you do not know which side of the merge should be considered the mainline. This option specifies the parent number (starting from 1) of the mainline and allows cherry-pick to replay the change relative to the specified parent.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-commit", "-n");
+                    Name = "no-commit";
+                    Description = "Usually the command automatically creates a sequence of commits. This flag applies the changes necessary to cherry-pick each named commit to your working tree and the index, without making any commit. In addition, when this option is used, your index does not have to match the HEAD commit. The cherry-pick is done against the beginning state of your index.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--signoff", "-s");
+                    Name = "signoff";
+                    Description = "Add a Signed-off-by trailer at the end of the commit message. See the signoff option in git-commit1 for more information.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--gpg-sign", "-S");
+                    Name = "gpg-sign";
+                    Description = "GPG-sign commits. The keyid argument is optional and defaults to the committer identity; if specified, it must be stuck to the option without a space. --no-gpg-sign is useful to countermand both commit.gpgSign configuration variable, and earlier --gpg-sign.";
+                    Condition = [ExclusiveParameterCondition]::new("no-gpg-sign");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-gpg-sign");
+                    Name = "no-gpg-sign";
+                    Description = "GPG-sign commits. The keyid argument is optional and defaults to the committer identity; if specified, it must be stuck to the option without a space. --no-gpg-sign is useful to countermand both commit.gpgSign configuration variable, and earlier --gpg-sign.";
+                    Condition = [ExclusiveParameterCondition]::new("gpg-sign");
+                },
+                [FlagParameter]@{
+                    Keys = @("--ff");
+                    Name = "ff";
+                    Description = "If the current HEAD is the same as the parent of the cherry-pick’ed commit, then a fast forward to this commit will be performed.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--allow-empty");
+                    Name = "allow-empty";
+                    Description = "By default, cherry-picking an empty commit will fail, indicating that an explicit invocation of git commit --allow-empty is required. This option overrides that behavior, allowing empty commits to be preserved automatically in a cherry-pick. Note that when `"--ff`" is in effect, empty commits that meet the `"fast-forward`" requirement will be kept even without this option. Note also, that use of this option only keeps commits that were initially empty (i.e. the commit recorded the same tree as its parent). Commits which are made empty due to a previous commit are dropped. To force the inclusion of those commits use --keep-redundant-commits.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--allow-empty-message");
+                    Name = "allow-empty-message";
+                    Description = "By default, cherry-picking a commit with an empty message will fail. This option overrides that behavior, allowing commits with empty messages to be cherry picked.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--keep-redundant-commits");
+                    Name = "keep-redundant-commits";
+                    Description = "If a commit being cherry picked duplicates a commit already in the current history, it will become empty. By default these redundant commits cause cherry-pick to stop so the user can examine the commit. This option overrides that behavior and creates an empty commit object. Implies --allow-empty.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--strategy");
+                    Name = "strategy";
+                    Description = "Use the given merge strategy. Should only be used once. See the MERGE STRATEGIES section in git-merge1 for details.";
+                    Source = $mergeStrategy;
+                },
+                [ValueParameter]@{
+                    Keys = @("--strategy-option", "-X");
+                    Name = "strategy-option";
+                    Description = "Pass the merge strategy-specific option through to the merge strategy. See git-merge1 for details.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--rerere-autoupdate");
+                    Name = "rerere-autoupdate";
+                    Description = "Allow the rerere mechanism to update the index with the result of auto-conflict resolution if possible.";
+                    Condition = [ExclusiveParameterCondition]::new("no-rerere-autoupdate");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-rerere-autoupdate");
+                    Name = "no-rerere-autoupdate";
+                    Description = "Allow the rerere mechanism to update the index with the result of auto-conflict resolution if possible.";
+                    Condition = [ExclusiveParameterCondition]::new("rerere-autoupdate");
                 }
             )
         }
