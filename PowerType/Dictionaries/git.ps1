@@ -3056,6 +3056,178 @@ $stashes = [DynamicSource]@{
                     Description = "A string that interpolates %(fieldname) from a branch ref being shown and the object it points at. The format is the same as that of git-for-each-ref1.";
                 }
             )
+        },
+        [CommandParameter]@{
+            Keys = @("blame");
+            Name = "blame";
+            Description = "Show what revision and author last modified each line of a file";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("-b");
+                    Name = "show-blank";
+                    Description = "Show blank SHA-1 for boundary commits. This can also be controlled via the blame.blankBoundary config option.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--root");
+                    Name = "root";
+                    Description = "Do not treat root commits as boundaries. This can also be controlled via the blame.showRoot config option.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--show-stats");
+                    Name = "show-stats";
+                    Description = "Include additional statistics at the end of blame output.";
+                },
+                [ValueParameter]@{
+                    Keys = @("-L");
+                    Name = "annotate";
+                    Description = "Annotate only the line range given by <start>,<end>, or by the function name regex <funcname>. May be specified multiple times. Overlapping ranges are allowed.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-l");
+                    Name = "Show long rev";
+                    Description = "Show long rev (Default: off).";
+                },
+                [FlagParameter]@{
+                    Keys = @("-t");
+                    Name = "Show raw timestamp";
+                    Description = "Show raw timestamp (Default: off).";
+                },
+                [ValueParameter]@{
+                    Keys = @("-S");
+                    Name = "S";
+                    Description = "Use revisions from revs-file instead of calling git-rev-list1.";
+                    #Source = file;
+                },
+                [ValueParameter]@{
+                    Keys = @("--reverse");
+                    Name = "reverse";
+                    Description = "Walk history forward instead of backward. Instead of showing the revision in which a line appeared, this shows the last revision in which a line has existed. This requires a range of revision like START..END where the path to blame exists in START. git blame --reverse START is taken as git blame --reverse START..HEAD for convenience.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--first-parent");
+                    Name = "first-parent";
+                    Description = "Follow only the first parent commit upon seeing a merge commit. This option can be used to determine when a line was introduced to a particular integration branch, rather than when it was introduced to the history overall.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--porcelain", "-p");
+                    Name = "porcelain";
+                    Description = "Show in a format designed for machine consumption.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--line-porcelain");
+                    Name = "line-porcelain";
+                    Description = "Show the porcelain format, but output commit information for each line, not just the first time a commit is referenced. Implies --porcelain.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--incremental");
+                    Name = "incremental";
+                    Description = "Show the result incrementally in a format designed for machine consumption.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--encoding");
+                    Name = "encoding";
+                    Description = "Specifies the encoding used to output author names and commit summaries. Setting it to none makes blame output unconverted data. For more information see the discussion about encoding in the git-log1 manual page.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--contents");
+                    Name = "contents";
+                    Description = "When <rev> is not specified, the command annotates the changes starting backwards from the working tree copy. This flag makes the command pretend as if the working tree copy has the contents of the named file (specify - to make the command read from the standard input).";
+                    #Source = file;
+                },
+                [ValueParameter]@{
+                    Keys = @("--date");
+                    Name = "date";
+                    Description = "Specifies the format used to output dates. If --date is not provided, the value of the blame.date config variable is used. If the blame.date config variable is also not set, the iso format is used. For supported values, see the discussion of the --date option at git-log1.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--progress");
+                    Name = "progress";
+                    Description = "Progress status is reported on the standard error stream by default when it is attached to a terminal. This flag enables progress reporting even if not attached to a terminal. Can’t use --progress together with --porcelain or --incremental.";
+                    Condition = [ExclusiveParameterCondition]::new("no-progress");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-progress");
+                    Name = "no-progress";
+                    Description = "Progress status is reported on the standard error stream by default when it is attached to a terminal. This flag enables progress reporting even if not attached to a terminal. Can’t use --progress together with --porcelain or --incremental.";
+                    Condition = [ExclusiveParameterCondition]::new("progress");
+                },
+                [ValueParameter]@{
+                    Keys = @("-M");
+                    Name = "M";
+                    Description = "Detect moved or copied lines within a file. When a commit moves or copies a block of lines (e.g. the original file has A and then B, and the commit changes it to B and then A), the traditional blame algorithm notices only half of the movement and typically blames the lines that were moved up (i.e. B) to the parent and assigns blame to the lines that were moved down (i.e. A) to the child commit. With this option, both groups of lines are blamed on the parent by running extra passes of inspection.";
+                },
+                [ValueParameter]@{
+                    Keys = @("-C");
+                    Name = "C";
+                    Description = "In addition to -M, detect lines moved or copied from other files that were modified in the same commit. This is useful when you reorganize your program and move code around across files. When this option is given twice, the command additionally looks for copies from other files in the commit that creates the file. When this option is given three times, the command additionally looks for copies from other files in any commit.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--ignore-rev");
+                    Name = "ignore-rev";
+                    Description = "Ignore changes made by the revision when assigning blame, as if the change never happened. Lines that were changed or added by an ignored commit will be blamed on the previous commit that changed that line or nearby lines. This option may be specified multiple times to ignore more than one revision. If the blame.markIgnoredLines config option is set, then lines that were changed by an ignored commit and attributed to another commit will be marked with a ? in the blame output. If the blame.markUnblamableLines config option is set, then those lines touched by an ignored commit that we could not attribute to another revision are marked with a *.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--ignore-revs-file");
+                    Name = "ignore-revs-file";
+                    Description = "Ignore revisions listed in file, which must be in the same format as an fsck.skipList. This option may be repeated, and these files will be processed after any files specified with the blame.ignoreRevsFile config option. An empty file name, `"`", will clear the list of revs from previously processed files.";
+                    # Source = file;
+                },
+                [FlagParameter]@{
+                    Keys = @("--color-lines");
+                    Name = "color-lines";
+                    Description = "Color line annotations in the default format differently if they come from the same commit as the preceding line. This makes it easier to distinguish code blocks introduced by different commits. The color defaults to cyan and can be adjusted using the color.blame.repeatedLines config option.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--color-by-age");
+                    Name = "color-by-age";
+                    Description = "Color line annotations depending on the age of the line in the default format. The color.blame.highlightRecent config option controls what color is used for each range of age.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-h");
+                    Name = "h";
+                    Description = "Show help message.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-c");
+                    Name = "c";
+                    Description = "Use the same output mode as git-annotate1 (Default: off).";
+                },
+                [FlagParameter]@{
+                    Keys = @("--score-debug");
+                    Name = "score-debug";
+                    Description = "Include debugging information related to the movement of lines between files (see -C) and lines moved within a file (see -M). The first number listed is the score. This is the number of alphanumeric characters detected as having been moved between or within files. This must be above a certain threshold for git blame to consider those lines of code to have been moved.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--show-name", "-f");
+                    Name = "show-name";
+                    Description = "Show the filename in the original commit. By default the filename is shown if there is any line that came from a file with a different name, due to rename detection.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--show-number", "-n");
+                    Name = "show-number";
+                    Description = "Show the line number in the original commit (Default: off).";
+                },
+                [FlagParameter]@{
+                    Keys = @("-s");
+                    Name = "s";
+                    Description = "Suppress the author name and timestamp from the output.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--show-email", "-e");
+                    Name = "show-email";
+                    Description = "Show the author email instead of author name (Default: off). This can also be controlled via the blame.showEmail config option.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-w");
+                    Name = "w";
+                    Description = "Ignore whitespace when comparing the parent’s version and the child’s to find where the lines came from.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--abbrev");
+                    Name = "abbrev";
+                    Description = "Instead of using the default 7+1 hexadecimal digits as the abbreviated object name, use <m>+1 digits, where <m> is at least <n> but ensures the commit object names are unique. Note that 1 column is used for a caret to mark the boundary commit.";
+                }
+            )
         }
     )
 }
