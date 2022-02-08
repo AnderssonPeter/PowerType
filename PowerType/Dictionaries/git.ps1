@@ -3332,6 +3332,85 @@ $mergeStrategy = [StaticSource]@{
                     Condition = [ExclusiveParameterCondition]::new("rerere-autoupdate");
                 }
             )
+        },
+        [CommandParameter]@{
+            Keys = @("revert");
+            Name = "revert";
+            Description = "Revert some existing commits";
+            Parameters = @(
+                [ValueParameter]@{
+                    Name = "commit";
+                    Description = "Commits to revert. For a more complete list of ways to spell commit names, see gitrevisions7. Sets of commits can also be given but no traversal is done by default, see git-rev-list1 and its --no-walk option.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--edit", "-e");
+                    Name = "edit";
+                    Description = "With this option, git revert will let you edit the commit message prior to committing the revert. This is the default if you run the command from a terminal.";
+                    Condition = [ExclusiveParameterCondition]::new("no-edit");
+                },
+                [ValueParameter]@{
+                    Keys = @("--mainline", "-m");
+                    Name = "mainline";
+                    Description = "Usually you cannot revert a merge because you do not know which side of the merge should be considered the mainline. This option specifies the parent number (starting from 1) of the mainline and allows revert to reverse the change relative to the specified parent.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-edit");
+                    Name = "no-edit";
+                    Description = "With this option, git revert will not start the commit message editor.";
+                    Condition = [ExclusiveParameterCondition]::new("edit");
+                },
+                [ValueParameter]@{
+                    Keys = @("--cleanup");
+                    Name = "cleanup";
+                    Description = "This option determines how the commit message will be cleaned up before being passed on to the commit machinery. See git-commit1 for more details. In particular, if the <mode> is given a value of scissors, scissors will be appended to MERGE_MSG before being passed on in the case of a conflict.";
+                    Source = $cleanupMode;
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-commit", "-n");
+                    Name = "no-commit";
+                    Description = "Usually the command automatically creates some commits with commit log messages stating which commits were reverted. This flag applies the changes necessary to revert the named commits to your working tree and the index, but does not make the commits. In addition, when this option is used, your index does not have to match the HEAD commit. The revert is done against the beginning state of your index.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--gpg-sign", "-S");
+                    Name = "gpg-sign";
+                    Description = "GPG-sign commits. The keyid argument is optional and defaults to the committer identity; if specified, it must be stuck to the option without a space. --no-gpg-sign is useful to countermand both commit.gpgSign configuration variable, and earlier --gpg-sign.";
+                    Condition = [ExclusiveParameterCondition]::new("no-gpg-sign");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-gpg-sign");
+                    Name = "no-gpg-sign";
+                    Description = "GPG-sign commits. The keyid argument is optional and defaults to the committer identity; if specified, it must be stuck to the option without a space. --no-gpg-sign is useful to countermand both commit.gpgSign configuration variable, and earlier --gpg-sign.";
+                    Condition = [ExclusiveParameterCondition]::new("gpg-sign");
+                },
+                [FlagParameter]@{
+                    Keys = @("--signoff", "-s");
+                    Name = "signoff";
+                    Description = "Add a Signed-off-by trailer at the end of the commit message. See the signoff option in git-commit1 for more information.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--strategy");
+                    Name = "strategy";
+                    Description = "Use the given merge strategy. Should only be used once. See the MERGE STRATEGIES section in git-merge1 for details.";
+                    Source = $mergeStrategy;
+                },
+                [ValueParameter]@{
+                    Keys = @("--strategy-option", "-X");
+                    Name = "strategy-option";
+                    Description = "Pass the merge strategy-specific option through to the merge strategy. See git-merge1 for details.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--rerere-autoupdate");
+                    Name = "rerere-autoupdate";
+                    Description = "Allow the rerere mechanism to update the index with the result of auto-conflict resolution if possible.";
+                    Condition = [ExclusiveParameterCondition]::new("no-rerere-autoupdate");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-rerere-autoupdate");
+                    Name = "no-rerere-autoupdate";
+                    Description = "Allow the rerere mechanism to update the index with the result of auto-conflict resolution if possible.";
+                    Condition = [ExclusiveParameterCondition]::new("rerere-autoupdate");
+                }
+            )
         }
     )
 }
