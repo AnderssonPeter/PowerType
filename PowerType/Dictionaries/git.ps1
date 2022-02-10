@@ -3955,6 +3955,23 @@ $archiveFormats = [DynamicSource]@{
                     #Source = fileglob?;
                 }
             )
+        },
+        [CommandParameter]@{
+            Keys = @("bisect");
+            Name = "bisect";
+            Description = "Use binary search to find the commit that introduced a bug";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("--no-checkout");
+                    Name = "no-checkout";
+                    Description = "Do not checkout the new working tree at each iteration of the bisection process. Instead just update a special reference named BISECT_HEAD to make it point to the commit that should be tested.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--first-parent");
+                    Name = "first-parent";
+                    Description = "Follow only the first parent commit upon seeing a merge commit.";
+                }
+            )
         }
     )
 }
