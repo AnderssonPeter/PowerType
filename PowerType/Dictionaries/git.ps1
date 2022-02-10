@@ -3698,6 +3698,183 @@ $mergeStrategy = [StaticSource]@{
                     Description = "Show help message.";
                 }
             )
+        },
+        [CommandParameter]@{
+            Keys = @("apply");
+            Name = "apply";
+            Description = "Apply a patch to files and/or to the index";
+            Parameters = @(
+                [ValueParameter]@{
+                    Name = "files";
+                    Description = "The files to read the patch from. - can be used to read from the standard input.";
+                    #Source = fileglob;
+                },
+                [FlagParameter]@{
+                    Keys = @("--stat");
+                    Name = "stat";
+                    Description = "Instead of applying the patch, output diffstat for the input. Turns off `"apply`".";
+                },
+                [FlagParameter]@{
+                    Keys = @("--numstat");
+                    Name = "numstat";
+                    Description = "Similar to --stat, but shows the number of added and deleted lines in decimal notation and the pathname without abbreviation, to make it more machine friendly. For binary files, outputs two - instead of saying 0 0. Turns off `"apply`".";
+                },
+                [FlagParameter]@{
+                    Keys = @("--summary");
+                    Name = "summary";
+                    Description = "Instead of applying the patch, output a condensed summary of information obtained from git diff extended headers, such as creations, renames and mode changes. Turns off `"apply`".";
+                },
+                [FlagParameter]@{
+                    Keys = @("--check");
+                    Name = "check";
+                    Description = "Instead of applying the patch, see if the patch is applicable to the current working tree and/or the index file and detects errors. Turns off `"apply`".";
+                },
+                [FlagParameter]@{
+                    Keys = @("--index");
+                    Name = "index";
+                    Description = "Apply the patch to both the index and the working tree (or merely check that it would apply cleanly to both if --check is in effect). Note that --index expects index entries and working tree copies for relevant paths to be identical (their contents and metadata such as file mode must match), and will raise an error if they are not, even if the patch would apply cleanly to both the index and the working tree in isolation.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--cached");
+                    Name = "cached";
+                    Description = "Apply the patch to just the index, without touching the working tree. If --check is in effect, merely check that it would apply cleanly to the index entry.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--intent-to-add");
+                    Name = "intent-to-add";
+                    Description = "When applying the patch only to the working tree, mark new files to be added to the index later (see --intent-to-add option in git-add1). This option is ignored unless running in a Git repository and --index is not specified. Note that --index could be implied by other options such as --cached or --3way.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--3way", "-3");
+                    Name = "3way";
+                    Description = "Attempt 3-way merge if the patch records the identity of blobs it is supposed to apply to and we have those blobs available locally, possibly leaving the conflict markers in the files in the working tree for the user to resolve. This option implies the --index option unless the --cached option is used, and is incompatible with the --reject option. When used with the --cached option, any conflicts are left at higher stages in the cache.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--build-fake-ancestor");
+                    Name = "build-fake-ancestor";
+                    Description = "Newer git diff output has embedded index information for each blob to help identify the original version that the patch applies to. When this flag is given, and if the original versions of the blobs are available locally, builds a temporary index containing those blobs.";
+                    # Source = file;
+                },
+                [FlagParameter]@{
+                    Keys = @("--reverse", "-R");
+                    Name = "reverse";
+                    Description = "Apply the patch in reverse.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--reject");
+                    Name = "reject";
+                    Description = "For atomicity, git apply by default fails the whole patch and does not touch the working tree when some of the hunks do not apply. This option makes it apply the parts of the patch that are applicable, and leave the rejected hunks in corresponding *.rej files.";
+                },
+                [FlagParameter]@{
+                    Keys = @("-z");
+                    Name = "z";
+                    Description = "When --numstat has been given, do not munge pathnames, but use a NUL-terminated machine-readable format.";
+                },
+                [ValueParameter]@{
+                    Keys = @("-p");
+                    Name = "p";
+                    Description = "Remove <n> leading path components (separated by slashes) from traditional diff paths. E.g., with -p2, a patch against a/dir/file will be applied directly to file. The default is 1.";
+                },
+                [ValueParameter]@{
+                    Keys = @("-C");
+                    Name = "C";
+                    Description = "Ensure at least <n> lines of surrounding context match before and after each change. When fewer lines of surrounding context exist they all must match. By default no context is ever ignored.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--unidiff-zero");
+                    Name = "unidiff-zero";
+                    Description = "By default, git apply expects that the patch being applied is a unified diff with at least one line of context. This provides good safety measures, but breaks down when applying a diff generated with --unified=0. To bypass these checks use --unidiff-zero.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--apply");
+                    Name = "apply";
+                    Description = "If you use any of the options marked `"Turns off apply`" above, git apply reads and outputs the requested information without actually applying the patch. Give this flag after those flags to also apply the patch.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-add");
+                    Name = "no-add";
+                    Description = "When applying a patch, ignore additions made by the patch. This can be used to extract the common part between two files by first running diff on them and applying the result with this option, which would apply the deletion part but not the addition part.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--binary", "--allow-binary-replacement");
+                    Name = "binary";
+                    Description = "Historically we did not allow binary patch applied without an explicit permission from the user, and this flag was the way to do so. Currently we always allow binary patch application, so this is a no-op.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--exclude");
+                    Name = "exclude";
+                    Description = "Don’t apply changes to files matching the given path pattern. This can be useful when importing patchsets, where you want to exclude certain files or directories.";
+                    #Source = pathglob
+                },
+                [ValueParameter]@{
+                    Keys = @("--include");
+                    Name = "include";
+                    Description = "Apply changes to files matching the given path pattern. This can be useful when importing patchsets, where you want to include certain files or directories.";
+                    #Source = pathglob
+                },
+                [FlagParameter]@{
+                    Keys = @("--ignore-whitespace", "--ignore-space-change");
+                    Name = "ignore-whitespace";
+                    Description = "When applying a patch, ignore changes in whitespace in context lines if necessary. Context lines will preserve their whitespace, and they will not undergo whitespace fixing regardless of the value of the --whitespace option. New lines will still be fixed, though.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--whitespace");
+                    Name = "whitespace";
+                    Description = "When applying a patch, detect a new or modified line that has whitespace errors. What are considered whitespace errors is controlled by core.whitespace configuration. By default, trailing whitespaces (including lines that solely consist of whitespaces) and a space character that is immediately followed by a tab character inside the initial indent of the line are considered whitespace errors.";
+                    Source = [StaticSource]@{
+                        Name = "whitespace mode";
+                        Description = "";
+                        Items = @(
+                            [SourceItem]@{
+                                Name = "nowarn";
+                                Description = "turns off the trailing whitespace warning."
+                            },
+                            [SourceItem]@{
+                                Name = "warn";
+                                Description = " outputs warnings for a few such errors, but applies the patch as-is (default)."
+                            },
+                            [SourceItem]@{
+                                Name = "fix";
+                                Description = "outputs warnings for a few such errors, and applies the patch after fixing them (strip is a synonym --- the tool used to consider only trailing whitespace characters as errors, and the fix involved stripping them, but modern Gits do more)."
+                            },
+                            [SourceItem]@{
+                                Name = "error";
+                                Description = "outputs warnings for a few such errors, and refuses to apply the patch."
+                            },
+                            [SourceItem]@{
+                                Name = "error-all";
+                                Description = "is similar to error but shows all errors."
+                            }
+                        )
+                    };
+                },
+                [FlagParameter]@{
+                    Keys = @("--inaccurate-eof");
+                    Name = "inaccurate-eof";
+                    Description = "Under certain circumstances, some versions of diff do not correctly detect a missing new-line at the end of the file. As a result, patches created by such diff programs do not record incomplete lines correctly. This option adds support for applying such patches by working around this bug.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--verbose", "-v");
+                    Name = "verbose";
+                    Description = "Report progress to stderr. By default, only a message about the current patch being applied will be printed. This option will cause additional information to be reported.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--recount");
+                    Name = "recount";
+                    Description = "Do not trust the line counts in the hunk headers, but infer them by inspecting the patch (e.g. after editing the patch without adjusting the hunk headers appropriately).";
+                },
+                [ValueParameter]@{
+                    Keys = @("--directory");
+                    Name = "directory";
+                    Description = "Prepend &lt;root&gt; to all filenames. If a `"-p`" argument was also passed, it is applied before prepending the new root.";
+                    # Source = directory;
+                },
+                [FlagParameter]@{
+                    Keys = @("--unsafe-paths");
+                    Name = "unsafe-paths";
+                    Description = "By default, a patch that affects outside the working area (either a Git controlled working tree, or the current working directory when `"git apply`" is used as a replacement of GNU patch) is rejected as a mistake (or a mischief).";
+                }
+            )
         }
     )
 }
