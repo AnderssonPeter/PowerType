@@ -3411,6 +3411,161 @@ $mergeStrategy = [StaticSource]@{
                     Condition = [ExclusiveParameterCondition]::new("rerere-autoupdate");
                 }
             )
+        },
+        [CommandParameter]@{
+            Keys = @("tag");
+            Name = "tag";
+            Description = "Create, list, delete or verify a tag object signed with GPG";
+            Parameters = @(
+                [FlagParameter]@{
+                    Keys = @("--annotate", "-a");
+                    Name = "annotate";
+                    Description = "Make an unsigned, annotated tag object";
+                },
+                [FlagParameter]@{
+                    Keys = @("--sign", "-s");
+                    Name = "sign";
+                    Description = "Make a GPG-signed tag, using the default e-mail address’s key. The default behavior of tag GPG-signing is controlled by tag.gpgSign configuration variable if it exists, or disabled otherwise. See git-config1.";
+                    Condition = [ExclusiveParameterCondition]::new("no-sign");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-sign");
+                    Name = "no-sign";
+                    Description = "Override tag.gpgSign configuration variable that is set to force each and every tag to be signed.";
+                    Condition = [ExclusiveParameterCondition]::new("sign");
+                },
+                [ValueParameter]@{
+                    Keys = @("--local-user", "-u");
+                    Name = "local-user";
+                    Description = "Make a GPG-signed tag, using the given key.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--force", "-f");
+                    Name = "force";
+                    Description = "Replace an existing tag with the given name (instead of failing)";
+                },
+                [FlagParameter]@{
+                    Keys = @("--delete", "-d");
+                    Name = "delete";
+                    Description = "Delete existing tags with the given names.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--verify", "-v");
+                    Name = "verify";
+                    Description = "Verify the GPG signature of the given tag names.";
+                },
+                [ValueParameter]@{
+                    Keys = @("-n");
+                    Name = "n";
+                    Description = "<num> specifies how many lines from the annotation, if any, are printed when using -l. Implies --list.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--list", "-l");
+                    Name = "list";
+                    Description = "List tags. With optional <pattern>..., e.g. git tag --list 'v-*', list only the tags that match the pattern(s).";
+                },
+                [ValueParameter]@{
+                    Keys = @("--sort");
+                    Name = "sort";
+                    Description = "Sort based on the key given. Prefix - to sort in descending order of the value. You may use the --sort=&lt;key&gt; option multiple times, in which case the last key becomes the primary key. Also supports `"version:refname`" or `"v:refname`" (tag names are treated as versions). The `"version:refname`" sort order can also be affected by the `"versionsort.suffix`" configuration variable. The keys supported are the same as those in git for-each-ref. Sort order defaults to the value configured for the tag.sort variable if it exists, or lexicographic order otherwise. See git-config1.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--color");
+                    Name = "color";
+                    Description = "Respect any colors specified in the --format option. The <when> field must be one of always, never, or auto (if <when> is absent, behave as if always was given).";
+                },
+                [FlagParameter]@{
+                    Keys = @("--ignore-case", "-i");
+                    Name = "ignore-case";
+                    Description = "Sorting and filtering tags are case insensitive.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--column");
+                    Name = "column";
+                    Description = "Display tag listing in columns. See configuration variable column.tag for option syntax. --column and --no-column without options are equivalent to always and never respectively.";
+                    Condition = [ExclusiveParameterCondition]::new("no-column");
+                },
+                [FlagParameter]@{
+                    Keys = @("--no-column");
+                    Name = "no-column";
+                    Description = "Display tag listing in columns. See configuration variable column.tag for option syntax. --column and --no-column without options are equivalent to always and never respectively.";
+                    Condition = [ExclusiveParameterCondition]::new("column");
+                },
+                [ValueParameter]@{
+                    Keys = @("--contains");
+                    Name = "contains";
+                    Description = "Only list tags which contain the specified commit (HEAD if not specified). Implies --list.";
+                    # Source = commit
+                    Condition = [ExclusiveParameterCondition]::new("no-contains");
+                },
+                [ValueParameter]@{
+                    Keys = @("--no-contains");
+                    Name = "no-contains";
+                    Description = "Only list tags which don’t contain the specified commit (HEAD if not specified). Implies --list.";
+                    # Source = commit
+                    Condition = [ExclusiveParameterCondition]::new("contains");
+                },
+                [ValueParameter]@{
+                    Keys = @("--merged");
+                    Name = "merged";
+                    Description = "Only list tags whose commits are reachable from the specified commit (HEAD if not specified).";
+                    # Source = commit
+                    Condition = [ExclusiveParameterCondition]::new("no-merged");
+                },
+                [ValueParameter]@{
+                    Keys = @("--no-merged");
+                    Name = "no-merged";
+                    Description = "Only list tags whose commits are not reachable from the specified commit (HEAD if not specified).";
+                    # Source = commit
+                    Condition = [ExclusiveParameterCondition]::new("merged");
+                },
+                [ValueParameter]@{
+                    Keys = @("--points-at");
+                    Name = "points-at";
+                    Description = "Only list tags of the given object (HEAD if not specified). Implies --list.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--message", "-m");
+                    Name = "message";
+                    Description = "Use the given tag message (instead of prompting). If multiple -m options are given, their values are concatenated as separate paragraphs. Implies -a if none of -a, -s, or -u <keyid> is given.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--file", "-F");
+                    Name = "file";
+                    Description = "Take the tag message from the given file. Use - to read the message from the standard input. Implies -a if none of -a, -s, or -u <keyid> is given.";
+                    # Source = file;
+                },
+                [FlagParameter]@{
+                    Keys = @("--edit", "-e");
+                    Name = "edit";
+                    Description = "The message taken from file with -F and command line with -m are usually used as the tag message unmodified. This option lets you further edit the message taken from these sources.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--cleanup");
+                    Name = "cleanup";
+                    Description = "This option sets how the tag message is cleaned up. The <mode> can be one of verbatim, whitespace and strip. The strip mode is default. The verbatim mode does not change message at all, whitespace removes just leading/trailing whitespace lines and strip removes both whitespace and commentary.";
+                    Source = $cleanupMode;
+                },
+                [FlagParameter]@{
+                    Keys = @("--create-reflog");
+                    Name = "create-reflog";
+                    Description = "Create a reflog for the tag. To globally enable reflogs for tags, see core.logAllRefUpdates in git-config1. The negated form --no-create-reflog only overrides an earlier --create-reflog, but currently does not negate the setting of core.logAllRefUpdates.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--format");
+                    Name = "format";
+                    Description = "A string that interpolates %(fieldname) from a tag ref being shown and the object it points at. The format is the same as that of git-for-each-ref1. When unspecified, defaults to %(refname:strip=2).";
+                },
+                [ValueParameter]@{
+                    Name = "tag-name";
+                    Description = "The name of the tag to create, delete, or describe. The new tag name must pass all checks defined by git-check-ref-format1. Some of these checks may restrict the characters allowed in a tag name.";
+                },
+                [ValueParameter]@{
+                    Name = "commit";
+                    Description = "The object that the new tag will refer to, usually a commit. Defaults to HEAD.";
+                    # Source = commit;
+                }
+            )
         }
     )
 }
