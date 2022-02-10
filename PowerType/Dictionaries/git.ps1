@@ -128,6 +128,17 @@ $mergeStrategy = [StaticSource]@{
     )
 }
 
+$archiveFormats = [DynamicSource]@{
+    Name = "archive formats";
+    Description = "list of supported git archive formats";
+    CommandExpression = {
+        git archive --list
+    };
+    Cache = [Cache]@{
+        ByTime = New-TimeSpan -Hours 24
+    }
+}
+
 # Should we remove the Parameter part? CommandParameter -> Command?
 [PowerTypeDictionary]@{
     Keys        = @("git");
@@ -3873,6 +3884,75 @@ $mergeStrategy = [StaticSource]@{
                     Keys = @("--unsafe-paths");
                     Name = "unsafe-paths";
                     Description = "By default, a patch that affects outside the working area (either a Git controlled working tree, or the current working directory when `"git apply`" is used as a replacement of GNU patch) is rejected as a mistake (or a mischief).";
+                }
+            )
+        },
+        [CommandParameter]@{
+            Keys = @("archive");
+            Name = "archive";
+            Description = "Create an archive of files from a named tree";
+            Parameters = @(
+                [ValueParameter]@{
+                    Keys = @("--format");
+                    Name = "format";
+                    Description = "Format of the resulting archive: tar or zip. If this option is not given, and the output file is specified, the format is inferred from the filename if possible (e.g. writing to `"foo.zip`" makes the output to be in the zip format). Otherwise the output format is tar.";
+                    Source = $archiveFormats;
+                },
+                [FlagParameter]@{
+                    Keys = @("--list", "-l");
+                    Name = "list";
+                    Description = "Show all available formats.";
+                },
+                [FlagParameter]@{
+                    Keys = @("--verbose", "-v");
+                    Name = "verbose";
+                    Description = "Report progress to stderr.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--prefix");
+                    Name = "prefix";
+                    Description = "Prepend <prefix>/ to each filename in the archive.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--output", "-o");
+                    Name = "output";
+                    Description = "Write the archive to <file> instead of stdout.";
+                    #Source = file;
+                },
+                [ValueParameter]@{
+                    Keys = @("--add-file");
+                    Name = "add-file";
+                    Description = "Add a non-tracked file to the archive. Can be repeated to add multiple files. The path of the file in the archive is built by concatenating the value for --prefix (if any) and the basename of <file>.";
+                    #Source = file;
+                },
+                [FlagParameter]@{
+                    Keys = @("--worktree-attributes");
+                    Name = "worktree-attributes";
+                    Description = "Look for attributes in .gitattributes files in the working tree as well (see ).";
+                },
+                [ValueParameter]@{
+                    Name = "extra";
+                    Description = "This can be any options that the archiver backend understands. See next section.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--remote");
+                    Name = "remote";
+                    Description = "Instead of making a tar archive from the local repository, retrieve a tar archive from a remote repository. Note that the remote repository may place restrictions on which sha1 expressions may be allowed in <tree-ish>. See git-upload-archive1 for details.";
+                },
+                [ValueParameter]@{
+                    Keys = @("--exec");
+                    Name = "exec";
+                    Description = "Used with --remote to specify the path to the git-upload-archive on the remote side.";
+                },
+                [ValueParameter]@{
+                    Name = "tree-ish";
+                    Description = "The tree or commit to produce an archive for.";
+                    #Source = $commit;
+                },
+                [ValueParameter]@{
+                    Name = "path";
+                    Description = "Without an optional path parameter, all files and subdirectories of the current working directory are included in the archive. If one or more paths are specified, only these are included.";
+                    #Source = fileglob?;
                 }
             )
         }
