@@ -65,6 +65,18 @@ $executionBit = [StaticSource]@{
     )
 }
 
+$remotes = [DynamicSource]@{
+    Name = "remotes";
+    Description = "list of git remotes";
+    CommandExpression = {
+        git --no-optional-locks remote
+    };
+    Cache = [Cache]@{
+        ByCurrentWorkingDirectory = $true;
+        ByTime = New-TimeSpan -Seconds 30
+    }
+}
+
 $allBranches = [DynamicSource]@{
     Name = "AllBranches";
     Description = "Local and remote branches";
@@ -1800,6 +1812,14 @@ $archiveFormats = [DynamicSource]@{
             Name = "push";
             Description = "Update remote refs along with associated objects";
             Parameters = @(
+                [ValueParameter]@{
+                    Name = "remote";
+                    Source = $remotes
+                },
+                [ValueParameter]@{
+                    Name = "branch";
+                    Source = $allBranches
+                },
                 [FlagParameter]@{
                     Keys = @("--all");
                     Name = "all";

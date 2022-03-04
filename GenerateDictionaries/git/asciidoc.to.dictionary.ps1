@@ -76,7 +76,7 @@ Write-Host "Enumerating files"
 [System.Collections.ArrayList] $files = @(Get-ChildItem -Filter '*.xml')
 
 $highPriorityCommands = @('add', 'commit', 'checkout', 'stash', 'merge', 'clone', 'rebase', 'status', 'push', 'fetch', 'log', 'diff', 'branch', 'blame', 'cherry-pick', 'revert', 'tag')
-$lowPriorityCommands = @('am', 'instaweb', 'bugreport', 'daemon', 'update-server-info', 'format-patch', 'send-email', 'request-pull', 'svn')
+$lowPriorityCommands = @('am', 'instaweb', 'bugreport', 'daemon', 'update-server-info', 'format-patch', 'send-email', 'request-pull', 'svn', 'archimport')
 
 for ($i = $highPriorityCommands.length-1; $i -ge 0; $i--) {
     $command = 'git-' + $highPriorityCommands[$i] + '.xml'
