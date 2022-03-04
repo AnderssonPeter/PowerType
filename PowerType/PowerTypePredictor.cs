@@ -17,7 +17,7 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
 
     public Guid Id => Identifier;
 
-    internal static readonly Guid Identifier = new("599d1760-4ee1-4ed2-806e-f2a1b1a0ba4d");
+    internal static readonly Guid Identifier = new("2ceecb5e-697d-4d0f-a32f-261cd3635a9f");
     private readonly ICurrentWorkingDirectoryProvider currentWorkingDirectoryProvider;
 
     public string Name => "PowerType";
