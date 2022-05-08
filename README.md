@@ -25,6 +25,7 @@
   - [Uninstall](#uninstall)
 - [Troubleshooting](#troubleshooting)
 - [Progress](#progress)
+- [Contribute](#contribute)
 - [Acknowledgements](#acknowledgements)
 
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/powertype?style=flat-square)](https://www.powershellgallery.com/packages/PowerType)
@@ -79,6 +80,12 @@ Get-PowerTypeHistory # Used to see if any suggestions caused a exception
 
 This project is far from done but has the aim to provide autocomplete for common cli tools like [git](PowerType/Dictionaries/git.ps1), [npm](PowerType/Dictionaries/npm.ps1), [adb](PowerType/Dictionaries/adb.ps1), docker, dotnet, node and many more while using powershell. 
 
+# Contribute
+If you wish to contribute the following would be greatly appreciated
+* Give this repository a Star
+* Spread the word
+* Create a pull request with a new Dictionary (See [npm](PowerType/Dictionaries/npm.ps1) for a simple example)
+* Sponsor using the button above (Only do this if you can afford to)
 
 # Acknowledgements
 This is heavily inspired by [Fish shell](https://fishshell.com/) and [fig autocomplete](https://github.com/withfig/autocomplete), some dictionaries are generated from the specifications in [Carapace-bin](https://github.com/rsteube/carapace-bin/) big thanks to [rsteube](https://github.com/rsteube) for his patience and help!
