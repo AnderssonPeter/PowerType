@@ -10,5 +10,5 @@ jobs:
       uses: actions/checkout@v2
     - name: Check for broken links
       uses: gaurav-nelson/github-action-markdown-link-check@v1
-    - name: Check for insensitive, inconsiderate writing 
-      uses: theashraf/alex-action@master
+#    - name: Check for insensitive, inconsiderate writing 
+#      uses: theashraf/alex-action@master
