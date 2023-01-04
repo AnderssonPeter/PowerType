@@ -70,7 +70,12 @@ public class DictionarySuggestorTests
                                     }
                                 }
                             }
-                        }
+                        },
+                        new FlagParameter
+                        {
+                            Keys = new List<string> { "--" },
+                            Name = "Separator"
+                        },
                     }
                 },
                 new CommandParameter
@@ -112,17 +117,19 @@ public class DictionarySuggestorTests
     [Theory]
     [InlineData(new string[] { "git" }, new[] { "git commit", "git checkout", "git --help" })]
     [InlineData(new string[] { "git", "c" }, new[] { "git commit", "git checkout" })]
-    [InlineData(new string[] { "git", "commit" }, new[] { "git commit --message", "git commit --verbose", "git commit --squash", "git commit --cleanup", "git commit --help" })]
+    [InlineData(new string[] { "git", "commit" }, new[] { "git commit --message", "git commit --verbose", "git commit --squash", "git commit --cleanup", "git commit --", "git commit --help" })]
     [InlineData(new string[] { "git", "commit", "--me" }, new[] { "git commit --message" })]
     [InlineData(new string[] { "git", "commit", "--message" }, new string[] { })]
     [InlineData(new string[] { "git", "commit", "--message=\"test" }, new string[] { })]
 
     [InlineData(new string[] { "git", "commit", "-m" }, new string[] { })]
     [InlineData(new string[] { "git", "commit", "-m=\"test" }, new string [] { })]
-    [InlineData(new string[] { "git", "commit", "-m=\"test\"" }, new string[] { "git commit -m=\"test\" --verbose", "git commit -m=\"test\" --squash", "git commit -m=\"test\" --cleanup", "git commit -m=\"test\" --help" })]
+    [InlineData(new string[] { "git", "commit", "-m=\"test\"" }, new string[] { "git commit -m=\"test\" --verbose", "git commit -m=\"test\" --squash", "git commit -m=\"test\" --cleanup", "git commit -m=\"test\" --", "git commit -m=\"test\" --help" })]
     [InlineData(new string[] { "git", "commit", "-m", "\"test" }, new string [] { })]
-    [InlineData(new string[] { "git", "commit", "-m", "\"test\"" }, new[] { "git commit -m \"test\" --verbose", "git commit -m \"test\" --squash", "git commit -m \"test\" --cleanup", "git commit -m \"test\" --help" })]
-    [InlineData(new string[] { "git", "commit", "-m", "\"test\"", "-" }, new[] { "git commit -m \"test\" --verbose", "git commit -m \"test\" --squash", "git commit -m \"test\" --cleanup", "git commit -m \"test\" --help" })]
+    [InlineData(new string[] { "git", "commit", "-m", "\"test\"" }, new[] { "git commit -m \"test\" --verbose", "git commit -m \"test\" --squash", "git commit -m \"test\" --cleanup", "git commit -m \"test\" --", "git commit -m \"test\" --help" })]
+    [InlineData(new string[] { "git", "commit", "-m", "\"test\"", "-" }, new[] { "git commit -m \"test\" --verbose", "git commit -m \"test\" --squash", "git commit -m \"test\" --cleanup", "git commit -m \"test\" --", "git commit -m \"test\" --help" })]
+    [InlineData(new string[] { "git", "commit", "-" }, new string[] { "git commit --message", "git commit --verbose", "git commit --squash", "git commit --cleanup", "git commit --", "git commit --help" })]
+    [InlineData(new string[] { "git", "commit", "--" }, new string[] { "git commit --message", "git commit --verbose", "git commit --squash", "git commit --cleanup", "git commit --", "git commit --help" }, Skip = "Current implementation does not support this yet")]
 
     [InlineData(new string[] { "git", "commit", "--cleanup" }, new string[] { "git commit --cleanup strip", "git commit --cleanup default" })]
     [InlineData(new string[] { "git", "commit", "--cleanup", "s" }, new string[] { "git commit --cleanup strip" })]
@@ -132,6 +139,7 @@ public class DictionarySuggestorTests
 
     [InlineData(new string[] { "git", "checkout" }, new string[] { "git checkout --quite", "git checkout First", "git checkout Second", "git checkout \"With space\"", "git checkout --help" })]
     [InlineData(new string[] { "git", "checkout", "F" }, new string[] { "git checkout First" })]
+    [InlineData(new string[] { "git", "checkout", "First" }, new string[] { "git checkout First --quite", "git checkout First --help" }, Skip = "Current implementation does not support this yet")]
     [InlineData(new string[] { "git", "checkout", "W" }, new string[] { "git checkout \"With space\"" })]
     [InlineData(new string[] { "git", "checkout", "\"F" }, new string[] { "git checkout \"First\"" })]
     [InlineData(new string[] { "git", "checkout", "'F" }, new string[] { "git checkout 'First'" })]

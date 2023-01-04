@@ -3,7 +3,7 @@
     "PowerShell": {
       "commandName": "Executable",
       "executablePath": "pwsh.exe",
-      "commandLineArgs": "-NoExit -NoProfile -command \"$DebugPreference = 'Continue'\nImport-Module $(TargetDir)$(TargetFileName)\nEnable-PowerType\nSet-PSReadLineOption -PredictionViewStyle ListView\""
+      "commandLineArgs": "-NoExit -NoProfile -command \"$DebugPreference = 'Continue' && Import-Module $(TargetDir)$(TargetFileName) && Enable-PowerType && Set-PSReadLineOption -PredictionViewStyle ListView\""
     }
   }
 }

@@ -44,6 +44,22 @@ public abstract class Parameter
     internal bool HasKeys => Keys?.Count > 0;
 
     internal virtual bool IsPerfectKeyMatch(PowerShellString value) => HasKeys && Keys.Exists(key => key.Equals(value.RawValue, StringComparison.OrdinalIgnoreCase));
+    internal virtual bool TryGetPerfectKeyMatch(PowerShellString value, out string matchingKey)
+    {
+        if (HasKeys)
+        {
+            foreach (var key in Keys)
+            {
+                if (key.Equals(value.RawValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    matchingKey = key;
+                    return true;
+                }
+            }
+        }
+        matchingKey = null!;
+        return false;
+    }
 
     internal bool TryGetPartialKeyMatch(PowerShellString value, out string matchingKey) {
         if (HasKeys)

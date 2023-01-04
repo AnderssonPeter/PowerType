@@ -62,7 +62,7 @@ public class PowerShellStringTests
     [InlineData(StringConstantType.DoubleQuotedHereString, "$t'\" \t\n`{}abc", "$t'`\" `t\n``{}abc")]
     [InlineData(StringConstantType.SingleQuoted, "$t'\" \t\n`{}abc", "$t''\" \t\n`{}abc")]
     [InlineData(StringConstantType.SingleQuotedHereString, "$t'\" \t\n`{}abc", "$t'\" \t\n`{}abc")]
-    //[InlineData(StringConstantType.DoubleQuoted, "$♥", "$([char]0x2665)", Skip = "Not implemented yet")] //skip is not supported yet, but should be added in the next release
+    [InlineData(StringConstantType.DoubleQuoted, "$♥", "$([char]0x2665)", Skip = "Not implemented yet")]
     public void Escape(StringConstantType type, string value, string expected)
     {
         PowerShellString.Escape(type, value).Should().Be(expected);
@@ -76,7 +76,7 @@ public class PowerShellStringTests
     [InlineData(StringConstantType.DoubleQuotedHereString, "$t'`\" `t\n``{}abc", "$t'\" \t\n`{}abc")]
     [InlineData(StringConstantType.SingleQuoted, "$t''\" \t\n`{}abc", "$t'\" \t\n`{}abc")]
     [InlineData(StringConstantType.SingleQuotedHereString, "$t'\" \t\n`{}abc", "$t'\" \t\n`{}abc")]
-    //[InlineData(StringConstantType.DoubleQuoted, "$([char]0x2665)", "$♥", Skip = "Not implemented yet")] //skip is not supported yet, but should be added in the next release
+    [InlineData(StringConstantType.DoubleQuoted, "$([char]0x2665)", "$♥", Skip = "Not implemented yet")]
     public void Unescape(StringConstantType type, string value, string expected)
     {
         PowerShellString.Unescape(type, value).Should().Be(expected);
