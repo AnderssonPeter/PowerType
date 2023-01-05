@@ -22,6 +22,7 @@
 - [Installation](#installation)
   - [Requirements](#requirements)
   - [Auto enable in every session](#auto-enable-in-every-session)
+  - [Upgrade](#upgrade)
   - [Uninstall](#uninstall)
 - [Troubleshooting](#troubleshooting)
 - [Progress](#progress)
@@ -58,6 +59,13 @@ Enable-PowerType
 Set-PSReadLineOption -PredictionSource HistoryAndPlugin -PredictionViewStyle ListView
 ```
 
+## Upgrade
+```Powershell
+Disable-PowerType
+Remove-Module PowerType
+Install-Module PowerType -AllowPrerelease -Force
+```
+Restart powershell
 
 ## Uninstall
 ```Powershell

@@ -159,6 +159,27 @@ public class ConditionTests
         result.Should().Be(expected);
     }
 
+    [InlineData(new string[] { "message" }, true)]
+    [InlineData(new string[] { "test", "message" }, true)]
+    [InlineData(new string[] { "test" }, false)]
+    [Theory]
+    public void InclusiveParameterConditionTrue(string[] parameterNames, bool expected)
+    {
+        var condition = new InclusiveParameterCondition(parameterNames);
+        var arguments = PowerShellString.FromRawSmart(new string[] { "git", "checkout", "-m", "'message'" }).ToArray();
+        var dictionaryParsingContext = new DictionaryParsingContext("", arguments)
+        {
+            Command = new Command("git", null)
+        };
+        dictionaryParsingContext.Parameters.Add(new ParameterWithValue(arguments[1], new CommandParameter() { Name = "checkout" }));
+        dictionaryParsingContext.Parameters.Add(new ParameterWithValue(arguments[2], new ValueParameter() { Name = "message" }, arguments[3]));
+        var result = condition.Evaluate(new Dictionary<string, object>
+        {
+            { nameof(DictionaryParsingContext),  dictionaryParsingContext}
+        });
+        result.Should().Be(expected);
+    }
+
     [Fact]
     public void ExclusiveParameterConditionArgumentNullException()
     {

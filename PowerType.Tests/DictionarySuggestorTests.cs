@@ -20,6 +20,14 @@ public class DictionarySuggestorTests
                 ByTime = TimeSpan.FromSeconds(15)
             }
         };
+        var mode = new StaticSource
+        {
+            Name = "mode",
+            Items = new List<SourceItem> {
+                new SourceItem() { Name = "simple" },
+                new SourceItem() { Name = "complex" }
+            }
+        };
         var dictionary = new PowerTypeDictionary()
         {
             Keys = new List<string>
@@ -100,7 +108,23 @@ public class DictionarySuggestorTests
                     Keys = new List<string> { "--help", "-h" },
                     Name = "Help",
                     Recursive = true
-                }
+                },
+                new CommandParameter
+                {
+                    Keys = new List<string> { "dummy" },
+                    Name = "dummy",
+                    Parameters = new List<Parameter>
+                    {
+                        new ValueParameter {
+                            Name = "Repository",
+                            Source = allRepositories
+                        },
+                        new ValueParameter {
+                            Name = "mode",
+                            Source = mode
+                        }
+                    }
+                },
             }
         };
         dictionary.Initialize(new SystemTime());
@@ -115,7 +139,7 @@ public class DictionarySuggestorTests
     }
     
     [Theory]
-    [InlineData(new string[] { "git" }, new[] { "git commit", "git checkout", "git --help" })]
+    [InlineData(new string[] { "git" }, new[] { "git commit", "git checkout", "git dummy", "git --help" })]
     [InlineData(new string[] { "git", "c" }, new[] { "git commit", "git checkout" })]
     [InlineData(new string[] { "git", "commit" }, new[] { "git commit --message", "git commit --verbose", "git commit --squash", "git commit --cleanup", "git commit --", "git commit --help" })]
     [InlineData(new string[] { "git", "commit", "--me" }, new[] { "git commit --message" })]
@@ -144,6 +168,8 @@ public class DictionarySuggestorTests
     [InlineData(new string[] { "git", "checkout", "\"F" }, new string[] { "git checkout \"First\"" })]
     [InlineData(new string[] { "git", "checkout", "'F" }, new string[] { "git checkout 'First'" })]
     [InlineData(new string[] { "git", "checkout", "i" }, new string[] { "git checkout --quite", "git checkout First", "git checkout \"With space\"" })]
+
+    [InlineData(new string[] { "git", "dummy", "First" }, new string[] { "git dummy First simple", "git dummy First complex" }, Skip = "The current implementation does not support this yet")]
 
     [InlineData(new string[] { "git", "unknown" }, new string[] { })]
     [InlineData(new string[] { "git", "unknown", "c" }, new[] { "git unknown commit", "git unknown checkout" })] //ignore unknown parameters

@@ -2,7 +2,9 @@
     Name = "versions";
     Description = "A all installed node versions";
     CommandExpression = {
-        nvm list | % { [regex]::match($_, '(\d+\.\d+\.\d+)').Groups[1].Value } | ? {$_.trim() -ne "" }
+        $hardcoded = @("latest", "lts")
+        $list = nvm list | % { [regex]::match($_, '(\d+\.\d+\.\d+)').Groups[1].Value } | ? {$_.trim() -ne "" }
+        $hardcoded + $list
     };
     Cache = [Cache]@{
         ByTime = New-TimeSpan -Seconds 10
@@ -83,6 +85,7 @@ $proxies = [StaticSource]@{
                     Name = "architecture";
                     Description = "architecture to install";
                     Source = $architecture;
+                    Condition = [ExclusiveParameterCondition]::new("version")
                 }
             );
         }
@@ -163,11 +166,12 @@ $proxies = [StaticSource]@{
                     Name = "version";
                     Description = "";
                     Source = $installedVersions
-                }
+                },
                 [ValueParameter]@{
                     Name = "architecture";
                     Description = "architecture to install";
                     Source = $architecture;
+                    Condition = [InclusiveParameterCondition]::new("version")
                 }
             );
         }
