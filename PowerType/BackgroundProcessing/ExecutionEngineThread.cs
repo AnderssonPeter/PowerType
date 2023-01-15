@@ -94,7 +94,6 @@ internal class ExecutionEngineThread : IDisposable
         initialState.ThrowOnRunspaceOpenError = true;
         initialState.Assemblies.Add(new SessionStateAssemblyEntry(assemblyName, assemblyPath));
         initialState.ImportPSModule(modulePath);
-        initialState.ExecutionPolicy = ExecutionPolicy.Unrestricted;
         var runspace = RunspaceFactory.CreateRunspace(initialState);
         runspace.Open();
 
