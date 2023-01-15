@@ -1,6 +1,7 @@
 ﻿using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.PowerShell;
 using PowerType.Model;
 
@@ -94,6 +95,10 @@ internal class ExecutionEngineThread : IDisposable
         initialState.ThrowOnRunspaceOpenError = true;
         initialState.Assemblies.Add(new SessionStateAssemblyEntry(assemblyName, assemblyPath));
         initialState.ImportPSModule(modulePath);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            initialState.ExecutionPolicy = ExecutionPolicy.Unrestricted;
+        }
         var runspace = RunspaceFactory.CreateRunspace(initialState);
         runspace.Open();
 
