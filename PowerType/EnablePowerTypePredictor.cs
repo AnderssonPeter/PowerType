@@ -56,7 +56,6 @@ public class EnablePowerTypePredictor : PowerTypeCmdlet
         var predictor = new PowerTypePredictor(currentWorkingDirectoryProvider, GetDictionaries());
         SubsystemManager.RegisterSubsystem<ICommandPredictor, PowerTypePredictor>(predictor);
         PowerTypePredictor.Instance = predictor;
-
         if (PassThru.IsPresent)
         {
             WriteObject(true);
@@ -68,7 +67,9 @@ public class EnablePowerTypePredictor : PowerTypeCmdlet
         get
         {
             string codeBase = Assembly.GetExecutingAssembly().Location;
-            UriBuilder uri = new(codeBase);
+            UriBuilder uri = new();
+            uri.Scheme = "file://";
+            uri.Path = codeBase;
             return Uri.UnescapeDataString(uri.Path);
         }
     }
