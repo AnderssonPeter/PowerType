@@ -90,6 +90,12 @@ public class PowerShellString
             EscapedValue = commandParameter.ToString();
             Type = StringConstantType.BareWord;
         }
+        else if (commandElementAst is ConstantExpressionAst constantExpression)
+        {
+            RawValue = constantExpression.ToString();
+            EscapedValue = constantExpression.ToString();
+            Type = StringConstantType.BareWord;
+        }
         else
         {
             throw new InvalidOperationException("We have no idea how to handle this type: " + commandElementAst.GetType().ToString());

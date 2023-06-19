@@ -13,7 +13,7 @@ public class DictionarySuggestorTests
         var allRepositories = new DynamicSource
         {
             Name = "All Repositories",
-            CommandExpression = System.Management.Automation.ScriptBlock.Create("@('First', 'Second', 'With space')"),
+            CommandExpression = System.Management.Automation.ScriptBlock.Create("@('First', 'Second', 'With space', 'release/v1.16.26')"),
             Cache = new Cache
             {
                 ByCurrentWorkingDirectory = true,
@@ -133,7 +133,7 @@ public class DictionarySuggestorTests
         //Fake cached values!
         allRepositories.Cache.UpdateCache(new List<SourceItem>
         {
-            SourceItem.FromName("First"), SourceItem.FromName("Second"), SourceItem.FromName("With space")
+            SourceItem.FromName("First"), SourceItem.FromName("Second"), SourceItem.FromName("With space"), SourceItem.FromName("release/v1.16.26")
         }, "");
         dictionarySuggestor = new DictionarySuggestor(dictionary);
     }
@@ -168,6 +168,7 @@ public class DictionarySuggestorTests
     [InlineData(new string[] { "git", "checkout", "\"F" }, new string[] { "git checkout \"First\"" })]
     [InlineData(new string[] { "git", "checkout", "'F" }, new string[] { "git checkout 'First'" })]
     [InlineData(new string[] { "git", "checkout", "i" }, new string[] { "git checkout --quite", "git checkout First", "git checkout \"With space\"" })]
+    [InlineData(new string[] { "git", "checkout", "16" }, new string[] { "git checkout release/v1.16.26" })]
 
     [InlineData(new string[] { "git", "dummy", "First" }, new string[] { "git dummy First simple", "git dummy First complex" }, Skip = "The current implementation does not support this yet")]
 

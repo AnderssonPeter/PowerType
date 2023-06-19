@@ -55,14 +55,14 @@ public class ExecutionEngineThreadTests
     }
 
     [Fact]
-    public void DontCrachOnUnkownDrive()
+    public void DontCrashOnUnkownDrive()
     {
         var queue = new ThreadQueue<Command>();
         using var executionEngineThread = new ExecutionEngineThread(queue);
         SendAndWaitForCommand(new InitializeDictionaryCommand(Path.Combine(Environment.CurrentDirectory, "Dictionaries", "test.ps1")), queue, executionEngineThread);
 
         var dictionary = executionEngineThread.GetDictionaries().Single();
-        SendAndWaitForCommand(new CacheDictionaryDynamicSources(dictionary, @"Z:\DoesNotExist"), queue, executionEngineThread);
+        SendAndWaitForCommand(new CacheDictionaryDynamicSources(dictionary, @"X:\DoesNotExist"), queue, executionEngineThread);
         if (!executionEngineThread.IsHealthy(out var exception))
         {
             throw new Exception("execution engine thread was not healthy", exception);
