@@ -56,11 +56,6 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: ${{ steps.find-lcov-file-path.outputs.path }}
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: test output
-        path: ${{ env.REPOSITORY_NAME }}.Tests/TestResults/tests.trx
-
     - name: Publish Results to Testspace
       if: ${{ always() && github.event_name == 'push' }}
       run: testspace ${{ env.REPOSITORY_NAME }}.Tests/TestResults/tests.trx
