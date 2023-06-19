@@ -27,4 +27,5 @@ A clear and concise description of what you expected to happen.
  - PowerType version: 
 
 **Additional context**
+Please include output of `Get-PowerTypeStatus` and `Get-PowerTypeHistory`
 Add any other context about the problem here.
