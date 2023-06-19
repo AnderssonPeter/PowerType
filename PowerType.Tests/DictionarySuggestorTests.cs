@@ -161,7 +161,7 @@ public class DictionarySuggestorTests
     [InlineData(new string[] { "git", "commit", "--cleanup=\"strip" }, new string[] { "git commit --cleanup=\"strip\"" })]
     [InlineData(new string[] { "git", "commit", "--cleanup='strip" }, new string[] { "git commit --cleanup='strip'" })]
 
-    [InlineData(new string[] { "git", "checkout" }, new string[] { "git checkout --quite", "git checkout First", "git checkout Second", "git checkout \"With space\"", "git checkout --help" })]
+    [InlineData(new string[] { "git", "checkout" }, new string[] { "git checkout --quite", "git checkout First", "git checkout Second", "git checkout \"With space\"", "git checkout release/v1.16.26", "git checkout --help" })]
     [InlineData(new string[] { "git", "checkout", "F" }, new string[] { "git checkout First" })]
     [InlineData(new string[] { "git", "checkout", "First" }, new string[] { "git checkout First --quite", "git checkout First --help" }, Skip = "Current implementation does not support this yet")]
     [InlineData(new string[] { "git", "checkout", "W" }, new string[] { "git checkout \"With space\"" })]
