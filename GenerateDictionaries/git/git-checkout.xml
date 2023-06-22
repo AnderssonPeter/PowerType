@@ -1,0 +1,846 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-checkout</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-checkout</refname>
+  <refpurpose>Switch branches or restore working tree files</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git checkout</emphasis> [-q] [-f] [-m] [&lt;branch&gt;]
+<emphasis>git checkout</emphasis> [-q] [-f] [-m] --detach [&lt;branch&gt;]
+<emphasis>git checkout</emphasis> [-q] [-f] [-m] [--detach] &lt;commit&gt;
+<emphasis>git checkout</emphasis> [-q] [-f] [-m] [[-b|-B|--orphan] &lt;new_branch&gt;] [&lt;start_point&gt;]
+<emphasis>git checkout</emphasis> [-f|--ours|--theirs|-m|--conflict=&lt;style&gt;] [&lt;tree-ish&gt;] [--] &lt;pathspec&gt;&#8230;
+<emphasis>git checkout</emphasis> [-f|--ours|--theirs|-m|--conflict=&lt;style&gt;] [&lt;tree-ish&gt;] --pathspec-from-file=&lt;file&gt; [--pathspec-file-nul]
+<emphasis>git checkout</emphasis> (-p|--patch) [&lt;tree-ish&gt;] [--] [&lt;pathspec&gt;&#8230;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Updates files in the working tree to match the version in the index
+or the specified tree.  If no pathspec was given, <emphasis>git checkout</emphasis> will
+also update <literal>HEAD</literal> to set the specified branch as the current
+branch.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>git checkout</emphasis> [&lt;branch&gt;]
+</term>
+<listitem>
+<simpara>
+        To prepare for working on <literal>&lt;branch&gt;</literal>, switch to it by updating
+        the index and the files in the working tree, and by pointing
+        <literal>HEAD</literal> at the branch. Local modifications to the files in the
+        working tree are kept, so that they can be committed to the
+        <literal>&lt;branch&gt;</literal>.
+</simpara>
+<simpara>If <literal>&lt;branch&gt;</literal> is not found but there does exist a tracking branch in
+exactly one remote (call it <literal>&lt;remote&gt;</literal>) with a matching name and
+<literal>--no-guess</literal> is not specified, treat as equivalent to</simpara>
+<literallayout class="monospaced">$ git checkout -b &lt;branch&gt; --track &lt;remote&gt;/&lt;branch&gt;</literallayout><simpara></simpara>
+<simpara>You could omit <literal>&lt;branch&gt;</literal>, in which case the command degenerates to
+"check out the current branch", which is a glorified no-op with
+rather expensive side-effects to show only the tracking information,
+if exists, for the current branch.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git checkout</emphasis> -b|-B &lt;new_branch&gt; [&lt;start point&gt;]
+</term>
+<listitem>
+<simpara>
+        Specifying <literal>-b</literal> causes a new branch to be created as if
+        <citerefentry>
+<refentrytitle>git-branch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> were called and then checked out.  In
+        this case you can use the <literal>--track</literal> or <literal>--no-track</literal> options,
+        which will be passed to <emphasis>git branch</emphasis>.  As a convenience,
+        <literal>--track</literal> without <literal>-b</literal> implies branch creation; see the
+        description of <literal>--track</literal> below.
+</simpara>
+<simpara>If <literal>-B</literal> is given, <literal>&lt;new_branch&gt;</literal> is created if it doesn&#8217;t exist; otherwise, it
+is reset. This is the transactional equivalent of</simpara>
+<literallayout class="monospaced">$ git branch -f &lt;branch&gt; [&lt;start point&gt;]
+$ git checkout &lt;branch&gt;</literallayout><simpara></simpara>
+<simpara>that is to say, the branch is not reset/created unless "git checkout" is
+successful.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git checkout</emphasis> --detach [&lt;branch&gt;]
+</term>
+<term>
+<emphasis>git checkout</emphasis> [--detach] &lt;commit&gt;
+</term>
+<listitem>
+<simpara>
+        Prepare to work on top of <literal>&lt;commit&gt;</literal>, by detaching <literal>HEAD</literal> at it
+        (see "DETACHED HEAD" section), and updating the index and the
+        files in the working tree.  Local modifications to the files
+        in the working tree are kept, so that the resulting working
+        tree will be the state recorded in the commit plus the local
+        modifications.
+</simpara>
+<simpara>When the <literal>&lt;commit&gt;</literal> argument is a branch name, the <literal>--detach</literal> option can
+be used to detach <literal>HEAD</literal> at the tip of the branch (<literal>git checkout
+&lt;branch&gt;</literal> would check out that branch without detaching <literal>HEAD</literal>).</simpara>
+<simpara>Omitting <literal>&lt;branch&gt;</literal> detaches <literal>HEAD</literal> at the tip of the current branch.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git checkout</emphasis> [-f|--ours|--theirs|-m|--conflict=&lt;style&gt;] [&lt;tree-ish&gt;] [--] &lt;pathspec&gt;&#8230;
+</term>
+<term>
+<emphasis>git checkout</emphasis> [-f|--ours|--theirs|-m|--conflict=&lt;style&gt;] [&lt;tree-ish&gt;] --pathspec-from-file=&lt;file&gt; [--pathspec-file-nul]
+</term>
+<listitem>
+<simpara>
+        Overwrite the contents of the files that match the pathspec.
+        When the <literal>&lt;tree-ish&gt;</literal> (most often a commit) is not given,
+        overwrite working tree with the contents in the index.
+        When the <literal>&lt;tree-ish&gt;</literal> is given, overwrite both the index and
+        the working tree with the contents at the <literal>&lt;tree-ish&gt;</literal>.
+</simpara>
+<simpara>The index may contain unmerged entries because of a previous failed merge.
+By default, if you try to check out such an entry from the index, the
+checkout operation will fail and nothing will be checked out.
+Using <literal>-f</literal> will ignore these unmerged entries.  The contents from a
+specific side of the merge can be checked out of the index by
+using <literal>--ours</literal> or <literal>--theirs</literal>.  With <literal>-m</literal>, changes made to the working tree
+file can be discarded to re-create the original conflicted merge result.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git checkout</emphasis> (-p|--patch) [&lt;tree-ish&gt;] [--] [&lt;pathspec&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        This is similar to the previous mode, but lets you use the
+        interactive interface to show the "diff" output and choose which
+        hunks to use in the result.  See below for the description of
+        <literal>--patch</literal> option.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-q
+</term>
+<term>
+--quiet
+</term>
+<listitem>
+<simpara>
+        Quiet, suppress feedback messages.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--progress
+</term>
+<term>
+--no-progress
+</term>
+<listitem>
+<simpara>
+        Progress status is reported on the standard error stream
+        by default when it is attached to a terminal, unless <literal>--quiet</literal>
+        is specified. This flag enables progress reporting even if not
+        attached to a terminal, regardless of <literal>--quiet</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-f
+</term>
+<term>
+--force
+</term>
+<listitem>
+<simpara>
+        When switching branches, proceed even if the index or the
+        working tree differs from <literal>HEAD</literal>, and even if there are untracked
+        files in the way.  This is used to throw away local changes and
+        any untracked files or directories that are in the way.
+</simpara>
+<simpara>When checking out paths from the index, do not fail upon unmerged
+entries; instead, unmerged entries are ignored.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ours
+</term>
+<term>
+--theirs
+</term>
+<listitem>
+<simpara>
+        When checking out paths from the index, check out stage #2
+        (<emphasis>ours</emphasis>) or #3 (<emphasis>theirs</emphasis>) for unmerged paths.
+</simpara>
+<simpara>Note that during <literal>git rebase</literal> and <literal>git pull --rebase</literal>, <emphasis>ours</emphasis> and
+<emphasis>theirs</emphasis> may appear swapped; <literal>--ours</literal> gives the version from the
+branch the changes are rebased onto, while <literal>--theirs</literal> gives the
+version from the branch that holds your work that is being rebased.</simpara>
+<simpara>This is because <literal>rebase</literal> is used in a workflow that treats the
+history at the remote as the shared canonical one, and treats the
+work done on the branch you are rebasing as the third-party work to
+be integrated, and you are temporarily assuming the role of the
+keeper of the canonical history during the rebase.  As the keeper of
+the canonical history, you need to view the history from the remote
+as <literal>ours</literal> (i.e. "our shared canonical history"), while what you did
+on your side branch as <literal>theirs</literal> (i.e. "one contributor&#8217;s work on top
+of it").</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-b &lt;new_branch&gt;
+</term>
+<listitem>
+<simpara>
+        Create a new branch named <literal>&lt;new_branch&gt;</literal> and start it at
+        <literal>&lt;start_point&gt;</literal>; see <citerefentry>
+<refentrytitle>git-branch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-B &lt;new_branch&gt;
+</term>
+<listitem>
+<simpara>
+        Creates the branch <literal>&lt;new_branch&gt;</literal> and start it at <literal>&lt;start_point&gt;</literal>;
+        if it already exists, then reset it to <literal>&lt;start_point&gt;</literal>. This is
+        equivalent to running "git branch" with "-f"; see
+        <citerefentry>
+<refentrytitle>git-branch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-t
+</term>
+<term>
+--track
+</term>
+<listitem>
+<simpara>
+        When creating a new branch, set up "upstream" configuration. See
+        "--track" in <citerefentry>
+<refentrytitle>git-branch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for details.
+</simpara>
+<simpara>If no <literal>-b</literal> option is given, the name of the new branch will be
+derived from the remote-tracking branch, by looking at the local part of
+the refspec configured for the corresponding remote, and then stripping
+the initial part up to the "*".
+This would tell us to use <literal>hack</literal> as the local branch when branching
+off of <literal>origin/hack</literal> (or <literal>remotes/origin/hack</literal>, or even
+<literal>refs/remotes/origin/hack</literal>).  If the given name has no slash, or the above
+guessing results in an empty name, the guessing is aborted.  You can
+explicitly give a name with <literal>-b</literal> in such a case.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-track
+</term>
+<listitem>
+<simpara>
+        Do not set up "upstream" configuration, even if the
+        <literal>branch.autoSetupMerge</literal> configuration variable is true.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--guess
+</term>
+<term>
+--no-guess
+</term>
+<listitem>
+<simpara>
+        If <literal>&lt;branch&gt;</literal> is not found but there does exist a tracking
+        branch in exactly one remote (call it <literal>&lt;remote&gt;</literal>) with a
+        matching name, treat as equivalent to
+</simpara>
+<literallayout class="monospaced">$ git checkout -b &lt;branch&gt; --track &lt;remote&gt;/&lt;branch&gt;</literallayout><simpara></simpara>
+<simpara>If the branch exists in multiple remotes and one of them is named by
+the <literal>checkout.defaultRemote</literal> configuration variable, we&#8217;ll use that
+one for the purposes of disambiguation, even if the <literal>&lt;branch&gt;</literal> isn&#8217;t
+unique across all remotes. Set it to
+e.g. <literal>checkout.defaultRemote=origin</literal> to always checkout remote
+branches from there if <literal>&lt;branch&gt;</literal> is ambiguous but exists on the
+<emphasis>origin</emphasis> remote. See also <literal>checkout.defaultRemote</literal> in
+<citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+<simpara><literal>--guess</literal> is the default behavior. Use <literal>--no-guess</literal> to disable it.</simpara>
+<simpara>The default behavior can be set via the <literal>checkout.guess</literal> configuration
+variable.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-l
+</term>
+<listitem>
+<simpara>
+        Create the new branch&#8217;s reflog; see <citerefentry>
+<refentrytitle>git-branch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for
+        details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-d
+</term>
+<term>
+--detach
+</term>
+<listitem>
+<simpara>
+        Rather than checking out a branch to work on it, check out a
+        commit for inspection and discardable experiments.
+        This is the default behavior of <literal>git checkout &lt;commit&gt;</literal> when
+        <literal>&lt;commit&gt;</literal> is not a branch name.  See the "DETACHED HEAD" section
+        below for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--orphan &lt;new_branch&gt;
+</term>
+<listitem>
+<simpara>
+        Create a new <emphasis>orphan</emphasis> branch, named <literal>&lt;new_branch&gt;</literal>, started from
+        <literal>&lt;start_point&gt;</literal> and switch to it.  The first commit made on this
+        new branch will have no parents and it will be the root of a new
+        history totally disconnected from all the other branches and
+        commits.
+</simpara>
+<simpara>The index and the working tree are adjusted as if you had previously run
+<literal>git checkout &lt;start_point&gt;</literal>.  This allows you to start a new history
+that records a set of paths similar to <literal>&lt;start_point&gt;</literal> by easily running
+<literal>git commit -a</literal> to make the root commit.</simpara>
+<simpara>This can be useful when you want to publish the tree from a commit
+without exposing its full history. You might want to do this to publish
+an open source branch of a project whose current tree is "clean", but
+whose full history contains proprietary or otherwise encumbered bits of
+code.</simpara>
+<simpara>If you want to start a disconnected history that records a set of paths
+that is totally different from the one of <literal>&lt;start_point&gt;</literal>, then you should
+clear the index and the working tree right after creating the orphan
+branch by running <literal>git rm -rf .</literal> from the top level of the working tree.
+Afterwards you will be ready to prepare your new files, repopulating the
+working tree, by copying them from elsewhere, extracting a tarball, etc.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-skip-worktree-bits
+</term>
+<listitem>
+<simpara>
+        In sparse checkout mode, <literal>git checkout -- &lt;paths&gt;</literal> would
+        update only entries matched by <literal>&lt;paths&gt;</literal> and sparse patterns
+        in <literal>$GIT_DIR/info/sparse-checkout</literal>. This option ignores
+        the sparse patterns and adds back any files in <literal>&lt;paths&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-m
+</term>
+<term>
+--merge
+</term>
+<listitem>
+<simpara>
+        When switching branches,
+        if you have local modifications to one or more files that
+        are different between the current branch and the branch to
+        which you are switching, the command refuses to switch
+        branches in order to preserve your modifications in context.
+        However, with this option, a three-way merge between the current
+        branch, your working tree contents, and the new branch
+        is done, and you will be on the new branch.
+</simpara>
+<simpara>When a merge conflict happens, the index entries for conflicting
+paths are left unmerged, and you need to resolve the conflicts
+and mark the resolved paths with <literal>git add</literal> (or <literal>git rm</literal> if the merge
+should result in deletion of the path).</simpara>
+<simpara>When checking out paths from the index, this option lets you recreate
+the conflicted merge in the specified paths.</simpara>
+<simpara>When switching branches with <literal>--merge</literal>, staged changes may be lost.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--conflict=&lt;style&gt;
+</term>
+<listitem>
+<simpara>
+        The same as <literal>--merge</literal> option above, but changes the way the
+        conflicting hunks are presented, overriding the
+        <literal>merge.conflictStyle</literal> configuration variable.  Possible values are
+        "merge" (default) and "diff3" (in addition to what is shown by
+        "merge" style, shows the original contents).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-p
+</term>
+<term>
+--patch
+</term>
+<listitem>
+<simpara>
+        Interactively select hunks in the difference between the
+        <literal>&lt;tree-ish&gt;</literal> (or the index, if unspecified) and the working
+        tree.  The chosen hunks are then applied in reverse to the
+        working tree (and if a <literal>&lt;tree-ish&gt;</literal> was specified, the index).
+</simpara>
+<simpara>This means that you can use <literal>git checkout -p</literal> to selectively discard
+edits from your current working tree. See the &#8220;Interactive Mode&#8221;
+section of <citerefentry>
+<refentrytitle>git-add</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> to learn how to operate the <literal>--patch</literal> mode.</simpara>
+<simpara>Note that this option uses the no overlay mode by default (see also
+<literal>--overlay</literal>), and currently doesn&#8217;t support overlay mode.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-other-worktrees
+</term>
+<listitem>
+<simpara>
+        <literal>git checkout</literal> refuses when the wanted ref is already checked
+        out by another worktree. This option makes it check the ref
+        out anyway. In other words, the ref can be held by more than one
+        worktree.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--overwrite-ignore
+</term>
+<term>
+--no-overwrite-ignore
+</term>
+<listitem>
+<simpara>
+        Silently overwrite ignored files when switching branches. This
+        is the default behavior. Use <literal>--no-overwrite-ignore</literal> to abort
+        the operation when the new branch contains ignored files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--recurse-submodules
+</term>
+<term>
+--no-recurse-submodules
+</term>
+<listitem>
+<simpara>
+        Using <literal>--recurse-submodules</literal> will update the content of all active
+        submodules according to the commit recorded in the superproject. If
+        local modifications in a submodule would be overwritten the checkout
+        will fail unless <literal>-f</literal> is used. If nothing (or <literal>--no-recurse-submodules</literal>)
+        is used, submodules working trees will not be updated.
+        Just like <citerefentry>
+<refentrytitle>git-submodule</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>, this will detach <literal>HEAD</literal> of the
+        submodule.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--overlay
+</term>
+<term>
+--no-overlay
+</term>
+<listitem>
+<simpara>
+        In the default overlay mode, <literal>git checkout</literal> never
+        removes files from the index or the working tree.  When
+        specifying <literal>--no-overlay</literal>, files that appear in the index and
+        working tree, but not in <literal>&lt;tree-ish&gt;</literal> are removed, to make them
+        match <literal>&lt;tree-ish&gt;</literal> exactly.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--pathspec-from-file=&lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        Pathspec is passed in <literal>&lt;file&gt;</literal> instead of commandline args. If
+        <literal>&lt;file&gt;</literal> is exactly <literal>-</literal> then standard input is used. Pathspec
+        elements are separated by LF or CR/LF. Pathspec elements can be
+        quoted as explained for the configuration variable <literal>core.quotePath</literal>
+        (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>). See also <literal>--pathspec-file-nul</literal> and
+        global <literal>--literal-pathspecs</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--pathspec-file-nul
+</term>
+<listitem>
+<simpara>
+        Only meaningful with <literal>--pathspec-from-file</literal>. Pathspec elements are
+        separated with NUL character and all other characters are taken
+        literally (including newlines and quotes).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;branch&gt;
+</term>
+<listitem>
+<simpara>
+        Branch to checkout; if it refers to a branch (i.e., a name that,
+        when prepended with "refs/heads/", is a valid ref), then that
+        branch is checked out. Otherwise, if it refers to a valid
+        commit, your <literal>HEAD</literal> becomes "detached" and you are no longer on
+        any branch (see below for details).
+</simpara>
+<simpara>You can use the <literal>@{-N}</literal> syntax to refer to the N-th last
+branch/commit checked out using "git checkout" operation. You may
+also specify <literal>-</literal> which is synonymous to <literal>@{-1}</literal>.</simpara>
+<simpara>As a special case, you may use <literal>A...B</literal> as a shortcut for the
+merge base of <literal>A</literal> and <literal>B</literal> if there is exactly one merge base. You can
+leave out at most one of <literal>A</literal> and <literal>B</literal>, in which case it defaults to <literal>HEAD</literal>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;new_branch&gt;
+</term>
+<listitem>
+<simpara>
+        Name for the new branch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;start_point&gt;
+</term>
+<listitem>
+<simpara>
+        The name of a commit at which to start the new branch; see
+        <citerefentry>
+<refentrytitle>git-branch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for details. Defaults to <literal>HEAD</literal>.
+</simpara>
+<simpara>As a special case, you may use <literal>"A...B"</literal> as a shortcut for the
+merge base of <literal>A</literal> and <literal>B</literal> if there is exactly one merge base. You can
+leave out at most one of <literal>A</literal> and <literal>B</literal>, in which case it defaults to <literal>HEAD</literal>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;tree-ish&gt;
+</term>
+<listitem>
+<simpara>
+        Tree to checkout from (when paths are given). If not specified,
+        the index will be used.
+</simpara>
+<simpara>As a special case, you may use <literal>"A...B"</literal> as a shortcut for the
+merge base of <literal>A</literal> and <literal>B</literal> if there is exactly one merge base. You can
+leave out at most one of <literal>A</literal> and <literal>B</literal>, in which case it defaults to <literal>HEAD</literal>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--
+</term>
+<listitem>
+<simpara>
+        Do not interpret any more arguments as options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;pathspec&gt;&#8230;
+</term>
+<listitem>
+<simpara>
+        Limits the paths affected by the operation.
+</simpara>
+<simpara>For more details, see the <emphasis>pathspec</emphasis> entry in <citerefentry>
+<refentrytitle>gitglossary</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_detached_head">
+<title>DETACHED HEAD</title>
+<simpara><literal>HEAD</literal> normally refers to a named branch (e.g. <literal>master</literal>). Meanwhile, each
+branch refers to a specific commit. Let&#8217;s look at a repo with three
+commits, one of them tagged, and with branch <literal>master</literal> checked out:</simpara>
+<literallayout class="monospaced">           HEAD (refers to branch 'master')
+            |
+            v
+a---b---c  branch 'master' (refers to commit 'c')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</literallayout><simpara></simpara>
+<simpara>When a commit is created in this state, the branch is updated to refer to
+the new commit. Specifically, <emphasis>git commit</emphasis> creates a new commit <literal>d</literal>, whose
+parent is commit <literal>c</literal>, and then updates branch <literal>master</literal> to refer to new
+commit <literal>d</literal>. <literal>HEAD</literal> still refers to branch <literal>master</literal> and so indirectly now refers
+to commit <literal>d</literal>:</simpara>
+<literallayout class="monospaced">$ edit; git add; git commit
+
+               HEAD (refers to branch 'master')
+                |
+                v
+a---b---c---d  branch 'master' (refers to commit 'd')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</literallayout><simpara></simpara>
+<simpara>It is sometimes useful to be able to checkout a commit that is not at
+the tip of any named branch, or even to create a new commit that is not
+referenced by a named branch. Let&#8217;s look at what happens when we
+checkout commit <literal>b</literal> (here we show two ways this may be done):</simpara>
+<literallayout class="monospaced">$ git checkout v2.0  # or
+$ git checkout master^^
+
+   HEAD (refers to commit 'b')
+    |
+    v
+a---b---c---d  branch 'master' (refers to commit 'd')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</literallayout><simpara></simpara>
+<simpara>Notice that regardless of which checkout command we use, <literal>HEAD</literal> now refers
+directly to commit <literal>b</literal>. This is known as being in detached <literal>HEAD</literal> state.
+It means simply that <literal>HEAD</literal> refers to a specific commit, as opposed to
+referring to a named branch. Let&#8217;s see what happens when we create a commit:</simpara>
+<literallayout class="monospaced">$ edit; git add; git commit
+
+     HEAD (refers to commit 'e')
+      |
+      v
+      e
+     /
+a---b---c---d  branch 'master' (refers to commit 'd')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</literallayout><simpara></simpara>
+<simpara>There is now a new commit <literal>e</literal>, but it is referenced only by <literal>HEAD</literal>. We can
+of course add yet another commit in this state:</simpara>
+<literallayout class="monospaced">$ edit; git add; git commit
+
+         HEAD (refers to commit 'f')
+          |
+          v
+      e---f
+     /
+a---b---c---d  branch 'master' (refers to commit 'd')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</literallayout><simpara></simpara>
+<simpara>In fact, we can perform all the normal Git operations. But, let&#8217;s look
+at what happens when we then checkout <literal>master</literal>:</simpara>
+<literallayout class="monospaced">$ git checkout master
+
+               HEAD (refers to branch 'master')
+      e---f     |
+     /          v
+a---b---c---d  branch 'master' (refers to commit 'd')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</literallayout><simpara></simpara>
+<simpara>It is important to realize that at this point nothing refers to commit
+<literal>f</literal>. Eventually commit <literal>f</literal> (and by extension commit <literal>e</literal>) will be deleted
+by the routine Git garbage collection process, unless we create a reference
+before that happens. If we have not yet moved away from commit <literal>f</literal>,
+any of these will create a reference to it:</simpara>
+<literallayout class="monospaced">$ git checkout -b foo   <co id="CO1-1"/>
+$ git branch foo        <co id="CO1-2"/>
+$ git tag foo           <co id="CO1-3"/></literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO1-1">
+<para>
+creates a new branch <literal>foo</literal>, which refers to commit <literal>f</literal>, and then
+    updates <literal>HEAD</literal> to refer to branch <literal>foo</literal>. In other words, we&#8217;ll no longer
+    be in detached <literal>HEAD</literal> state after this command.
+</para>
+</callout>
+<callout arearefs="CO1-2">
+<para>
+similarly creates a new branch <literal>foo</literal>, which refers to commit <literal>f</literal>,
+    but leaves <literal>HEAD</literal> detached.
+</para>
+</callout>
+<callout arearefs="CO1-3">
+<para>
+creates a new tag <literal>foo</literal>, which refers to commit <literal>f</literal>,
+    leaving <literal>HEAD</literal> detached.
+</para>
+</callout>
+</calloutlist>
+<simpara>If we have moved away from commit <literal>f</literal>, then we must first recover its object
+name (typically by using git reflog), and then we can create a reference to
+it. For example, to see the last two commits to which <literal>HEAD</literal> referred, we
+can use either of these commands:</simpara>
+<literallayout class="monospaced">$ git reflog -2 HEAD # or
+$ git log -g -2 HEAD</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_argument_disambiguation">
+<title>ARGUMENT DISAMBIGUATION</title>
+<simpara>When there is only one argument given and it is not <literal>--</literal> (e.g. <literal>git
+checkout abc</literal>), and when the argument is both a valid <literal>&lt;tree-ish&gt;</literal>
+(e.g. a branch <literal>abc</literal> exists) and a valid <literal>&lt;pathspec&gt;</literal> (e.g. a file
+or a directory whose name is "abc" exists), Git would usually ask
+you to disambiguate.  Because checking out a branch is so common an
+operation, however, <literal>git checkout abc</literal> takes "abc" as a <literal>&lt;tree-ish&gt;</literal>
+in such a situation.  Use <literal>git checkout -- &lt;pathspec&gt;</literal> if you want
+to checkout these paths out of the index.</simpara>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+The following sequence checks out the <literal>master</literal> branch, reverts
+  the <literal>Makefile</literal> to two revisions back, deletes <literal>hello.c</literal> by
+  mistake, and gets it back from the index.
+</simpara>
+<literallayout class="monospaced">$ git checkout master             <co id="CO2-1"/>
+$ git checkout master~2 Makefile  <co id="CO2-2"/>
+$ rm -f hello.c
+$ git checkout hello.c            <co id="CO2-3"/></literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO2-1">
+<para>
+switch branch
+</para>
+</callout>
+<callout arearefs="CO2-2">
+<para>
+take a file out of another commit
+</para>
+</callout>
+<callout arearefs="CO2-3">
+<para>
+restore <literal>hello.c</literal> from the index
+</para>
+<simpara>If you want to check out <emphasis>all</emphasis> C source files out of the index,
+you can say</simpara>
+<literallayout class="monospaced">$ git checkout -- '*.c'</literallayout><simpara></simpara>
+<simpara>Note the quotes around <literal>*.c</literal>.  The file <literal>hello.c</literal> will also be
+checked out, even though it is no longer in the working tree,
+because the file globbing is used to match entries in the index
+(not in the working tree by the shell).</simpara>
+<simpara>If you have an unfortunate branch that is named <literal>hello.c</literal>, this
+step would be confused as an instruction to switch to that branch.
+You should instead write:</simpara>
+<literallayout class="monospaced">$ git checkout -- hello.c</literallayout><simpara></simpara>
+</callout>
+</calloutlist>
+</listitem>
+<listitem>
+<simpara>
+After working in the wrong branch, switching to the correct
+  branch would be done using:
+</simpara>
+<literallayout class="monospaced">$ git checkout mytopic</literallayout><simpara></simpara>
+<simpara>However, your "wrong" branch and correct <literal>mytopic</literal> branch may
+differ in files that you have modified locally, in which case
+the above checkout would fail like this:</simpara>
+<literallayout class="monospaced">$ git checkout mytopic
+error: You have local changes to 'frotz'; not switching branches.</literallayout><simpara></simpara>
+<simpara>You can give the <literal>-m</literal> flag to the command, which would try a
+three-way merge:</simpara>
+<literallayout class="monospaced">$ git checkout -m mytopic
+Auto-merging frotz</literallayout><simpara></simpara>
+<simpara>After this three-way merge, the local modifications are <emphasis>not</emphasis>
+registered in your index file, so <literal>git diff</literal> would show you what
+changes you made since the tip of the new branch.</simpara>
+</listitem>
+<listitem>
+<simpara>
+When a merge conflict happens during switching branches with
+  the <literal>-m</literal> option, you would see something like this:
+</simpara>
+<literallayout class="monospaced">$ git checkout -m mytopic
+Auto-merging frotz
+ERROR: Merge conflict in frotz
+fatal: merge program failed</literallayout><simpara></simpara>
+<simpara>At this point, <literal>git diff</literal> shows the changes cleanly merged as in
+the previous example, as well as the changes in the conflicted
+files.  Edit and resolve the conflict and mark it resolved with
+<literal>git add</literal> as usual:</simpara>
+<literallayout class="monospaced">$ edit frotz
+$ git add frotz</literallayout><simpara></simpara>
+</listitem>
+</orderedlist>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-switch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-restore</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-citool</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-citool</refname>
+  <refpurpose>Graphical alternative to git-commit</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git citool</emphasis></literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>A Tcl/Tk based graphical interface to review modified files, stage
+them into the index, enter a commit message and record the new
+commit onto the current branch.  This interface is an alternative
+to the less interactive <emphasis>git commit</emphasis> program.</simpara>
+<simpara><emphasis>git citool</emphasis> is actually a standard alias for <literal>git gui citool</literal>.
+See <citerefentry>
+<refentrytitle>git-gui</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for more details.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-get-tar-commit-id</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-get-tar-commit-id</refname>
+  <refpurpose>Extract commit ID from an archive created using git-archive</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git get-tar-commit-id</emphasis></literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Read a tar archive created by <emphasis>git archive</emphasis> from the standard input
+and extract the commit ID stored in it.  It reads only the first
+1024 bytes of input, thus its runtime is not influenced by the size
+of the tar archive very much.</simpara>
+<simpara>If no commit ID is found, <emphasis>git get-tar-commit-id</emphasis> quietly exists with a
+return code of 1.  This can happen if the archive had not been created
+using <emphasis>git archive</emphasis> or if the first parameter of <emphasis>git archive</emphasis> had been
+a tree ID instead of a commit ID or tag.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

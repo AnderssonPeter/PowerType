@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-cat-file</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-cat-file</refname>
+  <refpurpose>Provide content or type and size information for repository objects</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git cat-file</emphasis> (-t [--allow-unknown-type]| -s [--allow-unknown-type]| -e | -p | &lt;type&gt; | --textconv | --filters ) [--path=&lt;path&gt;] &lt;object&gt;
+<emphasis>git cat-file</emphasis> (--batch[=&lt;format&gt;] | --batch-check[=&lt;format&gt;]) [ --textconv | --filters ] [--follow-symlinks]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>In its first form, the command provides the content or the type of an object in
+the repository. The type is required unless <literal>-t</literal> or <literal>-p</literal> is used to find the
+object type, or <literal>-s</literal> is used to find the object size, or <literal>--textconv</literal> or
+<literal>--filters</literal> is used (which imply type "blob").</simpara>
+<simpara>In the second form, a list of objects (separated by linefeeds) is provided on
+stdin, and the SHA-1, type, and size of each object is printed on stdout. The
+output format can be overridden using the optional <literal>&lt;format&gt;</literal> argument. If
+either <literal>--textconv</literal> or <literal>--filters</literal> was specified, the input is expected to
+list the object names followed by the path name, separated by a single
+whitespace, so that the appropriate drivers can be determined.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+&lt;object&gt;
+</term>
+<listitem>
+<simpara>
+        The name of the object to show.
+        For a more complete list of ways to spell object names, see
+        the "SPECIFYING REVISIONS" section in <citerefentry>
+<refentrytitle>gitrevisions</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-t
+</term>
+<listitem>
+<simpara>
+        Instead of the content, show the object type identified by
+        <literal>&lt;object&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-s
+</term>
+<listitem>
+<simpara>
+        Instead of the content, show the object size identified by
+        <literal>&lt;object&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-e
+</term>
+<listitem>
+<simpara>
+        Exit with zero status if <literal>&lt;object&gt;</literal> exists and is a valid
+        object. If <literal>&lt;object&gt;</literal> is of an invalid format exit with non-zero and
+        emits an error on stderr.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-p
+</term>
+<listitem>
+<simpara>
+        Pretty-print the contents of <literal>&lt;object&gt;</literal> based on its type.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;type&gt;
+</term>
+<listitem>
+<simpara>
+        Typically this matches the real type of <literal>&lt;object&gt;</literal> but asking
+        for a type that can trivially be dereferenced from the given
+        <literal>&lt;object&gt;</literal> is also permitted.  An example is to ask for a
+        "tree" with <literal>&lt;object&gt;</literal> being a commit object that contains it,
+        or to ask for a "blob" with <literal>&lt;object&gt;</literal> being a tag object that
+        points at it.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--textconv
+</term>
+<listitem>
+<simpara>
+        Show the content as transformed by a textconv filter. In this case,
+        <literal>&lt;object&gt;</literal> has to be of the form <literal>&lt;tree-ish&gt;:&lt;path&gt;</literal>, or <literal>:&lt;path&gt;</literal> in
+        order to apply the filter to the content recorded in the index at
+        <literal>&lt;path&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--filters
+</term>
+<listitem>
+<simpara>
+        Show the content as converted by the filters configured in
+        the current working tree for the given <literal>&lt;path&gt;</literal> (i.e. smudge filters,
+        end-of-line conversion, etc). In this case, <literal>&lt;object&gt;</literal> has to be of
+        the form <literal>&lt;tree-ish&gt;:&lt;path&gt;</literal>, or <literal>:&lt;path&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--path=&lt;path&gt;
+</term>
+<listitem>
+<simpara>
+        For use with <literal>--textconv</literal> or <literal>--filters</literal>, to allow specifying an object
+        name and a path separately, e.g. when it is difficult to figure out
+        the revision from which the blob came.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--batch
+</term>
+<term>
+--batch=&lt;format&gt;
+</term>
+<listitem>
+<simpara>
+        Print object information and contents for each object provided
+        on stdin.  May not be combined with any other options or arguments
+        except <literal>--textconv</literal> or <literal>--filters</literal>, in which case the input lines
+        also need to specify the path, separated by whitespace.  See the
+        section <literal>BATCH OUTPUT</literal> below for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--batch-check
+</term>
+<term>
+--batch-check=&lt;format&gt;
+</term>
+<listitem>
+<simpara>
+        Print object information for each object provided on stdin.  May
+        not be combined with any other options or arguments except
+        <literal>--textconv</literal> or <literal>--filters</literal>, in which case the input lines also
+        need to specify the path, separated by whitespace.  See the
+        section <literal>BATCH OUTPUT</literal> below for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--batch-all-objects
+</term>
+<listitem>
+<simpara>
+        Instead of reading a list of objects on stdin, perform the
+        requested batch operation on all objects in the repository and
+        any alternate object stores (not just reachable objects).
+        Requires <literal>--batch</literal> or <literal>--batch-check</literal> be specified. By default,
+        the objects are visited in order sorted by their hashes; see
+        also <literal>--unordered</literal> below. Objects are presented as-is, without
+        respecting the "replace" mechanism of <citerefentry>
+<refentrytitle>git-replace</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--buffer
+</term>
+<listitem>
+<simpara>
+        Normally batch output is flushed after each object is output, so
+        that a process can interactively read and write from
+        <literal>cat-file</literal>. With this option, the output uses normal stdio
+        buffering; this is much more efficient when invoking
+        <literal>--batch-check</literal> on a large number of objects.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--unordered
+</term>
+<listitem>
+<simpara>
+        When <literal>--batch-all-objects</literal> is in use, visit objects in an
+        order which may be more efficient for accessing the object
+        contents than hash order. The exact details of the order are
+        unspecified, but if you do not require a specific order, this
+        should generally result in faster output, especially with
+        <literal>--batch</literal>.  Note that <literal>cat-file</literal> will still show each object
+        only once, even if it is stored multiple times in the
+        repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--allow-unknown-type
+</term>
+<listitem>
+<simpara>
+        Allow <literal>-s</literal> or <literal>-t</literal> to query broken/corrupt objects of unknown type.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--follow-symlinks
+</term>
+<listitem>
+<simpara>
+        With <literal>--batch</literal> or <literal>--batch-check</literal>, follow symlinks inside the
+        repository when requesting objects with extended SHA-1
+        expressions of the form tree-ish:path-in-tree.  Instead of
+        providing output about the link itself, provide output about
+        the linked-to object.  If a symlink points outside the
+        tree-ish (e.g. a link to <literal>/foo</literal> or a root-level link to <literal>../foo</literal>),
+        the portion of the link which is outside the tree will be
+        printed.
+</simpara>
+<simpara>This option does not (currently) work correctly when an object in the
+index is specified (e.g. <literal>:link</literal> instead of <literal>HEAD:link</literal>) rather than
+one in the tree.</simpara>
+<simpara>This option cannot (currently) be used unless <literal>--batch</literal> or
+<literal>--batch-check</literal> is used.</simpara>
+<simpara>For example, consider a git repository containing:</simpara>
+<literallayout class="monospaced">f: a file containing "hello\n"
+link: a symlink to f
+dir/link: a symlink to ../f
+plink: a symlink to ../f
+alink: a symlink to /etc/passwd</literallayout>
+<simpara>For a regular file <literal>f</literal>, <literal>echo HEAD:f | git cat-file --batch</literal> would print</simpara>
+<literallayout class="monospaced">ce013625030ba8dba906f756967f9e9ca394464a blob 6</literallayout>
+<simpara>And <literal>echo HEAD:link | git cat-file --batch --follow-symlinks</literal> would
+print the same thing, as would <literal>HEAD:dir/link</literal>, as they both point at
+<literal>HEAD:f</literal>.</simpara>
+<simpara>Without <literal>--follow-symlinks</literal>, these would print data about the symlink
+itself.  In the case of <literal>HEAD:link</literal>, you would see</simpara>
+<literallayout class="monospaced">4d1ae35ba2c8ec712fa2a379db44ad639ca277bd blob 1</literallayout>
+<simpara>Both <literal>plink</literal> and <literal>alink</literal> point outside the tree, so they would
+respectively print:</simpara>
+<literallayout class="monospaced">symlink 4
+../f</literallayout>
+<literallayout class="monospaced">symlink 11
+/etc/passwd</literallayout>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_output">
+<title>OUTPUT</title>
+<simpara>If <literal>-t</literal> is specified, one of the <literal>&lt;type&gt;</literal>.</simpara>
+<simpara>If <literal>-s</literal> is specified, the size of the <literal>&lt;object&gt;</literal> in bytes.</simpara>
+<simpara>If <literal>-e</literal> is specified, no output, unless the <literal>&lt;object&gt;</literal> is malformed.</simpara>
+<simpara>If <literal>-p</literal> is specified, the contents of <literal>&lt;object&gt;</literal> are pretty-printed.</simpara>
+<simpara>If <literal>&lt;type&gt;</literal> is specified, the raw (though uncompressed) contents of the <literal>&lt;object&gt;</literal>
+will be returned.</simpara>
+</refsect1>
+<refsect1 id="_batch_output">
+<title>BATCH OUTPUT</title>
+<simpara>If <literal>--batch</literal> or <literal>--batch-check</literal> is given, <literal>cat-file</literal> will read objects
+from stdin, one per line, and print information about them. By default,
+the whole line is considered as an object, as if it were fed to
+<citerefentry>
+<refentrytitle>git-rev-parse</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+<simpara>You can specify the information shown for each object by using a custom
+<literal>&lt;format&gt;</literal>. The <literal>&lt;format&gt;</literal> is copied literally to stdout for each
+object, with placeholders of the form <literal>%(atom)</literal> expanded, followed by a
+newline. The available atoms are:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<literal>objectname</literal>
+</term>
+<listitem>
+<simpara>
+        The full hex representation of the object name.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>objecttype</literal>
+</term>
+<listitem>
+<simpara>
+        The type of the object (the same as <literal>cat-file -t</literal> reports).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>objectsize</literal>
+</term>
+<listitem>
+<simpara>
+        The size, in bytes, of the object (the same as <literal>cat-file -s</literal>
+        reports).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>objectsize:disk</literal>
+</term>
+<listitem>
+<simpara>
+        The size, in bytes, that the object takes up on disk. See the
+        note about on-disk sizes in the <literal>CAVEATS</literal> section below.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>deltabase</literal>
+</term>
+<listitem>
+<simpara>
+        If the object is stored as a delta on-disk, this expands to the
+        full hex representation of the delta base object name.
+        Otherwise, expands to the null OID (all zeroes). See <literal>CAVEATS</literal>
+        below.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>rest</literal>
+</term>
+<listitem>
+<simpara>
+        If this atom is used in the output string, input lines are split
+        at the first whitespace boundary. All characters before that
+        whitespace are considered to be the object name; characters
+        after that first run of whitespace (i.e., the "rest" of the
+        line) are output in place of the <literal>%(rest)</literal> atom.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>If no format is specified, the default format is <literal>%(objectname)
+%(objecttype) %(objectsize)</literal>.</simpara>
+<simpara>If <literal>--batch</literal> is specified, the object information is followed by the
+object contents (consisting of <literal>%(objectsize)</literal> bytes), followed by a
+newline.</simpara>
+<simpara>For example, <literal>--batch</literal> without a custom format would produce:</simpara>
+<literallayout class="monospaced">&lt;oid&gt; SP &lt;type&gt; SP &lt;size&gt; LF
+&lt;contents&gt; LF</literallayout><simpara></simpara>
+<simpara>Whereas <literal>--batch-check='%(objectname) %(objecttype)'</literal> would produce:</simpara>
+<literallayout class="monospaced">&lt;oid&gt; SP &lt;type&gt; LF</literallayout><simpara></simpara>
+<simpara>If a name is specified on stdin that cannot be resolved to an object in
+the repository, then <literal>cat-file</literal> will ignore any custom format and print:</simpara>
+<literallayout class="monospaced">&lt;object&gt; SP missing LF</literallayout><simpara></simpara>
+<simpara>If a name is specified that might refer to more than one object (an ambiguous short sha), then <literal>cat-file</literal> will ignore any custom format and print:</simpara>
+<literallayout class="monospaced">&lt;object&gt; SP ambiguous LF</literallayout><simpara></simpara>
+<simpara>If <literal>--follow-symlinks</literal> is used, and a symlink in the repository points
+outside the repository, then <literal>cat-file</literal> will ignore any custom format
+and print:</simpara>
+<literallayout class="monospaced">symlink SP &lt;size&gt; LF
+&lt;symlink&gt; LF</literallayout><simpara></simpara>
+<simpara>The symlink will either be absolute (beginning with a <literal>/</literal>), or relative
+to the tree root.  For instance, if dir/link points to <literal>../../foo</literal>, then
+<literal>&lt;symlink&gt;</literal> will be <literal>../foo</literal>.  <literal>&lt;size&gt;</literal> is the size of the symlink in bytes.</simpara>
+<simpara>If <literal>--follow-symlinks</literal> is used, the following error messages will be
+displayed:</simpara>
+<literallayout class="monospaced">&lt;object&gt; SP missing LF</literallayout><simpara></simpara>
+<simpara>is printed when the initial symlink requested does not exist.</simpara>
+<literallayout class="monospaced">dangling SP &lt;size&gt; LF
+&lt;object&gt; LF</literallayout><simpara></simpara>
+<simpara>is printed when the initial symlink exists, but something that
+it (transitive-of) points to does not.</simpara>
+<literallayout class="monospaced">loop SP &lt;size&gt; LF
+&lt;object&gt; LF</literallayout><simpara></simpara>
+<simpara>is printed for symlink loops (or any symlinks that
+require more than 40 link resolutions to resolve).</simpara>
+<literallayout class="monospaced">notdir SP &lt;size&gt; LF
+&lt;object&gt; LF</literallayout><simpara></simpara>
+<simpara>is printed when, during symlink resolution, a file is used as a
+directory name.</simpara>
+</refsect1>
+<refsect1 id="_caveats">
+<title>CAVEATS</title>
+<simpara>Note that the sizes of objects on disk are reported accurately, but care
+should be taken in drawing conclusions about which refs or objects are
+responsible for disk usage. The size of a packed non-delta object may be
+much larger than the size of objects which delta against it, but the
+choice of which object is the base and which is the delta is arbitrary
+and is subject to change during a repack.</simpara>
+<simpara>Note also that multiple copies of an object may be present in the object
+database; in this case, it is undefined which copy&#8217;s size or delta base
+will be reported.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -5,9 +5,10 @@ namespace PowerType.Model
     [Flags]
     public enum Platforms
     {
-        All = Windows | MacOS | Linux,
+        All = Windows | MacOSX | Linux | FreeBSD,
         Windows = 1,
-        MacOS = 2,
-        Linux = 4
+        MacOSX = 2,
+        Linux = 4,
+        FreeBSD = 8,
     }
 }

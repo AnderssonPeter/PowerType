@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-instaweb</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-instaweb</refname>
+  <refpurpose>Instantly browse your working repository in gitweb</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git instaweb</emphasis> [--local] [--httpd=&lt;httpd&gt;] [--port=&lt;port&gt;]
+               [--browser=&lt;browser&gt;]
+<emphasis>git instaweb</emphasis> [--start] [--stop] [--restart]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>A simple script to set up <literal>gitweb</literal> and a web server for browsing the local
+repository.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-l
+</term>
+<term>
+--local
+</term>
+<listitem>
+<simpara>
+        Only bind the web server to the local IP (127.0.0.1).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-d
+</term>
+<term>
+--httpd
+</term>
+<listitem>
+<simpara>
+        The HTTP daemon command-line that will be executed.
+        Command-line options may be specified here, and the
+        configuration file will be added at the end of the command-line.
+        Currently apache2, lighttpd, mongoose, plackup, python and
+        webrick are supported.
+        (Default: lighttpd)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-m
+</term>
+<term>
+--module-path
+</term>
+<listitem>
+<simpara>
+        The module path (only needed if httpd is Apache).
+        (Default: /usr/lib/apache2/modules)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-p
+</term>
+<term>
+--port
+</term>
+<listitem>
+<simpara>
+        The port number to bind the httpd to.  (Default: 1234)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-b
+</term>
+<term>
+--browser
+</term>
+<listitem>
+<simpara>
+        The web browser that should be used to view the gitweb
+        page. This will be passed to the <emphasis>git web&#45;&#45;browse</emphasis> helper
+        script along with the URL of the gitweb instance. See
+        <citerefentry>
+<refentrytitle>git-web&#45;&#45;browse</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for more information about this. If
+        the script fails, the URL will be printed to stdout.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+start
+</term>
+<term>
+--start
+</term>
+<listitem>
+<simpara>
+        Start the httpd instance and exit.  Regenerate configuration files
+        as necessary for spawning a new instance.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+stop
+</term>
+<term>
+--stop
+</term>
+<listitem>
+<simpara>
+        Stop the httpd instance and exit.  This does not generate
+        any of the configuration files for spawning a new instance,
+        nor does it close the browser.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+restart
+</term>
+<term>
+--restart
+</term>
+<listitem>
+<simpara>
+        Restart the httpd instance and exit.  Regenerate configuration files
+        as necessary for spawning a new instance.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_configuration">
+<title>CONFIGURATION</title>
+<simpara>You may specify configuration in your .git/config</simpara>
+<literallayout class="monospaced">[instaweb]
+        local = true
+        httpd = apache2 -f
+        port = 4321
+        browser = konqueror
+        modulePath = /usr/lib/apache2/modules</literallayout><simpara></simpara>
+<simpara>If the configuration variable <literal>instaweb.browser</literal> is not set,
+<literal>web.browser</literal> will be used instead if it is defined. See
+<citerefentry>
+<refentrytitle>git-web&#45;&#45;browse</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for more information about this.</simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>gitweb</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

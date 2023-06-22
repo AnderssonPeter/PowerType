@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-upload-pack</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-upload-pack</refname>
+  <refpurpose>Send objects packed back to git-fetch-pack</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git-upload-pack</emphasis> [--[no-]strict] [--timeout=&lt;n&gt;] [--stateless-rpc]
+                  [--advertise-refs] &lt;directory&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Invoked by <emphasis>git fetch-pack</emphasis>, learns what
+objects the other side is missing, and sends them after packing.</simpara>
+<simpara>This command is usually not invoked directly by the end user.
+The UI for the protocol is on the <emphasis>git fetch-pack</emphasis> side, and the
+program pair is meant to be used to pull updates from a remote
+repository.  For push operations, see <emphasis>git send-pack</emphasis>.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--[no-]strict
+</term>
+<listitem>
+<simpara>
+        Do not try &lt;directory&gt;/.git/ if &lt;directory&gt; is no Git directory.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--timeout=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        Interrupt transfer after &lt;n&gt; seconds of inactivity.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stateless-rpc
+</term>
+<listitem>
+<simpara>
+        Perform only a single read-write cycle with stdin and stdout.
+        This fits with the HTTP POST request processing model where
+        a program may read the request, write a response, and must exit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--http-backend-info-refs
+</term>
+<listitem>
+<simpara>
+        Used by <citerefentry>
+<refentrytitle>git-http-backend</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> to serve up
+        <literal>$GIT_URL/info/refs?service=git-upload-pack</literal> requests. See
+        "Smart Clients" in <ulink url="technical/http-protocol.html">the HTTP
+        transfer protocols</ulink> documentation and "HTTP Transport" in
+        <ulink url="technical/protocol-v2.html">the Git Wire Protocol, Version
+        2</ulink> documentation. Also understood by
+        <citerefentry>
+<refentrytitle>git-receive-pack</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;directory&gt;
+</term>
+<listitem>
+<simpara>
+        The repository to sync from.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_environment">
+<title>ENVIRONMENT</title>
+<variablelist>
+<varlistentry>
+<term>
+<literal>GIT_PROTOCOL</literal>
+</term>
+<listitem>
+<simpara>
+        Internal variable used for handshaking the wire protocol. Server
+        admins may need to configure some transports to allow this
+        variable to be passed. See the discussion in <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>gitnamespaces</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

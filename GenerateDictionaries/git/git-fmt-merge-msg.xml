@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-fmt-merge-msg</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-fmt-merge-msg</refname>
+  <refpurpose>Produce a merge commit message</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git fmt-merge-msg</emphasis> [-m &lt;message&gt;] [--log[=&lt;n&gt;] | --no-log]
+<emphasis>git fmt-merge-msg</emphasis> [-m &lt;message&gt;] [--log[=&lt;n&gt;] | --no-log] -F &lt;file&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Takes the list of merged objects on stdin and produces a suitable
+commit message to be used for the merge commit, usually to be
+passed as the <emphasis>&lt;merge-message&gt;</emphasis> argument of <emphasis>git merge</emphasis>.</simpara>
+<simpara>This command is intended mostly for internal use by scripts
+automatically invoking <emphasis>git merge</emphasis>.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--log[=&lt;n&gt;]
+</term>
+<listitem>
+<simpara>
+        In addition to branch names, populate the log message with
+        one-line descriptions from the actual commits that are being
+        merged.  At most &lt;n&gt; commits from each merge parent will be
+        used (20 if &lt;n&gt; is omitted).  This overrides the <literal>merge.log</literal>
+        configuration variable.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-log
+</term>
+<listitem>
+<simpara>
+        Do not list one-line descriptions from the actual commits being
+        merged.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]summary
+</term>
+<listitem>
+<simpara>
+        Synonyms to --log and --no-log; these are deprecated and will be
+        removed in the future.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-m &lt;message&gt;
+</term>
+<term>
+--message &lt;message&gt;
+</term>
+<listitem>
+<simpara>
+        Use &lt;message&gt; instead of the branch names for the first line
+        of the log message.  For use with <literal>--log</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-F &lt;file&gt;
+</term>
+<term>
+--file &lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        Take the list of merged objects from &lt;file&gt; instead of
+        stdin.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_configuration">
+<title>CONFIGURATION</title>
+<variablelist>
+<varlistentry>
+<term>
+merge.branchdesc
+</term>
+<listitem>
+<simpara>
+        In addition to branch names, populate the log message with
+        the branch description text associated with them.  Defaults
+        to false.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+merge.log
+</term>
+<listitem>
+<simpara>
+        In addition to branch names, populate the log message with at
+        most the specified number of one-line descriptions from the
+        actual commits that are being merged.  Defaults to false, and
+        true is a synonym for 20.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+merge.suppressDest
+</term>
+<listitem>
+<simpara>
+        By adding a glob that matches the names of integration
+        branches to this multi-valued configuration variable, the
+        default merge message computed for merges into these
+        integration branches will omit "into &lt;branch name&gt;" from
+        its title.
+</simpara>
+<simpara>An element with an empty value can be used to clear the list
+of globs accumulated from previous configuration entries.
+When there is no <literal>merge.suppressDest</literal> variable defined, the
+default value of <literal>master</literal> is used for backward compatibility.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+merge.summary
+</term>
+<listitem>
+<simpara>
+        Synonym to <literal>merge.log</literal>; this is deprecated and will be removed in
+        the future.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<literallayout class="monospaced">$ git fetch origin master
+$ git fmt-merge-msg --log &lt;$GIT_DIR/FETCH_HEAD</literallayout><simpara></simpara>
+<simpara>Print a log message describing a merge of the "master" branch from
+the "origin" remote.</simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-merge</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

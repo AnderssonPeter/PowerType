@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-sh-i18n</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-sh-i18n</refname>
+  <refpurpose>Git's i18n setup code for shell scripts</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>. "$(git --exec-path)/git-sh-i18n"</emphasis></literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>This is not a command the end user would want to run.  Ever.
+This documentation is meant for people who are studying the
+Porcelain-ish scripts and/or are writing new ones.</simpara>
+<simpara>The 'git sh-i18n scriptlet is designed to be sourced (using
+<literal>.</literal>) by Git&#8217;s porcelain programs implemented in shell
+script. It provides wrappers for the GNU <literal>gettext</literal> and
+<literal>eval_gettext</literal> functions accessible through the <literal>gettext.sh</literal>
+script, and provides pass-through fallbacks on systems
+without GNU gettext.</simpara>
+</refsect1>
+<refsect1 id="_functions">
+<title>FUNCTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+gettext
+</term>
+<listitem>
+<simpara>
+        Currently a dummy fall-through function implemented as a wrapper
+        around <literal>printf(1)</literal>. Will be replaced by a real gettext
+        implementation in a later version.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+eval_gettext
+</term>
+<listitem>
+<simpara>
+        Currently a dummy fall-through function implemented as a wrapper
+        around <literal>printf(1)</literal> with variables expanded by the
+        <citerefentry>
+<refentrytitle>git-sh-i18n&#45;&#45;envsubst</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> helper. Will be replaced by a
+        real gettext implementation in a later version.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

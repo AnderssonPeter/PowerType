@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-mergetool&#45;&#45;lib</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-mergetool--lib</refname>
+  <refpurpose>Common Git merge tool shell scriptlets</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>TOOL_MODE=(diff|merge) . "$(git --exec-path)/git-mergetool&#45;&#45;lib"</emphasis></literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>This is not a command the end user would want to run.  Ever.
+This documentation is meant for people who are studying the
+Porcelain-ish scripts and/or are writing new ones.</simpara>
+<simpara>The <emphasis>git-mergetool&#45;&#45;lib</emphasis> scriptlet is designed to be sourced (using
+<literal>.</literal>) by other shell scripts to set up functions for working
+with Git merge tools.</simpara>
+<simpara>Before sourcing <emphasis>git-mergetool&#45;&#45;lib</emphasis>, your script must set <literal>TOOL_MODE</literal>
+to define the operation mode for the functions listed below.
+<emphasis>diff</emphasis> and <emphasis>merge</emphasis> are valid values.</simpara>
+</refsect1>
+<refsect1 id="_functions">
+<title>FUNCTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+get_merge_tool
+</term>
+<listitem>
+<simpara>
+        returns a merge tool. the return code is 1 if we returned a guessed
+        merge tool, else 0. <emphasis>$GIT_MERGETOOL_GUI</emphasis> may be set to <emphasis>true</emphasis> to
+        search for the appropriate guitool.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+get_merge_tool_cmd
+</term>
+<listitem>
+<simpara>
+        returns the custom command for a merge tool.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+get_merge_tool_path
+</term>
+<listitem>
+<simpara>
+        returns the custom path for a merge tool.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+initialize_merge_tool
+</term>
+<listitem>
+<simpara>
+        bring merge tool specific functions into scope so they can be used or
+        overridden.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+run_merge_tool
+</term>
+<listitem>
+<simpara>
+        launches a merge tool given the tool name and a true/false
+        flag to indicate whether a merge base is present.
+        <emphasis>$MERGED</emphasis>, <emphasis>$LOCAL</emphasis>, <emphasis>$REMOTE</emphasis>, and <emphasis>$BASE</emphasis> must be defined
+        for use by the merge tool.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

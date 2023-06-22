@@ -19,6 +19,7 @@ else
 "Value"
 end }}Parameter]@{
 Keys = @("{{ [ Longhand, Shorthand ] | array.compact | array.join "^", ^"" }}");
+Name = "{{ Flag.Usage | escape }}";
 Description = "{{ Flag.Usage | escape }}";{{if Recursive}}
 Recursive = $True;
 {{end}}{{ if Flag.Type != "bool" }}
@@ -40,8 +41,8 @@ Elements = Command.LocalFlags | array.concat Command.PersistentFlags | array.con
 }}Keys = @("{{ Command.Name }}");
 Name = "{{ Command.Name }}";
 Description = "{{ Command.Short | escape }}";{{if Elements != empty}}
-Parameters = @( {{ for Element in Elements }}
-    {{ Element | writeElement }}{{ if !for.last || Command.PersistentFlags != null }}, {{ end }}{{ end }}
+Parameters = @({{ for Element in Elements }}
+    {{ Element | writeElement }}{{ if !for.last || Command.PersistentFlags != null }},{{ end }}{{ end }}
 ){{ end }}{{ end }}
 
 {{func writeCommand
@@ -63,9 +64,12 @@ Element | writeCommand
 end
 end
 }}
+# Generated from Carapace
+# Todo: Validate it against documentation
+# Todo: Add Static and Dynamic Sources where appropriate
 [PowerTypeDictionary]@{
 Platforms = ([Platforms]::{{ Platforms | array.join " -bor [Platforms]::" }});
-State = [DictionaryState]::GeneratedAndExperimental;
-Source = "Carapace";
+State = [DictionaryState]::Generated -bor [DictionaryState]::Experimental -bor [DictionaryState]::Incomplete;
+Source = "Generated from carapace";
 {{ if Url }}Url = "{{ Url }}";{{ end }}
 {{ this | writeCommandParameters }}}

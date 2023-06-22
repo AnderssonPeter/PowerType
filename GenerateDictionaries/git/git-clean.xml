@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-clean</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-clean</refname>
+  <refpurpose>Remove untracked files from the working tree</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git clean</emphasis> [-d] [-f] [-i] [-n] [-q] [-e &lt;pattern&gt;] [-x | -X] [--] &lt;path&gt;&#8230;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Cleans the working tree by recursively removing files that are not
+under version control, starting from the current directory.</simpara>
+<simpara>Normally, only files unknown to Git are removed, but if the <literal>-x</literal>
+option is specified, ignored files are also removed. This can, for
+example, be useful to remove all build products.</simpara>
+<simpara>If any optional <literal>&lt;path&gt;...</literal> arguments are given, only those paths
+are affected.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-d
+</term>
+<listitem>
+<simpara>
+        Normally, when no &lt;path&gt; is specified, git clean will not
+        recurse into untracked directories to avoid removing too much.
+        Specify -d to have it recurse into such directories as well.
+        If any paths are specified, -d is irrelevant; all untracked
+        files matching the specified paths (with exceptions for nested
+        git directories mentioned under <literal>--force</literal>) will be removed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-f
+</term>
+<term>
+--force
+</term>
+<listitem>
+<simpara>
+        If the Git configuration variable clean.requireForce is not set
+        to false, <emphasis>git clean</emphasis> will refuse to delete files or directories
+        unless given -f or -i.  Git will refuse to modify untracked
+        nested git repositories (directories with a .git subdirectory)
+        unless a second -f is given.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-i
+</term>
+<term>
+--interactive
+</term>
+<listitem>
+<simpara>
+        Show what would be done and clean files interactively. See
+        &#8220;Interactive mode&#8221; for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-n
+</term>
+<term>
+--dry-run
+</term>
+<listitem>
+<simpara>
+        Don&#8217;t actually remove anything, just show what would be done.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-q
+</term>
+<term>
+--quiet
+</term>
+<listitem>
+<simpara>
+        Be quiet, only report errors, but not the files that are
+        successfully removed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-e &lt;pattern&gt;
+</term>
+<term>
+--exclude=&lt;pattern&gt;
+</term>
+<listitem>
+<simpara>
+        Use the given exclude pattern in addition to the standard ignore rules
+        (see <citerefentry>
+<refentrytitle>gitignore</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-x
+</term>
+<listitem>
+<simpara>
+        Don&#8217;t use the standard ignore rules (see <citerefentry>
+<refentrytitle>gitignore</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>), but
+        still use the ignore rules given with <literal>-e</literal> options from the command
+        line.  This allows removing all untracked
+        files, including build products.  This can be used (possibly in
+        conjunction with <emphasis>git restore</emphasis> or <emphasis>git reset</emphasis>) to create a pristine
+        working directory to test a clean build.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-X
+</term>
+<listitem>
+<simpara>
+        Remove only files ignored by Git.  This may be useful to rebuild
+        everything from scratch, but keep manually created files.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_interactive_mode">
+<title>Interactive mode</title>
+<simpara>When the command enters the interactive mode, it shows the
+files and directories to be cleaned, and goes into its
+interactive command loop.</simpara>
+<simpara>The command loop shows the list of subcommands available, and
+gives a prompt "What now&gt; ".  In general, when the prompt ends
+with a single <emphasis>&gt;</emphasis>, you can pick only one of the choices given
+and type return, like this:</simpara>
+<literallayout class="monospaced">    *** Commands ***
+        1: clean                2: filter by pattern    3: select by numbers
+        4: ask each             5: quit                 6: help
+    What now&gt; 1</literallayout><simpara></simpara>
+<simpara>You also could say <literal>c</literal> or <literal>clean</literal> above as long as the choice is unique.</simpara>
+<simpara>The main command loop has 6 subcommands.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+clean
+</term>
+<listitem>
+<simpara>
+   Start cleaning files and directories, and then quit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+filter by pattern
+</term>
+<listitem>
+<simpara>
+   This shows the files and directories to be deleted and issues an
+   "Input ignore patterns&gt;&gt;" prompt. You can input space-separated
+   patterns to exclude files and directories from deletion.
+   E.g. "*.c *.h" will excludes files end with ".c" and ".h" from
+   deletion. When you are satisfied with the filtered result, press
+   ENTER (empty) back to the main menu.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+select by numbers
+</term>
+<listitem>
+<simpara>
+   This shows the files and directories to be deleted and issues an
+   "Select items to delete&gt;&gt;" prompt. When the prompt ends with double
+   <emphasis>&gt;&gt;</emphasis> like this, you can make more than one selection, concatenated
+   with whitespace or comma.  Also you can say ranges.  E.g. "2-5 7,9"
+   to choose 2,3,4,5,7,9 from the list.  If the second number in a
+   range is omitted, all remaining items are selected.  E.g. "7-" to
+   choose 7,8,9 from the list.  You can say <emphasis>*</emphasis> to choose everything.
+   Also when you are satisfied with the filtered result, press ENTER
+   (empty) back to the main menu.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+ask each
+</term>
+<listitem>
+<simpara>
+  This will start to clean, and you must confirm one by one in order
+  to delete items. Please note that this action is not as efficient
+  as the above two actions.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+quit
+</term>
+<listitem>
+<simpara>
+  This lets you quit without do cleaning.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+help
+</term>
+<listitem>
+<simpara>
+  Show brief usage of interactive git-clean.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>gitignore</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

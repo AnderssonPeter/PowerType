@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-shell</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-shell</refname>
+  <refpurpose>Restricted login shell for Git-only SSH access</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>chsh</emphasis> -s $(command -v git-shell) &lt;user&gt;
+<emphasis>git clone</emphasis> &lt;user&gt;<literal>@localhost:/path/to/repo.git</literal>
+<emphasis>ssh</emphasis> &lt;user&gt;<literal>@localhost</literal></literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>This is a login shell for SSH accounts to provide restricted Git access.
+It permits execution only of server-side Git commands implementing the
+pull/push functionality, plus custom commands present in a subdirectory
+named <literal>git-shell-commands</literal> in the user&#8217;s home directory.</simpara>
+</refsect1>
+<refsect1 id="_commands">
+<title>COMMANDS</title>
+<simpara><emphasis>git shell</emphasis> accepts the following commands after the <literal>-c</literal> option:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>git receive-pack &lt;argument&gt;</emphasis>
+</term>
+<term>
+<emphasis>git upload-pack &lt;argument&gt;</emphasis>
+</term>
+<term>
+<emphasis>git upload-archive &lt;argument&gt;</emphasis>
+</term>
+<listitem>
+<simpara>
+        Call the corresponding server-side command to support
+        the client&#8217;s <emphasis>git push</emphasis>, <emphasis>git fetch</emphasis>, or <emphasis>git archive --remote</emphasis>
+        request.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>cvs server</emphasis>
+</term>
+<listitem>
+<simpara>
+        Imitate a CVS server.  See <citerefentry>
+<refentrytitle>git-cvsserver</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>If a <literal>~/git-shell-commands</literal> directory is present, <emphasis>git shell</emphasis> will
+also handle other, custom commands by running
+"<literal>git-shell-commands/&lt;command&gt; &lt;arguments&gt;</literal>" from the user&#8217;s home
+directory.</simpara>
+</refsect1>
+<refsect1 id="_interactive_use">
+<title>INTERACTIVE USE</title>
+<simpara>By default, the commands above can be executed only with the <literal>-c</literal>
+option; the shell is not interactive.</simpara>
+<simpara>If a <literal>~/git-shell-commands</literal> directory is present, <emphasis>git shell</emphasis>
+can also be run interactively (with no arguments).  If a <literal>help</literal>
+command is present in the <literal>git-shell-commands</literal> directory, it is
+run to provide the user with an overview of allowed actions.  Then a
+"git&gt; " prompt is presented at which one can enter any of the
+commands from the <literal>git-shell-commands</literal> directory, or <literal>exit</literal> to close
+the connection.</simpara>
+<simpara>Generally this mode is used as an administrative interface to allow
+users to list repositories they have access to, create, delete, or
+rename repositories, or change repository descriptions and
+permissions.</simpara>
+<simpara>If a <literal>no-interactive-login</literal> command exists, then it is run and the
+interactive shell is aborted.</simpara>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<simpara>To disable interactive logins, displaying a greeting instead:</simpara>
+<literallayout class="monospaced">$ chsh -s /usr/bin/git-shell
+$ mkdir $HOME/git-shell-commands
+$ cat &gt;$HOME/git-shell-commands/no-interactive-login &lt;&lt;\EOF
+#!/bin/sh
+printf '%s\n' "Hi $USER! You've successfully authenticated, but I do not"
+printf '%s\n' "provide interactive shell access."
+exit 128
+EOF
+$ chmod +x $HOME/git-shell-commands/no-interactive-login</literallayout><simpara></simpara>
+<simpara>To enable git-cvsserver access (which should generally have the
+<literal>no-interactive-login</literal> example above as a prerequisite, as creating
+the git-shell-commands directory allows interactive logins):</simpara>
+<literallayout class="monospaced">$ cat &gt;$HOME/git-shell-commands/cvs &lt;&lt;\EOF
+if ! test $# = 1 &amp;&amp; test "$1" = "server"
+then
+        echo &gt;&amp;2 "git-cvsserver only handles \"server\""
+        exit 1
+fi
+exec git cvsserver server
+EOF
+$ chmod +x $HOME/git-shell-commands/cvs</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara>ssh(1),
+<citerefentry>
+<refentrytitle>git-daemon</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+contrib/git-shell-commands/README</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-mktag</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-mktag</refname>
+  <refpurpose>Creates a tag object with extra validation</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git mktag</emphasis></literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Reads a tag contents on standard input and creates a tag object. The
+output is the new tag&#8217;s &lt;object&gt; identifier.</simpara>
+<simpara>This command is mostly equivalent to <citerefentry>
+<refentrytitle>git-hash-object</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+invoked with <literal>-t tag -w --stdin</literal>. I.e. both of these will create and
+write a tag found in <literal>my-tag</literal>:</simpara>
+<literallayout class="monospaced">git mktag &lt;my-tag
+git hash-object -t tag -w --stdin &lt;my-tag</literallayout>
+<simpara>The difference is that mktag will die before writing the tag if the
+tag doesn&#8217;t pass a <citerefentry>
+<refentrytitle>git-fsck</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> check.</simpara>
+<simpara>The "fsck" check done mktag is stricter than what <citerefentry>
+<refentrytitle>git-fsck</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+would run by default in that all <literal>fsck.&lt;msg-id&gt;</literal> messages are promoted
+from warnings to errors (so e.g. a missing "tagger" line is an error).</simpara>
+<simpara>Extra headers in the object are also an error under mktag, but ignored
+by <citerefentry>
+<refentrytitle>git-fsck</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>. This extra check can be turned off by setting
+the appropriate <literal>fsck.&lt;msg-id&gt;</literal> varible:</simpara>
+<literallayout class="monospaced">git -c fsck.extraHeaderEntry=ignore mktag &lt;my-tag-with-headers</literallayout>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--strict
+</term>
+<listitem>
+<simpara>
+        By default mktag turns on the equivalent of
+        <citerefentry>
+<refentrytitle>git-fsck</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> <literal>--strict</literal> mode. Use <literal>--no-strict</literal> to
+        disable it.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_tag_format">
+<title>Tag Format</title>
+<simpara>A tag signature file, to be fed to this command&#8217;s standard input,
+has a very simple fixed format: four lines of</simpara>
+<literallayout class="monospaced">object &lt;hash&gt;
+type &lt;typename&gt;
+tag &lt;tagname&gt;
+tagger &lt;tagger&gt;</literallayout>
+<simpara>followed by some <emphasis>optional</emphasis> free-form message (some tags created
+by older Git may not have <literal>tagger</literal> line).  The message, when it
+exists, is separated by a blank line from the header.  The
+message part may contain a signature that Git itself doesn&#8217;t
+care about, but that can be verified with gpg.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

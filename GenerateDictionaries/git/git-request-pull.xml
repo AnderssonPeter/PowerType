@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-request-pull</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-request-pull</refname>
+  <refpurpose>Generates a summary of pending changes</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git request-pull</emphasis> [-p] &lt;start&gt; &lt;url&gt; [&lt;end&gt;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Generate a request asking your upstream project to pull changes into
+their tree.  The request, printed to the standard output,
+begins with the branch description, summarizes
+the changes and indicates from where they can be pulled.</simpara>
+<simpara>The upstream project is expected to have the commit named by
+<literal>&lt;start&gt;</literal> and the output asks it to integrate the changes you made
+since that commit, up to the commit named by <literal>&lt;end&gt;</literal>, by visiting
+the repository named by <literal>&lt;url&gt;</literal>.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-p
+</term>
+<listitem>
+<simpara>
+        Include patch text in the output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;start&gt;
+</term>
+<listitem>
+<simpara>
+        Commit to start at.  This names a commit that is already in
+        the upstream history.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;url&gt;
+</term>
+<listitem>
+<simpara>
+        The repository URL to be pulled from.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;end&gt;
+</term>
+<listitem>
+<simpara>
+        Commit to end at (defaults to HEAD).  This names the commit
+        at the tip of the history you are asking to be pulled.
+</simpara>
+<simpara>When the repository named by <literal>&lt;url&gt;</literal> has the commit at a tip of a
+ref that is different from the ref you have locally, you can use the
+<literal>&lt;local&gt;:&lt;remote&gt;</literal> syntax, to have its local name, a colon <literal>:</literal>, and
+its remote name.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<simpara>Imagine that you built your work on your <literal>master</literal> branch on top of
+the <literal>v1.0</literal> release, and want it to be integrated to the project.
+First you push that change to your public repository for others to
+see:</simpara>
+<literallayout class="monospaced">git push https://git.ko.xz/project master</literallayout>
+<simpara>Then, you run this command:</simpara>
+<literallayout class="monospaced">git request-pull v1.0 https://git.ko.xz/project master</literallayout>
+<simpara>which will produce a request to the upstream, summarizing the
+changes between the <literal>v1.0</literal> release and your <literal>master</literal>, to pull it
+from your public repository.</simpara>
+<simpara>If you pushed your change to a branch whose name is different from
+the one you have locally, e.g.</simpara>
+<literallayout class="monospaced">git push https://git.ko.xz/project master:for-linus</literallayout>
+<simpara>then you can ask that to be pulled with</simpara>
+<literallayout class="monospaced">git request-pull v1.0 https://git.ko.xz/project master:for-linus</literallayout>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

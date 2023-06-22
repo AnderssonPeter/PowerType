@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-repack</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-repack</refname>
+  <refpurpose>Pack unpacked objects in a repository</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git repack</emphasis> [-a] [-A] [-d] [-f] [-F] [-l] [-n] [-q] [-b] [-m] [--window=&lt;n&gt;] [--depth=&lt;n&gt;] [--threads=&lt;n&gt;] [--keep-pack=&lt;pack-name&gt;] [--write-midx]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>This command is used to combine all objects that do not currently
+reside in a "pack", into a pack.  It can also be used to re-organize
+existing packs into a single, more efficient pack.</simpara>
+<simpara>A pack is a collection of objects, individually compressed, with
+delta compression applied, stored in a single file, with an
+associated index file.</simpara>
+<simpara>Packs are used to reduce the load on mirror systems, backup
+engines, disk storage, etc.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-a
+</term>
+<listitem>
+<simpara>
+        Instead of incrementally packing the unpacked objects,
+        pack everything referenced into a single pack.
+        Especially useful when packing a repository that is used
+        for private development. Use
+        with <literal>-d</literal>.  This will clean up the objects that <literal>git prune</literal>
+        leaves behind, but <literal>git fsck --full --dangling</literal> shows as
+        dangling.
+</simpara>
+<simpara>Note that users fetching over dumb protocols will have to fetch the
+whole new pack in order to get any contained object, no matter how many
+other objects in that pack they already have locally.</simpara>
+<simpara>Promisor packfiles are repacked separately: if there are packfiles that
+have an associated ".promisor" file, these packfiles will be repacked
+into another separate pack, and an empty ".promisor" file corresponding
+to the new separate pack will be written.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-A
+</term>
+<listitem>
+<simpara>
+        Same as <literal>-a</literal>, unless <literal>-d</literal> is used.  Then any unreachable
+        objects in a previous pack become loose, unpacked objects,
+        instead of being left in the old pack.  Unreachable objects
+        are never intentionally added to a pack, even when repacking.
+        This option prevents unreachable objects from being immediately
+        deleted by way of being left in the old pack and then
+        removed.  Instead, the loose unreachable objects
+        will be pruned according to normal expiry rules
+        with the next <emphasis>git gc</emphasis> invocation. See <citerefentry>
+<refentrytitle>git-gc</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-d
+</term>
+<listitem>
+<simpara>
+        After packing, if the newly created packs make some
+        existing packs redundant, remove the redundant packs.
+        Also run  <emphasis>git prune-packed</emphasis> to remove redundant
+        loose object files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-l
+</term>
+<listitem>
+<simpara>
+        Pass the <literal>--local</literal> option to <emphasis>git pack-objects</emphasis>. See
+        <citerefentry>
+<refentrytitle>git-pack-objects</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-f
+</term>
+<listitem>
+<simpara>
+        Pass the <literal>--no-reuse-delta</literal> option to <literal>git-pack-objects</literal>, see
+        <citerefentry>
+<refentrytitle>git-pack-objects</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-F
+</term>
+<listitem>
+<simpara>
+        Pass the <literal>--no-reuse-object</literal> option to <literal>git-pack-objects</literal>, see
+        <citerefentry>
+<refentrytitle>git-pack-objects</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-q
+</term>
+<listitem>
+<simpara>
+        Pass the <literal>-q</literal> option to <emphasis>git pack-objects</emphasis>. See
+        <citerefentry>
+<refentrytitle>git-pack-objects</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-n
+</term>
+<listitem>
+<simpara>
+        Do not update the server information with
+        <emphasis>git update-server-info</emphasis>.  This option skips
+        updating local catalog files needed to publish
+        this repository (or a direct copy of it)
+        over HTTP or FTP.  See <citerefentry>
+<refentrytitle>git-update-server-info</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--window=&lt;n&gt;
+</term>
+<term>
+--depth=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        These two options affect how the objects contained in the pack are
+        stored using delta compression. The objects are first internally
+        sorted by type, size and optionally names and compared against the
+        other objects within <literal>--window</literal> to see if using delta compression saves
+        space. <literal>--depth</literal> limits the maximum delta depth; making it too deep
+        affects the performance on the unpacker side, because delta data needs
+        to be applied that many times to get to the necessary object.
+</simpara>
+<simpara>The default value for --window is 10 and --depth is 50. The maximum
+depth is 4095.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--threads=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        This option is passed through to <literal>git pack-objects</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--window-memory=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        This option provides an additional limit on top of <literal>--window</literal>;
+        the window size will dynamically scale down so as to not take
+        up more than <emphasis>&lt;n&gt;</emphasis> bytes in memory.  This is useful in
+        repositories with a mix of large and small objects to not run
+        out of memory with a large window, but still be able to take
+        advantage of the large window for the smaller objects.  The
+        size can be suffixed with "k", "m", or "g".
+        <literal>--window-memory=0</literal> makes memory usage unlimited.  The default
+        is taken from the <literal>pack.windowMemory</literal> configuration variable.
+        Note that the actual memory usage will be the limit multiplied
+        by the number of threads used by <citerefentry>
+<refentrytitle>git-pack-objects</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--max-pack-size=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        Maximum size of each output pack file. The size can be suffixed with
+        "k", "m", or "g". The minimum size allowed is limited to 1 MiB.
+        If specified, multiple packfiles may be created, which also
+        prevents the creation of a bitmap index.
+        The default is unlimited, unless the config variable
+        <literal>pack.packSizeLimit</literal> is set. Note that this option may result in
+        a larger and slower repository; see the discussion in
+        <literal>pack.packSizeLimit</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-b
+</term>
+<term>
+--write-bitmap-index
+</term>
+<listitem>
+<simpara>
+        Write a reachability bitmap index as part of the repack. This
+        only makes sense when used with <literal>-a</literal>, <literal>-A</literal> or <literal>-m</literal>, as the bitmaps
+        must be able to refer to all reachable objects. This option
+        overrides the setting of <literal>repack.writeBitmaps</literal>. This option
+        has no effect if multiple packfiles are created, unless writing a
+        MIDX (in which case a multi-pack bitmap is created).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--pack-kept-objects
+</term>
+<listitem>
+<simpara>
+        Include objects in <literal>.keep</literal> files when repacking.  Note that we
+        still do not delete <literal>.keep</literal> packs after <literal>pack-objects</literal> finishes.
+        This means that we may duplicate objects, but this makes the
+        option safe to use when there are concurrent pushes or fetches.
+        This option is generally only useful if you are writing bitmaps
+        with <literal>-b</literal> or <literal>repack.writeBitmaps</literal>, as it ensures that the
+        bitmapped packfile has the necessary objects.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--keep-pack=&lt;pack-name&gt;
+</term>
+<listitem>
+<simpara>
+        Exclude the given pack from repacking. This is the equivalent
+        of having <literal>.keep</literal> file on the pack. <literal>&lt;pack-name&gt;</literal> is the
+        pack file name without leading directory (e.g. <literal>pack-123.pack</literal>).
+        The option could be specified multiple times to keep multiple
+        packs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--unpack-unreachable=&lt;when&gt;
+</term>
+<listitem>
+<simpara>
+        When loosening unreachable objects, do not bother loosening any
+        objects older than <literal>&lt;when&gt;</literal>. This can be used to optimize out
+        the write of any objects that would be immediately pruned by
+        a follow-up <literal>git prune</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-k
+</term>
+<term>
+--keep-unreachable
+</term>
+<listitem>
+<simpara>
+        When used with <literal>-ad</literal>, any unreachable objects from existing
+        packs will be appended to the end of the packfile instead of
+        being removed. In addition, any unreachable loose objects will
+        be packed (and their loose counterparts removed).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-i
+</term>
+<term>
+--delta-islands
+</term>
+<listitem>
+<simpara>
+        Pass the <literal>--delta-islands</literal> option to <literal>git-pack-objects</literal>, see
+        <citerefentry>
+<refentrytitle>git-pack-objects</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-g=&lt;factor&gt;
+</term>
+<term>
+--geometric=&lt;factor&gt;
+</term>
+<listitem>
+<simpara>
+        Arrange resulting pack structure so that each successive pack
+        contains at least <literal>&lt;factor&gt;</literal> times the number of objects as the
+        next-largest pack.
+</simpara>
+<simpara><literal>git repack</literal> ensures this by determining a "cut" of packfiles that need
+to be repacked into one in order to ensure a geometric progression. It
+picks the smallest set of packfiles such that as many of the larger
+packfiles (by count of objects contained in that pack) may be left
+intact.</simpara>
+<simpara>Unlike other repack modes, the set of objects to pack is determined
+uniquely by the set of packs being "rolled-up"; in other words, the
+packs determined to need to be combined in order to restore a geometric
+progression.</simpara>
+<simpara>When <literal>--unpacked</literal> is specified, loose objects are implicitly included in
+this "roll-up", without respect to their reachability. This is subject
+to change in the future. This option (implying a drastically different
+repack mode) is not guaranteed to work with all other combinations of
+option to <literal>git repack</literal>.</simpara>
+<simpara>When writing a multi-pack bitmap, <literal>git repack</literal> selects the largest resulting
+pack as the preferred pack for object selection by the MIDX (see
+<citerefentry>
+<refentrytitle>git-multi-pack-index</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-m
+</term>
+<term>
+--write-midx
+</term>
+<listitem>
+<simpara>
+        Write a multi-pack index (see <citerefentry>
+<refentrytitle>git-multi-pack-index</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>)
+        containing the non-redundant packs.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_configuration">
+<title>CONFIGURATION</title>
+<simpara>Various configuration variables affect packing, see
+<citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> (search for "pack" and "delta").</simpara>
+<simpara>By default, the command passes <literal>--delta-base-offset</literal> option to
+<emphasis>git pack-objects</emphasis>; this typically results in slightly smaller packs,
+but the generated packs are incompatible with versions of Git older than
+version 1.4.4. If you need to share your repository with such ancient Git
+versions, either directly or via the dumb http protocol, then you
+need to set the configuration variable <literal>repack.UseDeltaBaseOffset</literal> to
+"false" and repack. Access from old Git versions over the native protocol
+is unaffected by this option as the conversion is performed on the fly
+as needed in that case.</simpara>
+<simpara>Delta compression is not used on objects larger than the
+<literal>core.bigFileThreshold</literal> configuration variable and on files with the
+attribute <literal>delta</literal> set to false.</simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-pack-objects</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+<citerefentry>
+<refentrytitle>git-prune-packed</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

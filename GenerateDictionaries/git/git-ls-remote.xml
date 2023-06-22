@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-ls-remote</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-ls-remote</refname>
+  <refpurpose>List references in a remote repository</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git ls-remote</emphasis> [--heads] [--tags] [--refs] [--upload-pack=&lt;exec&gt;]
+              [-q | --quiet] [--exit-code] [--get-url] [--sort=&lt;key&gt;]
+              [--symref] [&lt;repository&gt; [&lt;refs&gt;&#8230;]]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Displays references available in a remote repository along with the associated
+commit IDs.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-h
+</term>
+<term>
+--heads
+</term>
+<term>
+-t
+</term>
+<term>
+--tags
+</term>
+<listitem>
+<simpara>
+        Limit to only refs/heads and refs/tags, respectively.
+        These options are <emphasis>not</emphasis> mutually exclusive; when given
+        both, references stored in refs/heads and refs/tags are
+        displayed.  Note that <literal>git ls-remote -h</literal> used without
+        anything else on the command line gives help, consistent
+        with other git subcommands.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--refs
+</term>
+<listitem>
+<simpara>
+        Do not show peeled tags or pseudorefs like <literal>HEAD</literal> in the output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-q
+</term>
+<term>
+--quiet
+</term>
+<listitem>
+<simpara>
+        Do not print remote URL to stderr.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--upload-pack=&lt;exec&gt;
+</term>
+<listitem>
+<simpara>
+        Specify the full path of <emphasis>git-upload-pack</emphasis> on the remote
+        host. This allows listing references from repositories accessed via
+        SSH and where the SSH daemon does not use the PATH configured by the
+        user.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--exit-code
+</term>
+<listitem>
+<simpara>
+        Exit with status "2" when no matching refs are found in the remote
+        repository. Usually the command exits with status "0" to indicate
+        it successfully talked with the remote repository, whether it
+        found any matching refs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--get-url
+</term>
+<listitem>
+<simpara>
+        Expand the URL of the given remote repository taking into account any
+        "url.&lt;base&gt;.insteadOf" config setting (See <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>) and
+        exit without talking to the remote.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--symref
+</term>
+<listitem>
+<simpara>
+        In addition to the object pointed by it, show the underlying
+        ref pointed by it when showing a symbolic ref.  Currently,
+        upload-pack only shows the symref HEAD, so it will be the only
+        one shown by ls-remote.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--sort=&lt;key&gt;
+</term>
+<listitem>
+<simpara>
+        Sort based on the key given. Prefix <literal>-</literal> to sort in descending order
+        of the value. Supports "version:refname" or "v:refname" (tag names
+        are treated as versions). The "version:refname" sort order can also
+        be affected by the "versionsort.suffix" configuration variable.
+        See <citerefentry>
+<refentrytitle>git-for-each-ref</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for more sort options, but be aware
+        keys like <literal>committerdate</literal> that require access to the objects
+        themselves will not work for refs whose objects have not yet been
+        fetched from the remote, and will give a <literal>missing object</literal> error.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-o &lt;option&gt;
+</term>
+<term>
+--server-option=&lt;option&gt;
+</term>
+<listitem>
+<simpara>
+        Transmit the given string to the server when communicating using
+        protocol version 2.  The given string must not contain a NUL or LF
+        character.
+        When multiple <literal>--server-option=&lt;option&gt;</literal> are given, they are all
+        sent to the other side in the order listed on the command line.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;repository&gt;
+</term>
+<listitem>
+<simpara>
+        The "remote" repository to query.  This parameter can be
+        either a URL or the name of a remote (see the GIT URLS and
+        REMOTES sections of <citerefentry>
+<refentrytitle>git-fetch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;refs&gt;&#8230;
+</term>
+<listitem>
+<simpara>
+        When unspecified, all references, after filtering done
+        with --heads and --tags, are shown.  When &lt;refs&gt;&#8230; are
+        specified, only references matching the given patterns
+        are displayed.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<literallayout class="monospaced">$ git ls-remote --tags ./.
+d6602ec5194c87b0fc87103ca4d67251c76f233a        refs/tags/v0.99
+f25a265a342aed6041ab0cc484224d9ca54b6f41        refs/tags/v0.99.1
+7ceca275d047c90c0c7d5afb13ab97efdf51bd6e        refs/tags/v0.99.3
+c5db5456ae3b0873fc659c19fafdde22313cc441        refs/tags/v0.99.2
+0918385dbd9656cab0d1d81ba7453d49bbc16250        refs/tags/junio-gpg-pub
+$ git ls-remote http://www.kernel.org/pub/scm/git/git.git master seen rc
+5fe978a5381f1fbad26a80e682ddd2a401966740        refs/heads/master
+c781a84b5204fb294c9ccc79f8b3baceeb32c061        refs/heads/seen
+$ git remote add korg http://www.kernel.org/pub/scm/git/git.git
+$ git ls-remote --tags korg v\*
+d6602ec5194c87b0fc87103ca4d67251c76f233a        refs/tags/v0.99
+f25a265a342aed6041ab0cc484224d9ca54b6f41        refs/tags/v0.99.1
+c5db5456ae3b0873fc659c19fafdde22313cc441        refs/tags/v0.99.2
+7ceca275d047c90c0c7d5afb13ab97efdf51bd6e        refs/tags/v0.99.3</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-check-ref-format</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

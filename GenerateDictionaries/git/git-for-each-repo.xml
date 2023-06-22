@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-for-each-repo</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-for-each-repo</refname>
+  <refpurpose>Run a Git command on a list of repositories</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git for-each-repo</emphasis> --config=&lt;config&gt; [--] &lt;arguments&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Run a Git command on a list of repositories. The arguments after the
+known options or <literal>--</literal> indicator are used as the arguments for the Git
+subprocess.</simpara>
+<simpara>THIS COMMAND IS EXPERIMENTAL. THE BEHAVIOR MAY CHANGE.</simpara>
+<simpara>For example, we could run maintenance on each of a list of repositories
+stored in a <literal>maintenance.repo</literal> config variable using</simpara>
+<literallayout class="monospaced">git for-each-repo --config=maintenance.repo maintenance run</literallayout><simpara></simpara>
+<simpara>This will run <literal>git -C &lt;repo&gt; maintenance run</literal> for each value <literal>&lt;repo&gt;</literal>
+in the multi-valued config variable <literal>maintenance.repo</literal>.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--config=&lt;config&gt;
+</term>
+<listitem>
+<simpara>
+        Use the given config variable as a multi-valued list storing
+        absolute path names. Iterate on that list of paths to run
+        the given arguments.
+</simpara>
+<simpara>These config values are loaded from system, global, and local Git config,
+as available. If <literal>git for-each-repo</literal> is run in a directory that is not a
+Git repository, then only the system and global config is used.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_subprocess_behavior">
+<title>SUBPROCESS BEHAVIOR</title>
+<simpara>If any <literal>git -C &lt;repo&gt; &lt;arguments&gt;</literal> subprocess returns a non-zero exit code,
+then the <literal>git for-each-repo</literal> process returns that exit code without running
+more subprocesses.</simpara>
+<simpara>Each <literal>git -C &lt;repo&gt; &lt;arguments&gt;</literal> subprocess inherits the standard file
+descriptors <literal>stdin</literal>, <literal>stdout</literal>, and <literal>stderr</literal>.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-update-ref</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-update-ref</refname>
+  <refpurpose>Update the object name stored in a ref safely</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git update-ref</emphasis> [-m &lt;reason&gt;] [--no-deref] (-d &lt;ref&gt; [&lt;oldvalue&gt;] | [--create-reflog] &lt;ref&gt; &lt;newvalue&gt; [&lt;oldvalue&gt;] | --stdin [-z])</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Given two arguments, stores the &lt;newvalue&gt; in the &lt;ref&gt;, possibly
+dereferencing the symbolic refs.  E.g. <literal>git update-ref HEAD
+&lt;newvalue&gt;</literal> updates the current branch head to the new object.</simpara>
+<simpara>Given three arguments, stores the &lt;newvalue&gt; in the &lt;ref&gt;,
+possibly dereferencing the symbolic refs, after verifying that
+the current value of the &lt;ref&gt; matches &lt;oldvalue&gt;.
+E.g. <literal>git update-ref refs/heads/master &lt;newvalue&gt; &lt;oldvalue&gt;</literal>
+updates the master branch head to &lt;newvalue&gt; only if its current
+value is &lt;oldvalue&gt;.  You can specify 40 "0" or an empty string
+as &lt;oldvalue&gt; to make sure that the ref you are creating does
+not exist.</simpara>
+<simpara>It also allows a "ref" file to be a symbolic pointer to another
+ref file by starting with the four-byte header sequence of
+"ref:".</simpara>
+<simpara>More importantly, it allows the update of a ref file to follow
+these symbolic pointers, whether they are symlinks or these
+"regular file symbolic refs".  It follows <emphasis role="strong">real</emphasis> symlinks only
+if they start with "refs/": otherwise it will just try to read
+them and update them as a regular file (i.e. it will allow the
+filesystem to follow them, but will overwrite such a symlink to
+somewhere else with a regular filename).</simpara>
+<simpara>If --no-deref is given, &lt;ref&gt; itself is overwritten, rather than
+the result of following the symbolic pointers.</simpara>
+<simpara>In general, using</simpara>
+<literallayout class="monospaced">git update-ref HEAD "$head"</literallayout>
+<simpara>should be a <emphasis>lot</emphasis> safer than doing</simpara>
+<literallayout class="monospaced">echo "$head" &gt; "$GIT_DIR/HEAD"</literallayout>
+<simpara>both from a symlink following standpoint <emphasis role="strong">and</emphasis> an error checking
+standpoint.  The "refs/" rule for symlinks means that symlinks
+that point to "outside" the tree are safe: they&#8217;ll be followed
+for reading but not for writing (so we&#8217;ll never write through a
+ref symlink to some other tree, if you have copied a whole
+archive by creating a symlink tree).</simpara>
+<simpara>With <literal>-d</literal> flag, it deletes the named &lt;ref&gt; after verifying it
+still contains &lt;oldvalue&gt;.</simpara>
+<simpara>With <literal>--stdin</literal>, update-ref reads instructions from standard input and
+performs all modifications together.  Specify commands of the form:</simpara>
+<literallayout class="monospaced">update SP &lt;ref&gt; SP &lt;newvalue&gt; [SP &lt;oldvalue&gt;] LF
+create SP &lt;ref&gt; SP &lt;newvalue&gt; LF
+delete SP &lt;ref&gt; [SP &lt;oldvalue&gt;] LF
+verify SP &lt;ref&gt; [SP &lt;oldvalue&gt;] LF
+option SP &lt;opt&gt; LF
+start LF
+prepare LF
+commit LF
+abort LF</literallayout>
+<simpara>With <literal>--create-reflog</literal>, update-ref will create a reflog for each ref
+even if one would not ordinarily be created.</simpara>
+<simpara>Quote fields containing whitespace as if they were strings in C source
+code; i.e., surrounded by double-quotes and with backslash escapes.
+Use 40 "0" characters or the empty string to specify a zero value.  To
+specify a missing value, omit the value and its preceding SP entirely.</simpara>
+<simpara>Alternatively, use <literal>-z</literal> to specify in NUL-terminated format, without
+quoting:</simpara>
+<literallayout class="monospaced">update SP &lt;ref&gt; NUL &lt;newvalue&gt; NUL [&lt;oldvalue&gt;] NUL
+create SP &lt;ref&gt; NUL &lt;newvalue&gt; NUL
+delete SP &lt;ref&gt; NUL [&lt;oldvalue&gt;] NUL
+verify SP &lt;ref&gt; NUL [&lt;oldvalue&gt;] NUL
+option SP &lt;opt&gt; NUL
+start NUL
+prepare NUL
+commit NUL
+abort NUL</literallayout>
+<simpara>In this format, use 40 "0" to specify a zero value, and use the empty
+string to specify a missing value.</simpara>
+<simpara>In either format, values can be specified in any form that Git
+recognizes as an object name.  Commands in any other format or a
+repeated &lt;ref&gt; produce an error.  Command meanings are:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+update
+</term>
+<listitem>
+<simpara>
+        Set &lt;ref&gt; to &lt;newvalue&gt; after verifying &lt;oldvalue&gt;, if given.
+        Specify a zero &lt;newvalue&gt; to ensure the ref does not exist
+        after the update and/or a zero &lt;oldvalue&gt; to make sure the
+        ref does not exist before the update.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+create
+</term>
+<listitem>
+<simpara>
+        Create &lt;ref&gt; with &lt;newvalue&gt; after verifying it does not
+        exist.  The given &lt;newvalue&gt; may not be zero.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+delete
+</term>
+<listitem>
+<simpara>
+        Delete &lt;ref&gt; after verifying it exists with &lt;oldvalue&gt;, if
+        given.  If given, &lt;oldvalue&gt; may not be zero.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+verify
+</term>
+<listitem>
+<simpara>
+        Verify &lt;ref&gt; against &lt;oldvalue&gt; but do not change it.  If
+        &lt;oldvalue&gt; is zero or missing, the ref must not exist.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+option
+</term>
+<listitem>
+<simpara>
+        Modify behavior of the next command naming a &lt;ref&gt;.
+        The only valid option is <literal>no-deref</literal> to avoid dereferencing
+        a symbolic ref.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+start
+</term>
+<listitem>
+<simpara>
+        Start a transaction. In contrast to a non-transactional session, a
+        transaction will automatically abort if the session ends without an
+        explicit commit. This command may create a new empty transaction when
+        the current one has been committed or aborted already.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+prepare
+</term>
+<listitem>
+<simpara>
+        Prepare to commit the transaction. This will create lock files for all
+        queued reference updates. If one reference could not be locked, the
+        transaction will be aborted.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+commit
+</term>
+<listitem>
+<simpara>
+        Commit all reference updates queued for the transaction, ending the
+        transaction.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+abort
+</term>
+<listitem>
+<simpara>
+        Abort the transaction, releasing all locks if the transaction is in
+        prepared state.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>If all &lt;ref&gt;s can be locked with matching &lt;oldvalue&gt;s
+simultaneously, all modifications are performed.  Otherwise, no
+modifications are performed.  Note that while each individual
+&lt;ref&gt; is updated or deleted atomically, a concurrent reader may
+still see a subset of the modifications.</simpara>
+</refsect1>
+<refsect1 id="_logging_updates">
+<title>LOGGING UPDATES</title>
+<simpara>If config parameter "core.logAllRefUpdates" is true and the ref is one
+under "refs/heads/", "refs/remotes/", "refs/notes/", or a pseudoref
+like HEAD or ORIG_HEAD; or the file "$GIT_DIR/logs/&lt;ref&gt;" exists then
+<literal>git update-ref</literal> will append a line to the log file
+"$GIT_DIR/logs/&lt;ref&gt;" (dereferencing all symbolic refs before creating
+the log name) describing the change in ref value.  Log lines are
+formatted as:</simpara>
+<literallayout class="monospaced">oldsha1 SP newsha1 SP committer LF</literallayout>
+<simpara>Where "oldsha1" is the 40 character hexadecimal value previously
+stored in &lt;ref&gt;, "newsha1" is the 40 character hexadecimal value of
+&lt;newvalue&gt; and "committer" is the committer&#8217;s name, email address
+and date in the standard Git committer ident format.</simpara>
+<simpara>Optionally with -m:</simpara>
+<literallayout class="monospaced">oldsha1 SP newsha1 SP committer TAB message LF</literallayout>
+<simpara>Where all fields are as described above and "message" is the
+value supplied to the -m option.</simpara>
+<simpara>An update will fail (without changing &lt;ref&gt;) if the current user is
+unable to create a new log file, append to the existing log file
+or does not have committer information available.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

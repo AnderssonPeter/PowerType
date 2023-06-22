@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-web&#45;&#45;browse</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-web--browse</refname>
+  <refpurpose>Git helper script to launch a web browser</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git web&#45;&#45;browse</emphasis> [&lt;options&gt;] &lt;url|file&gt;&#8230;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>This script tries, as much as possible, to display the URLs and FILEs
+that are passed as arguments, as HTML pages in new tabs on an already
+opened web browser.</simpara>
+<simpara>The following browsers (or commands) are currently supported:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+firefox (this is the default under X Window when not using KDE)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+iceweasel
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+seamonkey
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+iceape
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+chromium (also supported as chromium-browser)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+google-chrome (also supported as chrome)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+konqueror (this is the default under KDE, see <emphasis>Note about konqueror</emphasis> below)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+opera
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+w3m (this is the default outside graphical environments)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+elinks
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+links
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+lynx
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+dillo
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+open (this is the default under Mac OS X GUI)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+start (this is the default under MinGW)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+cygstart (this is the default under Cygwin)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+xdg-open
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>Custom commands may also be specified.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-b &lt;browser&gt;
+</term>
+<term>
+--browser=&lt;browser&gt;
+</term>
+<listitem>
+<simpara>
+        Use the specified browser. It must be in the list of supported
+        browsers.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-t &lt;browser&gt;
+</term>
+<term>
+--tool=&lt;browser&gt;
+</term>
+<listitem>
+<simpara>
+        Same as above.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-c &lt;conf.var&gt;
+</term>
+<term>
+--config=&lt;conf.var&gt;
+</term>
+<listitem>
+<simpara>
+        CONF.VAR is looked up in the Git config files. If it&#8217;s set,
+        then its value specifies the browser that should be used.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_configuration_variables">
+<title>CONFIGURATION VARIABLES</title>
+<refsect2 id="_conf_var_from_c_option_and_web_browser">
+<title>CONF.VAR (from -c option) and web.browser</title>
+<simpara>The web browser can be specified using a configuration variable passed
+with the -c (or --config) command-line option, or the <literal>web.browser</literal>
+configuration variable if the former is not used.</simpara>
+</refsect2>
+<refsect2 id="_browser_lt_tool_gt_path">
+<title>browser.&lt;tool&gt;.path</title>
+<simpara>You can explicitly provide a full path to your preferred browser by
+setting the configuration variable <literal>browser.&lt;tool&gt;.path</literal>. For example,
+you can configure the absolute path to firefox by setting
+<emphasis>browser.firefox.path</emphasis>. Otherwise, <emphasis>git web&#45;&#45;browse</emphasis> assumes the tool
+is available in PATH.</simpara>
+</refsect2>
+<refsect2 id="_browser_lt_tool_gt_cmd">
+<title>browser.&lt;tool&gt;.cmd</title>
+<simpara>When the browser, specified by options or configuration variables, is
+not among the supported ones, then the corresponding
+<literal>browser.&lt;tool&gt;.cmd</literal> configuration variable will be looked up. If this
+variable exists then <emphasis>git web&#45;&#45;browse</emphasis> will treat the specified tool
+as a custom command and will use a shell eval to run the command with
+the URLs passed as arguments.</simpara>
+</refsect2>
+</refsect1>
+<refsect1 id="_note_about_konqueror">
+<title>NOTE ABOUT KONQUEROR</title>
+<simpara>When <emphasis>konqueror</emphasis> is specified by a command-line option or a
+configuration variable, we launch <emphasis>kfmclient</emphasis> to try to open the HTML
+man page on an already opened konqueror in a new tab if possible.</simpara>
+<simpara>For consistency, we also try such a trick if <emphasis>browser.konqueror.path</emphasis> is
+set to something like <literal>A_PATH_TO/konqueror</literal>. That means we will try to
+launch <literal>A_PATH_TO/kfmclient</literal> instead.</simpara>
+<simpara>If you really want to use <emphasis>konqueror</emphasis>, then you can use something like
+the following:</simpara>
+<literallayout class="monospaced">        [web]
+                browser = konq
+
+        [browser "konq"]
+                cmd = A_PATH_TO/konqueror</literallayout><simpara></simpara>
+<refsect2 id="_note_about_git_config_global">
+<title>Note about git-config --global</title>
+<simpara>Note that these configuration variables should probably be set using
+the <literal>--global</literal> flag, for example like this:</simpara>
+<literallayout class="monospaced">$ git config --global web.browser firefox</literallayout><simpara></simpara>
+<simpara>as they are probably more user specific than repository specific.
+See <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for more information about this.</simpara>
+</refsect2>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

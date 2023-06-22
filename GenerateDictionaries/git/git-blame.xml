@@ -1,0 +1,700 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-blame</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-blame</refname>
+  <refpurpose>Show what revision and author last modified each line of a file</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git blame</emphasis> [-c] [-b] [-l] [--root] [-t] [-f] [-n] [-s] [-e] [-p] [-w] [--incremental]
+            [-L &lt;range&gt;] [-S &lt;revs-file&gt;] [-M] [-C] [-C] [-C] [--since=&lt;date&gt;]
+            [--ignore-rev &lt;rev&gt;] [--ignore-revs-file &lt;file&gt;]
+            [--color-lines] [--color-by-age] [--progress] [--abbrev=&lt;n&gt;]
+            [&lt;rev&gt; | --contents &lt;file&gt; | --reverse &lt;rev&gt;..&lt;rev&gt;] [--] &lt;file&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Annotates each line in the given file with information from the revision which
+last modified the line. Optionally, start annotating from the given revision.</simpara>
+<simpara>When specified one or more times, <literal>-L</literal> restricts annotation to the requested
+lines.</simpara>
+<simpara>The origin of lines is automatically followed across whole-file
+renames (currently there is no option to turn the rename-following
+off). To follow lines moved from one file to another, or to follow
+lines that were copied and pasted from another file, etc., see the
+<literal>-C</literal> and <literal>-M</literal> options.</simpara>
+<simpara>The report does not tell you anything about lines which have been deleted or
+replaced; you need to use a tool such as <emphasis>git diff</emphasis> or the "pickaxe"
+interface briefly mentioned in the following paragraph.</simpara>
+<simpara>Apart from supporting file annotation, Git also supports searching the
+development history for when a code snippet occurred in a change. This makes it
+possible to track when a code snippet was added to a file, moved or copied
+between files, and eventually deleted or replaced. It works by searching for
+a text string in the diff. A small example of the pickaxe interface
+that searches for <literal>blame_usage</literal>:</simpara>
+<literallayout class="monospaced">$ git log --pretty=oneline -S'blame_usage'
+5040f17eba15504bad66b14a645bddd9b015ebb7 blame -S &lt;ancestry-file&gt;
+ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-b
+</term>
+<listitem>
+<simpara>
+        Show blank SHA-1 for boundary commits.  This can also
+        be controlled via the <literal>blame.blankBoundary</literal> config option.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--root
+</term>
+<listitem>
+<simpara>
+        Do not treat root commits as boundaries.  This can also be
+        controlled via the <literal>blame.showRoot</literal> config option.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--show-stats
+</term>
+<listitem>
+<simpara>
+        Include additional statistics at the end of blame output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-L &lt;start&gt;,&lt;end&gt;
+</term>
+<term>
+-L :&lt;funcname&gt;
+</term>
+<listitem>
+<simpara>
+        Annotate only the line range given by <emphasis>&lt;start&gt;,&lt;end&gt;</emphasis>,
+        or by the function name regex <emphasis>&lt;funcname&gt;</emphasis>.
+        May be specified multiple times. Overlapping ranges are allowed.
+</simpara>
+<simpara><emphasis>&lt;start&gt;</emphasis> and <emphasis>&lt;end&gt;</emphasis> are optional. <literal>-L &lt;start&gt;</literal> or <literal>-L &lt;start&gt;,</literal> spans from
+<emphasis>&lt;start&gt;</emphasis> to end of file. <literal>-L ,&lt;end&gt;</literal> spans from start of file to <emphasis>&lt;end&gt;</emphasis>.</simpara>
+<simpara><emphasis>&lt;start&gt;</emphasis> and <emphasis>&lt;end&gt;</emphasis> can take one of these forms:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+number
+</simpara>
+<simpara>If <emphasis>&lt;start&gt;</emphasis> or <emphasis>&lt;end&gt;</emphasis> is a number, it specifies an
+absolute line number (lines count from 1).</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>/regex/</literal>
+</simpara>
+<simpara>This form will use the first line matching the given
+POSIX regex. If <emphasis>&lt;start&gt;</emphasis> is a regex, it will search from the end of
+the previous <literal>-L</literal> range, if any, otherwise from the start of file.
+If <emphasis>&lt;start&gt;</emphasis> is <literal>^/regex/</literal>, it will search from the start of file.
+If <emphasis>&lt;end&gt;</emphasis> is a regex, it will search
+starting at the line given by <emphasis>&lt;start&gt;</emphasis>.</simpara>
+</listitem>
+<listitem>
+<simpara>
++offset or -offset
+</simpara>
+<simpara>This is only valid for <emphasis>&lt;end&gt;</emphasis> and will specify a number
+of lines before or after the line given by <emphasis>&lt;start&gt;</emphasis>.</simpara>
+</listitem>
+</itemizedlist>
+<simpara>If <literal>:&lt;funcname&gt;</literal> is given in place of <emphasis>&lt;start&gt;</emphasis> and <emphasis>&lt;end&gt;</emphasis>, it is a
+regular expression that denotes the range from the first funcname line
+that matches <emphasis>&lt;funcname&gt;</emphasis>, up to the next funcname line. <literal>:&lt;funcname&gt;</literal>
+searches from the end of the previous <literal>-L</literal> range, if any, otherwise
+from the start of file. <literal>^:&lt;funcname&gt;</literal> searches from the start of
+file. The function names are determined in the same way as <literal>git diff</literal>
+works out patch hunk headers (see <emphasis>Defining a custom hunk-header</emphasis>
+in <citerefentry>
+<refentrytitle>gitattributes</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>).</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-l
+</term>
+<listitem>
+<simpara>
+        Show long rev (Default: off).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-t
+</term>
+<listitem>
+<simpara>
+        Show raw timestamp (Default: off).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-S &lt;revs-file&gt;
+</term>
+<listitem>
+<simpara>
+        Use revisions from revs-file instead of calling <citerefentry>
+<refentrytitle>git-rev-list</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--reverse &lt;rev&gt;..&lt;rev&gt;
+</term>
+<listitem>
+<simpara>
+        Walk history forward instead of backward. Instead of showing
+        the revision in which a line appeared, this shows the last
+        revision in which a line has existed. This requires a range of
+        revision like START..END where the path to blame exists in
+        START.  <literal>git blame --reverse START</literal> is taken as <literal>git blame
+        --reverse START..HEAD</literal> for convenience.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--first-parent
+</term>
+<listitem>
+<simpara>
+        Follow only the first parent commit upon seeing a merge
+        commit. This option can be used to determine when a line
+        was introduced to a particular integration branch, rather
+        than when it was introduced to the history overall.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-p
+</term>
+<term>
+--porcelain
+</term>
+<listitem>
+<simpara>
+        Show in a format designed for machine consumption.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--line-porcelain
+</term>
+<listitem>
+<simpara>
+        Show the porcelain format, but output commit information for
+        each line, not just the first time a commit is referenced.
+        Implies --porcelain.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--incremental
+</term>
+<listitem>
+<simpara>
+        Show the result incrementally in a format designed for
+        machine consumption.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--encoding=&lt;encoding&gt;
+</term>
+<listitem>
+<simpara>
+        Specifies the encoding used to output author names
+        and commit summaries. Setting it to <literal>none</literal> makes blame
+        output unconverted data. For more information see the
+        discussion about encoding in the <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+        manual page.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--contents &lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        When &lt;rev&gt; is not specified, the command annotates the
+        changes starting backwards from the working tree copy.
+        This flag makes the command pretend as if the working
+        tree copy has the contents of the named file (specify
+        <literal>-</literal> to make the command read from the standard input).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--date &lt;format&gt;
+</term>
+<listitem>
+<simpara>
+        Specifies the format used to output dates. If --date is not
+        provided, the value of the blame.date config variable is
+        used. If the blame.date config variable is also not set, the
+        iso format is used. For supported values, see the discussion
+        of the --date option at <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]progress
+</term>
+<listitem>
+<simpara>
+        Progress status is reported on the standard error stream
+        by default when it is attached to a terminal. This flag
+        enables progress reporting even if not attached to a
+        terminal. Can&#8217;t use <literal>--progress</literal> together with <literal>--porcelain</literal>
+        or <literal>--incremental</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-M[&lt;num&gt;]
+</term>
+<listitem>
+<simpara>
+        Detect moved or copied lines within a file. When a commit
+        moves or copies a block of lines (e.g. the original file
+        has A and then B, and the commit changes it to B and then
+        A), the traditional <emphasis>blame</emphasis> algorithm notices only half of
+        the movement and typically blames the lines that were moved
+        up (i.e. B) to the parent and assigns blame to the lines that
+        were moved down (i.e. A) to the child commit.  With this
+        option, both groups of lines are blamed on the parent by
+        running extra passes of inspection.
+</simpara>
+<simpara>&lt;num&gt; is optional but it is the lower bound on the number of
+alphanumeric characters that Git must detect as moving/copying
+within a file for it to associate those lines with the parent
+commit. The default value is 20.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-C[&lt;num&gt;]
+</term>
+<listitem>
+<simpara>
+        In addition to <literal>-M</literal>, detect lines moved or copied from other
+        files that were modified in the same commit.  This is
+        useful when you reorganize your program and move code
+        around across files.  When this option is given twice,
+        the command additionally looks for copies from other
+        files in the commit that creates the file. When this
+        option is given three times, the command additionally
+        looks for copies from other files in any commit.
+</simpara>
+<simpara>&lt;num&gt; is optional but it is the lower bound on the number of
+alphanumeric characters that Git must detect as moving/copying
+between files for it to associate those lines with the parent
+commit. And the default value is 40. If there are more than one
+<literal>-C</literal> options given, the &lt;num&gt; argument of the last <literal>-C</literal> will
+take effect.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-rev &lt;rev&gt;
+</term>
+<listitem>
+<simpara>
+        Ignore changes made by the revision when assigning blame, as if the
+        change never happened.  Lines that were changed or added by an ignored
+        commit will be blamed on the previous commit that changed that line or
+        nearby lines.  This option may be specified multiple times to ignore
+        more than one revision.  If the <literal>blame.markIgnoredLines</literal> config option
+        is set, then lines that were changed by an ignored commit and attributed to
+        another commit will be marked with a <literal>?</literal> in the blame output.  If the
+        <literal>blame.markUnblamableLines</literal> config option is set, then those lines touched
+        by an ignored commit that we could not attribute to another revision are
+        marked with a <emphasis>*</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-revs-file &lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        Ignore revisions listed in <literal>file</literal>, which must be in the same format as an
+        <literal>fsck.skipList</literal>.  This option may be repeated, and these files will be
+        processed after any files specified with the <literal>blame.ignoreRevsFile</literal> config
+        option.  An empty file name, <literal>""</literal>, will clear the list of revs from
+        previously processed files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--color-lines
+</term>
+<listitem>
+<simpara>
+        Color line annotations in the default format differently if they come from
+        the same commit as the preceding line. This makes it easier to distinguish
+        code blocks introduced by different commits. The color defaults to cyan and
+        can be adjusted using the <literal>color.blame.repeatedLines</literal> config option.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--color-by-age
+</term>
+<listitem>
+<simpara>
+        Color line annotations depending on the age of the line in the default format.
+        The <literal>color.blame.highlightRecent</literal> config option controls what color is used for
+        each range of age.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-h
+</term>
+<listitem>
+<simpara>
+        Show help message.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-c
+</term>
+<listitem>
+<simpara>
+        Use the same output mode as <citerefentry>
+<refentrytitle>git-annotate</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> (Default: off).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--score-debug
+</term>
+<listitem>
+<simpara>
+        Include debugging information related to the movement of
+        lines between files (see <literal>-C</literal>) and lines moved within a
+        file (see <literal>-M</literal>).  The first number listed is the score.
+        This is the number of alphanumeric characters detected
+        as having been moved between or within files.  This must be above
+        a certain threshold for <emphasis>git blame</emphasis> to consider those lines
+        of code to have been moved.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-f
+</term>
+<term>
+--show-name
+</term>
+<listitem>
+<simpara>
+        Show the filename in the original commit.  By default
+        the filename is shown if there is any line that came from a
+        file with a different name, due to rename detection.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-n
+</term>
+<term>
+--show-number
+</term>
+<listitem>
+<simpara>
+        Show the line number in the original commit (Default: off).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-s
+</term>
+<listitem>
+<simpara>
+        Suppress the author name and timestamp from the output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-e
+</term>
+<term>
+--show-email
+</term>
+<listitem>
+<simpara>
+        Show the author email instead of author name (Default: off).
+        This can also be controlled via the <literal>blame.showEmail</literal> config
+        option.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-w
+</term>
+<listitem>
+<simpara>
+        Ignore whitespace when comparing the parent&#8217;s version and
+        the child&#8217;s to find where the lines came from.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--abbrev=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        Instead of using the default 7+1 hexadecimal digits as the
+        abbreviated object name, use &lt;m&gt;+1 digits, where &lt;m&gt; is at
+        least &lt;n&gt; but ensures the commit object names are unique.
+        Note that 1 column
+        is used for a caret to mark the boundary commit.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_the_default_format">
+<title>THE DEFAULT FORMAT</title>
+<simpara>When neither <literal>--porcelain</literal> nor <literal>--incremental</literal> option is specified,
+<literal>git blame</literal> will output annotation for each line with:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+abbreviated object name for the commit the line came from;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+author ident (by default author name and date, unless <literal>-s</literal> or <literal>-e</literal>
+  is specified); and
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+line number
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>before the line contents.</simpara>
+</refsect1>
+<refsect1 id="_the_porcelain_format">
+<title>THE PORCELAIN FORMAT</title>
+<simpara>In this format, each line is output after a header; the
+header at the minimum has the first line which has:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+40-byte SHA-1 of the commit the line is attributed to;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the line number of the line in the original file;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the line number of the line in the final file;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+on a line that starts a group of lines from a different
+  commit than the previous one, the number of lines in this
+  group.  On subsequent lines this field is absent.
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>This header line is followed by the following information
+at least once for each commit:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+the author name ("author"), email ("author-mail"), time
+  ("author-time"), and time zone ("author-tz"); similarly
+  for committer.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the filename in the commit that the line is attributed to.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the first line of the commit log message ("summary").
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>The contents of the actual line is output after the above
+header, prefixed by a TAB. This is to allow adding more
+header elements later.</simpara>
+<simpara>The porcelain format generally suppresses commit information that has
+already been seen. For example, two lines that are blamed to the same
+commit will both be shown, but the details for that commit will be shown
+only once. This is more efficient, but may require more state be kept by
+the reader. The <literal>--line-porcelain</literal> option can be used to output full
+commit information for each line, allowing simpler (but less efficient)
+usage like:</simpara>
+<literallayout class="monospaced"># count the number of lines attributed to each author
+git blame --line-porcelain file |
+sed -n 's/^author //p' |
+sort | uniq -c | sort -rn</literallayout>
+</refsect1>
+<refsect1 id="_specifying_ranges">
+<title>SPECIFYING RANGES</title>
+<simpara>Unlike <emphasis>git blame</emphasis> and <emphasis>git annotate</emphasis> in older versions of git, the extent
+of the annotation can be limited to both line ranges and revision
+ranges. The <literal>-L</literal> option, which limits annotation to a range of lines, may be
+specified multiple times.</simpara>
+<simpara>When you are interested in finding the origin for
+lines 40-60 for file <literal>foo</literal>, you can use the <literal>-L</literal> option like so
+(they mean the same thing&#8201;&#8212;&#8201;both ask for 21 lines starting at
+line 40):</simpara>
+<literallayout class="monospaced">git blame -L 40,60 foo
+git blame -L 40,+21 foo</literallayout>
+<simpara>Also you can use a regular expression to specify the line range:</simpara>
+<literallayout class="monospaced">git blame -L '/^sub hello {/,/^}$/' foo</literallayout>
+<simpara>which limits the annotation to the body of the <literal>hello</literal> subroutine.</simpara>
+<simpara>When you are not interested in changes older than version
+v2.6.18, or changes older than 3 weeks, you can use revision
+range specifiers  similar to <emphasis>git rev-list</emphasis>:</simpara>
+<literallayout class="monospaced">git blame v2.6.18.. -- foo
+git blame --since=3.weeks -- foo</literallayout>
+<simpara>When revision range specifiers are used to limit the annotation,
+lines that have not changed since the range boundary (either the
+commit v2.6.18 or the most recent commit that is more than 3
+weeks old in the above example) are blamed for that range
+boundary commit.</simpara>
+<simpara>A particularly useful way is to see if an added file has lines
+created by copy-and-paste from existing files.  Sometimes this
+indicates that the developer was being sloppy and did not
+refactor the code properly.  You can first find the commit that
+introduced the file with:</simpara>
+<literallayout class="monospaced">git log --diff-filter=A --pretty=short -- foo</literallayout>
+<simpara>and then annotate the change between the commit and its
+parents, using <literal>commit^!</literal> notation:</simpara>
+<literallayout class="monospaced">git blame -C -C -f $commit^! -- foo</literallayout>
+</refsect1>
+<refsect1 id="_incremental_output">
+<title>INCREMENTAL OUTPUT</title>
+<simpara>When called with <literal>--incremental</literal> option, the command outputs the
+result as it is built.  The output generally will talk about
+lines touched by more recent commits first (i.e. the lines will
+be annotated out of order) and is meant to be used by
+interactive viewers.</simpara>
+<simpara>The output format is similar to the Porcelain format, but it
+does not contain the actual lines from the file that is being
+annotated.</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+Each blame entry always starts with a line of:
+</simpara>
+<literallayout class="monospaced">&lt;40-byte hex sha1&gt; &lt;sourceline&gt; &lt;resultline&gt; &lt;num_lines&gt;</literallayout>
+<simpara>Line numbers count from 1.</simpara>
+</listitem>
+<listitem>
+<simpara>
+The first time that a commit shows up in the stream, it has various
+  other information about it printed out with a one-word tag at the
+  beginning of each line describing the extra commit information (author,
+  email, committer, dates, summary, etc.).
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Unlike the Porcelain format, the filename information is always
+  given and terminates the entry:
+</simpara>
+<literallayout class="monospaced">"filename" &lt;whitespace-quoted-filename-goes-here&gt;</literallayout>
+<simpara>and thus it is really quite easy to parse for some line- and word-oriented
+parser (which should be quite natural for most scripting languages).</simpara>
+<note><simpara>For people who do parsing: to make it more robust, just ignore any
+lines between the first and last one ("&lt;sha1&gt;" and "filename" lines)
+where you do not recognize the tag words (or care about that particular
+one) at the beginning of the "extended information" lines. That way, if
+there is ever added information (like the commit encoding or extended
+commit commentary), a blame viewer will not care.</simpara></note>
+</listitem>
+</orderedlist>
+</refsect1>
+<refsect1 id="_mapping_authors">
+<title>MAPPING AUTHORS</title>
+<simpara>See <citerefentry>
+<refentrytitle>gitmailmap</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>.</simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-annotate</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-update-server-info</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-update-server-info</refname>
+  <refpurpose>Update auxiliary info file to help dumb servers</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git update-server-info</emphasis></literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>A dumb server that does not do on-the-fly pack generations must
+have some auxiliary information files in $GIT_DIR/info and
+$GIT_OBJECT_DIRECTORY/info directories to help clients discover
+what references and packs the server has.  This command
+generates such auxiliary files.</simpara>
+</refsect1>
+<refsect1 id="_output">
+<title>OUTPUT</title>
+<simpara>Currently the command updates the following files.  Please see
+<citerefentry>
+<refentrytitle>gitrepository-layout</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry> for description of
+what they are for:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+objects/info/packs
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+info/refs
+</simpara>
+</listitem>
+</itemizedlist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

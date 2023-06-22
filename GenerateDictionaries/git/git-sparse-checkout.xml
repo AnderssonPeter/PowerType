@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-sparse-checkout</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-sparse-checkout</refname>
+  <refpurpose>Initialize and modify the sparse-checkout configuration, which reduces the checkout to a set of paths given by a list of patterns.</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git sparse-checkout &lt;subcommand&gt; [options]</emphasis></literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Initialize and modify the sparse-checkout configuration, which reduces
+the checkout to a set of paths given by a list of patterns.</simpara>
+<simpara>THIS COMMAND IS EXPERIMENTAL. ITS BEHAVIOR, AND THE BEHAVIOR OF OTHER
+COMMANDS IN THE PRESENCE OF SPARSE-CHECKOUTS, WILL LIKELY CHANGE IN
+THE FUTURE.</simpara>
+</refsect1>
+<refsect1 id="_commands">
+<title>COMMANDS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>list</emphasis>
+</term>
+<listitem>
+<simpara>
+        Describe the patterns in the sparse-checkout file.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>init</emphasis>
+</term>
+<listitem>
+<simpara>
+        Enable the <literal>core.sparseCheckout</literal> setting. If the
+        sparse-checkout file does not exist, then populate it with
+        patterns that match every file in the root directory and
+        no other directories, then will remove all directories tracked
+        by Git. Add patterns to the sparse-checkout file to
+        repopulate the working directory.
+</simpara>
+<simpara>To avoid interfering with other worktrees, it first enables the
+<literal>extensions.worktreeConfig</literal> setting and makes sure to set the
+<literal>core.sparseCheckout</literal> setting in the worktree-specific config file.</simpara>
+<simpara>When <literal>--cone</literal> is provided, the <literal>core.sparseCheckoutCone</literal> setting is
+also set, allowing for better performance with a limited set of
+patterns (see <emphasis>CONE PATTERN SET</emphasis> below).</simpara>
+<simpara>Use the <literal>--[no-]sparse-index</literal> option to toggle the use of the sparse
+index format. This reduces the size of the index to be more closely
+aligned with your sparse-checkout definition. This can have significant
+performance advantages for commands such as <literal>git status</literal> or <literal>git add</literal>.
+This feature is still experimental. Some commands might be slower with
+a sparse index until they are properly integrated with the feature.</simpara>
+<simpara><emphasis role="strong">WARNING:</emphasis> Using a sparse index requires modifying the index in a way
+that is not completely understood by external tools. If you have trouble
+with this compatibility, then run <literal>git sparse-checkout init --no-sparse-index</literal>
+to rewrite your index to not be sparse. Older versions of Git will not
+understand the sparse directory entries index extension and may fail to
+interact with your repository until it is disabled.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>set</emphasis>
+</term>
+<listitem>
+<simpara>
+        Write a set of patterns to the sparse-checkout file, as given as
+        a list of arguments following the <emphasis>set</emphasis> subcommand. Update the
+        working directory to match the new patterns. Enable the
+        core.sparseCheckout config setting if it is not already enabled.
+</simpara>
+<simpara>When the <literal>--stdin</literal> option is provided, the patterns are read from
+standard in as a newline-delimited list instead of from the arguments.</simpara>
+<simpara>When <literal>core.sparseCheckoutCone</literal> is enabled, the input list is considered a
+list of directories instead of sparse-checkout patterns. The command writes
+patterns to the sparse-checkout file to include all files contained in those
+directories (recursively) as well as files that are siblings of ancestor
+directories. The input format matches the output of <literal>git ls-tree --name-only</literal>.
+This includes interpreting pathnames that begin with a double quote (") as
+C-style quoted strings.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>add</emphasis>
+</term>
+<listitem>
+<simpara>
+        Update the sparse-checkout file to include additional patterns.
+        By default, these patterns are read from the command-line arguments,
+        but they can be read from stdin using the <literal>--stdin</literal> option. When
+        <literal>core.sparseCheckoutCone</literal> is enabled, the given patterns are interpreted
+        as directory names as in the <emphasis>set</emphasis> subcommand.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>reapply</emphasis>
+</term>
+<listitem>
+<simpara>
+        Reapply the sparsity pattern rules to paths in the working tree.
+        Commands like merge or rebase can materialize paths to do their
+        work (e.g. in order to show you a conflict), and other
+        sparse-checkout commands might fail to sparsify an individual file
+        (e.g. because it has unstaged changes or conflicts).  In such
+        cases, it can make sense to run <literal>git sparse-checkout reapply</literal> later
+        after cleaning up affected paths (e.g. resolving conflicts, undoing
+        or committing changes, etc.).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>disable</emphasis>
+</term>
+<listitem>
+<simpara>
+        Disable the <literal>core.sparseCheckout</literal> config setting, and restore the
+        working directory to include all files. Leaves the sparse-checkout
+        file intact so a later <emphasis>git sparse-checkout init</emphasis> command may
+        return the working directory to the same state.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_sparse_checkout">
+<title>SPARSE CHECKOUT</title>
+<simpara>"Sparse checkout" allows populating the working directory sparsely.
+It uses the skip-worktree bit (see <citerefentry>
+<refentrytitle>git-update-index</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>) to tell
+Git whether a file in the working directory is worth looking at. If
+the skip-worktree bit is set, then the file is ignored in the working
+directory. Git will not populate the contents of those files, which
+makes a sparse checkout helpful when working in a repository with many
+files, but only a few are important to the current user.</simpara>
+<simpara>The <literal>$GIT_DIR/info/sparse-checkout</literal> file is used to define the
+skip-worktree reference bitmap. When Git updates the working
+directory, it updates the skip-worktree bits in the index based
+on this file. The files matching the patterns in the file will
+appear in the working directory, and the rest will not.</simpara>
+<simpara>To enable the sparse-checkout feature, run <literal>git sparse-checkout init</literal> to
+initialize a simple sparse-checkout file and enable the <literal>core.sparseCheckout</literal>
+config setting. Then, run <literal>git sparse-checkout set</literal> to modify the patterns in
+the sparse-checkout file.</simpara>
+<simpara>To repopulate the working directory with all files, use the
+<literal>git sparse-checkout disable</literal> command.</simpara>
+</refsect1>
+<refsect1 id="_full_pattern_set">
+<title>FULL PATTERN SET</title>
+<simpara>By default, the sparse-checkout file uses the same syntax as <literal>.gitignore</literal>
+files.</simpara>
+<simpara>While <literal>$GIT_DIR/info/sparse-checkout</literal> is usually used to specify what
+files are included, you can also specify what files are <emphasis>not</emphasis> included,
+using negative patterns. For example, to remove the file <literal>unwanted</literal>:</simpara>
+<literallayout class="monospaced">/*
+!unwanted</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_cone_pattern_set">
+<title>CONE PATTERN SET</title>
+<simpara>The full pattern set allows for arbitrary pattern matches and complicated
+inclusion/exclusion rules. These can result in O(N*M) pattern matches when
+updating the index, where N is the number of patterns and M is the number
+of paths in the index. To combat this performance issue, a more restricted
+pattern set is allowed when <literal>core.sparseCheckoutCone</literal> is enabled.</simpara>
+<simpara>The accepted patterns in the cone pattern set are:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+<emphasis role="strong">Recursive:</emphasis> All paths inside a directory are included.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<emphasis role="strong">Parent:</emphasis> All files immediately inside a directory are included.
+</simpara>
+</listitem>
+</orderedlist>
+<simpara>In addition to the above two patterns, we also expect that all files in the
+root directory are included. If a recursive pattern is added, then all
+leading directories are added as parent patterns.</simpara>
+<simpara>By default, when running <literal>git sparse-checkout init</literal>, the root directory is
+added as a parent pattern. At this point, the sparse-checkout file contains
+the following patterns:</simpara>
+<literallayout class="monospaced">/*
+!/*/</literallayout><simpara></simpara>
+<simpara>This says "include everything in root, but nothing two levels below root."</simpara>
+<simpara>When in cone mode, the <literal>git sparse-checkout set</literal> subcommand takes a list of
+directories instead of a list of sparse-checkout patterns. In this mode,
+the command <literal>git sparse-checkout set A/B/C</literal> sets the directory <literal>A/B/C</literal> as
+a recursive pattern, the directories <literal>A</literal> and <literal>A/B</literal> are added as parent
+patterns. The resulting sparse-checkout file is now</simpara>
+<literallayout class="monospaced">/*
+!/*/
+/A/
+!/A/*/
+/A/B/
+!/A/B/*/
+/A/B/C/</literallayout><simpara></simpara>
+<simpara>Here, order matters, so the negative patterns are overridden by the positive
+patterns that appear lower in the file.</simpara>
+<simpara>If <literal>core.sparseCheckoutCone=true</literal>, then Git will parse the sparse-checkout file
+expecting patterns of these types. Git will warn if the patterns do not match.
+If the patterns do match the expected format, then Git will use faster hash-
+based algorithms to compute inclusion in the sparse-checkout.</simpara>
+<simpara>In the cone mode case, the <literal>git sparse-checkout list</literal> subcommand will list the
+directories that define the recursive patterns. For the example sparse-checkout
+file above, the output is as follows:</simpara>
+<literallayout class="monospaced">$ git sparse-checkout list
+A/B/C</literallayout><simpara></simpara>
+<simpara>If <literal>core.ignoreCase=true</literal>, then the pattern-matching algorithm will use a
+case-insensitive check. This corrects for case mismatched filenames in the
+<emphasis>git sparse-checkout set</emphasis> command to reflect the expected cone in the working
+directory.</simpara>
+<simpara>When changing the sparse-checkout patterns in cone mode, Git will inspect each
+tracked directory that is not within the sparse-checkout cone to see if it
+contains any untracked files. If all of those files are ignored due to the
+<literal>.gitignore</literal> patterns, then the directory will be deleted. If any of the
+untracked files within that directory is not ignored, then no deletions will
+occur within that directory and a warning message will appear. If these files
+are important, then reset your sparse-checkout definition so they are included,
+use <literal>git add</literal> and <literal>git commit</literal> to store them, then remove any remaining files
+manually to ensure Git can behave optimally.</simpara>
+</refsect1>
+<refsect1 id="_submodules">
+<title>SUBMODULES</title>
+<simpara>If your repository contains one or more submodules, then submodules
+are populated based on interactions with the <literal>git submodule</literal> command.
+Specifically, <literal>git submodule init -- &lt;path&gt;</literal> will ensure the submodule
+at <literal>&lt;path&gt;</literal> is present, while <literal>git submodule deinit [-f] -- &lt;path&gt;</literal>
+will remove the files for the submodule at <literal>&lt;path&gt;</literal> (including any
+untracked files, uncommitted changes, and unpushed history).  Similar
+to how sparse-checkout removes files from the working tree but still
+leaves entries in the index, deinitialized submodules are removed from
+the working directory but still have an entry in the index.</simpara>
+<simpara>Since submodules may have unpushed changes or untracked files,
+removing them could result in data loss.  Thus, changing sparse
+inclusion/exclusion rules will not cause an already checked out
+submodule to be removed from the working copy.  Said another way, just
+as <literal>checkout</literal> will not cause submodules to be automatically removed or
+initialized even when switching between branches that remove or add
+submodules, using <literal>sparse-checkout</literal> to reduce or expand the scope of
+"interesting" files will not cause submodules to be automatically
+deinitialized or initialized either.</simpara>
+<simpara>Further, the above facts mean that there are multiple reasons that
+"tracked" files might not be present in the working copy: sparsity
+pattern application from sparse-checkout, and submodule initialization
+state.  Thus, commands like <literal>git grep</literal> that work on tracked files in
+the working copy may return results that are limited by either or both
+of these restrictions.</simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-read-tree</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+<citerefentry>
+<refentrytitle>gitignore</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

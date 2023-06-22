@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-fetch-pack</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-fetch-pack</refname>
+  <refpurpose>Receive missing objects from another repository</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git fetch-pack</emphasis> [--all] [--quiet|-q] [--keep|-k] [--thin] [--include-tag]
+        [--upload-pack=&lt;git-upload-pack&gt;]
+        [--depth=&lt;n&gt;] [--no-progress]
+        [-v] &lt;repository&gt; [&lt;refs&gt;&#8230;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Usually you would want to use <emphasis>git fetch</emphasis>, which is a
+higher level wrapper of this command, instead.</simpara>
+<simpara>Invokes <emphasis>git-upload-pack</emphasis> on a possibly remote repository
+and asks it to send objects missing from this repository, to
+update the named heads.  The list of commits available locally
+is found out by scanning the local refs/ hierarchy and sent to
+<emphasis>git-upload-pack</emphasis> running on the other end.</simpara>
+<simpara>This command degenerates to download everything to complete the
+asked refs from the remote side when the local side does not
+have a common ancestor commit.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--all
+</term>
+<listitem>
+<simpara>
+        Fetch all remote refs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin
+</term>
+<listitem>
+<simpara>
+        Take the list of refs from stdin, one per line. If there
+        are refs specified on the command line in addition to this
+        option, then the refs from stdin are processed after those
+        on the command line.
+</simpara>
+<simpara>If <literal>--stateless-rpc</literal> is specified together with this option then
+the list of refs must be in packet format (pkt-line). Each ref must
+be in a separate packet, and the list must end with a flush packet.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-q
+</term>
+<term>
+--quiet
+</term>
+<listitem>
+<simpara>
+        Pass <literal>-q</literal> flag to <emphasis>git unpack-objects</emphasis>; this makes the
+        cloning process less verbose.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-k
+</term>
+<term>
+--keep
+</term>
+<listitem>
+<simpara>
+        Do not invoke <emphasis>git unpack-objects</emphasis> on received data, but
+        create a single packfile out of it instead, and store it
+        in the object database. If provided twice then the pack is
+        locked against repacking.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--thin
+</term>
+<listitem>
+<simpara>
+        Fetch a "thin" pack, which records objects in deltified form based
+        on objects not included in the pack to reduce network traffic.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--include-tag
+</term>
+<listitem>
+<simpara>
+        If the remote side supports it, annotated tags objects will
+        be downloaded on the same connection as the other objects if
+        the object the tag references is downloaded.  The caller must
+        otherwise determine the tags this option made available.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--upload-pack=&lt;git-upload-pack&gt;
+</term>
+<listitem>
+<simpara>
+        Use this to specify the path to <emphasis>git-upload-pack</emphasis> on the
+        remote side, if is not found on your $PATH.
+        Installations of sshd ignores the user&#8217;s environment
+        setup scripts for login shells (e.g. .bash_profile) and
+        your privately installed git may not be found on the system
+        default $PATH.  Another workaround suggested is to set
+        up your $PATH in ".bashrc", but this flag is for people
+        who do not want to pay the overhead for non-interactive
+        shells by having a lean .bashrc file (they set most of
+        the things up in .bash_profile).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--exec=&lt;git-upload-pack&gt;
+</term>
+<listitem>
+<simpara>
+        Same as --upload-pack=&lt;git-upload-pack&gt;.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--depth=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        Limit fetching to ancestor-chains not longer than n.
+        <emphasis>git-upload-pack</emphasis> treats the special depth 2147483647 as
+        infinite even if there is an ancestor-chain that long.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--shallow-since=&lt;date&gt;
+</term>
+<listitem>
+<simpara>
+        Deepen or shorten the history of a shallow repository to
+        include all reachable commits after &lt;date&gt;.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--shallow-exclude=&lt;revision&gt;
+</term>
+<listitem>
+<simpara>
+        Deepen or shorten the history of a shallow repository to
+        exclude commits reachable from a specified remote branch or tag.
+        This option can be specified multiple times.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--deepen-relative
+</term>
+<listitem>
+<simpara>
+        Argument --depth specifies the number of commits from the
+        current shallow boundary instead of from the tip of each
+        remote branch history.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-progress
+</term>
+<listitem>
+<simpara>
+        Do not show the progress.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--check-self-contained-and-connected
+</term>
+<listitem>
+<simpara>
+        Output "connectivity-ok" if the received pack is
+        self-contained and connected.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-v
+</term>
+<listitem>
+<simpara>
+        Run verbosely.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;repository&gt;
+</term>
+<listitem>
+<simpara>
+        The URL to the remote repository.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;refs&gt;&#8230;
+</term>
+<listitem>
+<simpara>
+        The remote heads to update from. This is relative to
+        $GIT_DIR (e.g. "HEAD", "refs/heads/master").  When
+        unspecified, update from all heads the remote side has.
+</simpara>
+<simpara>If the remote has enabled the options <literal>uploadpack.allowTipSHA1InWant</literal>,
+<literal>uploadpack.allowReachableSHA1InWant</literal>, or <literal>uploadpack.allowAnySHA1InWant</literal>,
+they may alternatively be 40-hex sha1s present on the remote.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-fetch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

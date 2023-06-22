@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-var</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-var</refname>
+  <refpurpose>Show a Git logical variable</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git var</emphasis> ( -l | &lt;variable&gt; )</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Prints a Git logical variable.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-l
+</term>
+<listitem>
+<simpara>
+        Cause the logical variables to be listed. In addition, all the
+        variables of the Git configuration file .git/config are listed
+        as well. (However, the configuration variables listing functionality
+        is deprecated in favor of <literal>git config -l</literal>.)
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<literallayout class="monospaced">$ git var GIT_AUTHOR_IDENT
+Eric W. Biederman &lt;ebiederm@lnxi.com&gt; 1121223278 -0600</literallayout>
+</refsect1>
+<refsect1 id="_variables">
+<title>VARIABLES</title>
+<variablelist>
+<varlistentry>
+<term>
+GIT_AUTHOR_IDENT
+</term>
+<listitem>
+<simpara>
+    The author of a piece of code.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+GIT_COMMITTER_IDENT
+</term>
+<listitem>
+<simpara>
+    The person who put a piece of code into Git.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+GIT_EDITOR
+</term>
+<listitem>
+<simpara>
+    Text editor for use by Git commands.  The value is meant to be
+    interpreted by the shell when it is used.  Examples: <literal>~/bin/vi</literal>,
+    <literal>$SOME_ENVIRONMENT_VARIABLE</literal>, <literal>"C:\Program Files\Vim\gvim.exe"
+    --nofork</literal>.  The order of preference is the <literal>$GIT_EDITOR</literal>
+    environment variable, then <literal>core.editor</literal> configuration, then
+    <literal>$VISUAL</literal>, then <literal>$EDITOR</literal>, and then the default chosen at compile
+    time, which is usually <emphasis>vi</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+GIT_PAGER
+</term>
+<listitem>
+<simpara>
+    Text viewer for use by Git commands (e.g., <emphasis>less</emphasis>).  The value
+    is meant to be interpreted by the shell.  The order of preference
+    is the <literal>$GIT_PAGER</literal> environment variable, then <literal>core.pager</literal>
+    configuration, then <literal>$PAGER</literal>, and then the default chosen at
+    compile time (usually <emphasis>less</emphasis>).
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-commit-tree</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+<citerefentry>
+<refentrytitle>git-tag</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+<citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-branch</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-branch</refname>
+  <refpurpose>List, create, or delete branches</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git branch</emphasis> [--color[=&lt;when&gt;] | --no-color] [--show-current]
+        [-v [--abbrev=&lt;n&gt; | --no-abbrev]]
+        [--column[=&lt;options&gt;] | --no-column] [--sort=&lt;key&gt;]
+        [--merged [&lt;commit&gt;]] [--no-merged [&lt;commit&gt;]]
+        [--contains [&lt;commit&gt;]] [--no-contains [&lt;commit&gt;]]
+        [--points-at &lt;object&gt;] [--format=&lt;format&gt;]
+        [(-r | --remotes) | (-a | --all)]
+        [--list] [&lt;pattern&gt;&#8230;]
+<emphasis>git branch</emphasis> [--track | --no-track] [-f] &lt;branchname&gt; [&lt;start-point&gt;]
+<emphasis>git branch</emphasis> (--set-upstream-to=&lt;upstream&gt; | -u &lt;upstream&gt;) [&lt;branchname&gt;]
+<emphasis>git branch</emphasis> --unset-upstream [&lt;branchname&gt;]
+<emphasis>git branch</emphasis> (-m | -M) [&lt;oldbranch&gt;] &lt;newbranch&gt;
+<emphasis>git branch</emphasis> (-c | -C) [&lt;oldbranch&gt;] &lt;newbranch&gt;
+<emphasis>git branch</emphasis> (-d | -D) [-r] &lt;branchname&gt;&#8230;
+<emphasis>git branch</emphasis> --edit-description [&lt;branchname&gt;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>If <literal>--list</literal> is given, or if there are no non-option arguments, existing
+branches are listed; the current branch will be highlighted in green and
+marked with an asterisk.  Any branches checked out in linked worktrees will
+be highlighted in cyan and marked with a plus sign. Option <literal>-r</literal> causes the
+remote-tracking branches to be listed,
+and option <literal>-a</literal> shows both local and remote branches.</simpara>
+<simpara>If a <literal>&lt;pattern&gt;</literal>
+is given, it is used as a shell wildcard to restrict the output to
+matching branches. If multiple patterns are given, a branch is shown if
+it matches any of the patterns.</simpara>
+<simpara>Note that when providing a
+<literal>&lt;pattern&gt;</literal>, you must use <literal>--list</literal>; otherwise the command may be interpreted
+as branch creation.</simpara>
+<simpara>With <literal>--contains</literal>, shows only the branches that contain the named commit
+(in other words, the branches whose tip commits are descendants of the
+named commit), <literal>--no-contains</literal> inverts it. With <literal>--merged</literal>, only branches
+merged into the named commit (i.e. the branches whose tip commits are
+reachable from the named commit) will be listed.  With <literal>--no-merged</literal> only
+branches not merged into the named commit will be listed.  If the &lt;commit&gt;
+argument is missing it defaults to <literal>HEAD</literal> (i.e. the tip of the current
+branch).</simpara>
+<simpara>The command&#8217;s second form creates a new branch head named &lt;branchname&gt;
+which points to the current <literal>HEAD</literal>, or &lt;start-point&gt; if given. As a
+special case, for &lt;start-point&gt;, you may use <literal>"A...B"</literal> as a shortcut for
+the merge base of <literal>A</literal> and <literal>B</literal> if there is exactly one merge base. You
+can leave out at most one of <literal>A</literal> and <literal>B</literal>, in which case it defaults to
+<literal>HEAD</literal>.</simpara>
+<simpara>Note that this will create the new branch, but it will not switch the
+working tree to it; use "git switch &lt;newbranch&gt;" to switch to the
+new branch.</simpara>
+<simpara>When a local branch is started off a remote-tracking branch, Git sets up the
+branch (specifically the <literal>branch.&lt;name&gt;.remote</literal> and <literal>branch.&lt;name&gt;.merge</literal>
+configuration entries) so that <emphasis>git pull</emphasis> will appropriately merge from
+the remote-tracking branch. This behavior may be changed via the global
+<literal>branch.autoSetupMerge</literal> configuration flag. That setting can be
+overridden by using the <literal>--track</literal> and <literal>--no-track</literal> options, and
+changed later using <literal>git branch --set-upstream-to</literal>.</simpara>
+<simpara>With a <literal>-m</literal> or <literal>-M</literal> option, &lt;oldbranch&gt; will be renamed to &lt;newbranch&gt;.
+If &lt;oldbranch&gt; had a corresponding reflog, it is renamed to match
+&lt;newbranch&gt;, and a reflog entry is created to remember the branch
+renaming. If &lt;newbranch&gt; exists, -M must be used to force the rename
+to happen.</simpara>
+<simpara>The <literal>-c</literal> and <literal>-C</literal> options have the exact same semantics as <literal>-m</literal> and
+<literal>-M</literal>, except instead of the branch being renamed, it will be copied to a
+new name, along with its config and reflog.</simpara>
+<simpara>With a <literal>-d</literal> or <literal>-D</literal> option, <literal>&lt;branchname&gt;</literal> will be deleted.  You may
+specify more than one branch for deletion.  If the branch currently
+has a reflog then the reflog will also be deleted.</simpara>
+<simpara>Use <literal>-r</literal> together with <literal>-d</literal> to delete remote-tracking branches. Note, that it
+only makes sense to delete remote-tracking branches if they no longer exist
+in the remote repository or if <emphasis>git fetch</emphasis> was configured not to fetch
+them again. See also the <emphasis>prune</emphasis> subcommand of <citerefentry>
+<refentrytitle>git-remote</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for a
+way to clean up all obsolete remote-tracking branches.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-d
+</term>
+<term>
+--delete
+</term>
+<listitem>
+<simpara>
+        Delete a branch. The branch must be fully merged in its
+        upstream branch, or in <literal>HEAD</literal> if no upstream was set with
+        <literal>--track</literal> or <literal>--set-upstream-to</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-D
+</term>
+<listitem>
+<simpara>
+        Shortcut for <literal>--delete --force</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--create-reflog
+</term>
+<listitem>
+<simpara>
+        Create the branch&#8217;s reflog.  This activates recording of
+        all changes made to the branch ref, enabling use of date
+        based sha1 expressions such as "&lt;branchname&gt;@{yesterday}".
+        Note that in non-bare repositories, reflogs are usually
+        enabled by default by the <literal>core.logAllRefUpdates</literal> config option.
+        The negated form <literal>--no-create-reflog</literal> only overrides an earlier
+        <literal>--create-reflog</literal>, but currently does not negate the setting of
+        <literal>core.logAllRefUpdates</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-f
+</term>
+<term>
+--force
+</term>
+<listitem>
+<simpara>
+        Reset &lt;branchname&gt; to &lt;startpoint&gt;, even if &lt;branchname&gt; exists
+        already. Without <literal>-f</literal>, <emphasis>git branch</emphasis> refuses to change an existing branch.
+        In combination with <literal>-d</literal> (or <literal>--delete</literal>), allow deleting the
+        branch irrespective of its merged status, or whether it even
+        points to a valid commit. In combination with
+        <literal>-m</literal> (or <literal>--move</literal>), allow renaming the branch even if the new
+        branch name already exists, the same applies for <literal>-c</literal> (or <literal>--copy</literal>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-m
+</term>
+<term>
+--move
+</term>
+<listitem>
+<simpara>
+        Move/rename a branch, together with its config and reflog.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-M
+</term>
+<listitem>
+<simpara>
+        Shortcut for <literal>--move --force</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-c
+</term>
+<term>
+--copy
+</term>
+<listitem>
+<simpara>
+        Copy a branch, together with its config and reflog.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-C
+</term>
+<listitem>
+<simpara>
+        Shortcut for <literal>--copy --force</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--color[=&lt;when&gt;]
+</term>
+<listitem>
+<simpara>
+        Color branches to highlight current, local, and
+        remote-tracking branches.
+        The value must be always (the default), never, or auto.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-color
+</term>
+<listitem>
+<simpara>
+        Turn off branch colors, even when the configuration file gives the
+        default to color output.
+        Same as <literal>--color=never</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-i
+</term>
+<term>
+--ignore-case
+</term>
+<listitem>
+<simpara>
+        Sorting and filtering branches are case insensitive.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--column[=&lt;options&gt;]
+</term>
+<term>
+--no-column
+</term>
+<listitem>
+<simpara>
+        Display branch listing in columns. See configuration variable
+        <literal>column.branch</literal> for option syntax. <literal>--column</literal> and <literal>--no-column</literal>
+        without options are equivalent to <emphasis>always</emphasis> and <emphasis>never</emphasis> respectively.
+</simpara>
+<simpara>This option is only applicable in non-verbose mode.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-r
+</term>
+<term>
+--remotes
+</term>
+<listitem>
+<simpara>
+        List or delete (if used with -d) the remote-tracking branches.
+        Combine with <literal>--list</literal> to match the optional pattern(s).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-a
+</term>
+<term>
+--all
+</term>
+<listitem>
+<simpara>
+        List both remote-tracking branches and local branches.
+        Combine with <literal>--list</literal> to match optional pattern(s).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-l
+</term>
+<term>
+--list
+</term>
+<listitem>
+<simpara>
+        List branches.  With optional <literal>&lt;pattern&gt;...</literal>, e.g. <literal>git
+        branch --list 'maint-*'</literal>, list only the branches that match
+        the pattern(s).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--show-current
+</term>
+<listitem>
+<simpara>
+        Print the name of the current branch. In detached HEAD state,
+        nothing is printed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-v
+</term>
+<term>
+-vv
+</term>
+<term>
+--verbose
+</term>
+<listitem>
+<simpara>
+        When in list mode,
+        show sha1 and commit subject line for each head, along with
+        relationship to upstream branch (if any). If given twice, print
+        the path of the linked worktree (if any) and the name of the upstream
+        branch, as well (see also <literal>git remote show &lt;remote&gt;</literal>).  Note that the
+        current worktree&#8217;s HEAD will not have its path printed (it will always
+        be your current directory).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-q
+</term>
+<term>
+--quiet
+</term>
+<listitem>
+<simpara>
+        Be more quiet when creating or deleting a branch, suppressing
+        non-error messages.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--abbrev=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        In the verbose listing that show the commit object name,
+        show the shortest prefix that is at least <emphasis>&lt;n&gt;</emphasis> hexdigits
+        long that uniquely refers the object.
+        The default value is 7 and can be overridden by the <literal>core.abbrev</literal>
+        config option.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-abbrev
+</term>
+<listitem>
+<simpara>
+        Display the full sha1s in the output listing rather than abbreviating them.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-t
+</term>
+<term>
+--track
+</term>
+<listitem>
+<simpara>
+        When creating a new branch, set up <literal>branch.&lt;name&gt;.remote</literal> and
+        <literal>branch.&lt;name&gt;.merge</literal> configuration entries to mark the
+        start-point branch as "upstream" from the new branch. This
+        configuration will tell git to show the relationship between the
+        two branches in <literal>git status</literal> and <literal>git branch -v</literal>. Furthermore,
+        it directs <literal>git pull</literal> without arguments to pull from the
+        upstream when the new branch is checked out.
+</simpara>
+<simpara>This behavior is the default when the start point is a remote-tracking branch.
+Set the branch.autoSetupMerge configuration variable to <literal>false</literal> if you
+want <literal>git switch</literal>, <literal>git checkout</literal> and <literal>git branch</literal> to always behave as if <literal>--no-track</literal>
+were given. Set it to <literal>always</literal> if you want this behavior when the
+start-point is either a local or remote-tracking branch.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-track
+</term>
+<listitem>
+<simpara>
+        Do not set up "upstream" configuration, even if the
+        branch.autoSetupMerge configuration variable is true.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--set-upstream
+</term>
+<listitem>
+<simpara>
+        As this option had confusing syntax, it is no longer supported.
+        Please use <literal>--track</literal> or <literal>--set-upstream-to</literal> instead.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-u &lt;upstream&gt;
+</term>
+<term>
+--set-upstream-to=&lt;upstream&gt;
+</term>
+<listitem>
+<simpara>
+        Set up &lt;branchname&gt;'s tracking information so &lt;upstream&gt; is
+        considered &lt;branchname&gt;'s upstream branch. If no &lt;branchname&gt;
+        is specified, then it defaults to the current branch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--unset-upstream
+</term>
+<listitem>
+<simpara>
+        Remove the upstream information for &lt;branchname&gt;. If no branch
+        is specified it defaults to the current branch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--edit-description
+</term>
+<listitem>
+<simpara>
+        Open an editor and edit the text to explain what the branch is
+        for, to be used by various other commands (e.g. <literal>format-patch</literal>,
+        <literal>request-pull</literal>, and <literal>merge</literal> (if enabled)). Multi-line explanations
+        may be used.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--contains [&lt;commit&gt;]
+</term>
+<listitem>
+<simpara>
+        Only list branches which contain the specified commit (HEAD
+        if not specified). Implies <literal>--list</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-contains [&lt;commit&gt;]
+</term>
+<listitem>
+<simpara>
+        Only list branches which don&#8217;t contain the specified commit
+        (HEAD if not specified). Implies <literal>--list</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--merged [&lt;commit&gt;]
+</term>
+<listitem>
+<simpara>
+        Only list branches whose tips are reachable from the
+        specified commit (HEAD if not specified). Implies <literal>--list</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-merged [&lt;commit&gt;]
+</term>
+<listitem>
+<simpara>
+        Only list branches whose tips are not reachable from the
+        specified commit (HEAD if not specified). Implies <literal>--list</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;branchname&gt;
+</term>
+<listitem>
+<simpara>
+        The name of the branch to create or delete.
+        The new branch name must pass all checks defined by
+        <citerefentry>
+<refentrytitle>git-check-ref-format</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.  Some of these checks
+        may restrict the characters allowed in a branch name.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;start-point&gt;
+</term>
+<listitem>
+<simpara>
+        The new branch head will point to this commit.  It may be
+        given as a branch name, a commit-id, or a tag.  If this
+        option is omitted, the current HEAD will be used instead.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;oldbranch&gt;
+</term>
+<listitem>
+<simpara>
+        The name of an existing branch to rename.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;newbranch&gt;
+</term>
+<listitem>
+<simpara>
+        The new name for an existing branch. The same restrictions as for
+        &lt;branchname&gt; apply.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--sort=&lt;key&gt;
+</term>
+<listitem>
+<simpara>
+        Sort based on the key given. Prefix <literal>-</literal> to sort in descending
+        order of the value. You may use the --sort=&lt;key&gt; option
+        multiple times, in which case the last key becomes the primary
+        key. The keys supported are the same as those in <literal>git
+        for-each-ref</literal>. Sort order defaults to the value configured for the
+        <literal>branch.sort</literal> variable if exists, or to sorting based on the
+        full refname (including <literal>refs/...</literal> prefix). This lists
+        detached HEAD (if present) first, then local branches and
+        finally remote-tracking branches. See <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--points-at &lt;object&gt;
+</term>
+<listitem>
+<simpara>
+        Only list branches of the given object.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--format &lt;format&gt;
+</term>
+<listitem>
+<simpara>
+        A string that interpolates <literal>%(fieldname)</literal> from a branch ref being shown
+        and the object it points at.  The format is the same as
+        that of <citerefentry>
+<refentrytitle>git-for-each-ref</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_configuration">
+<title>CONFIGURATION</title>
+<simpara><literal>pager.branch</literal> is only respected when listing branches, i.e., when
+<literal>--list</literal> is used or implied. The default is to use a pager.
+See <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<variablelist>
+<varlistentry>
+<term>
+Start development from a known tag
+</term>
+<listitem>
+<literallayout class="monospaced">$ git clone git://git.kernel.org/pub/scm/.../linux-2.6 my2.6
+$ cd my2.6
+$ git branch my2.6.14 v2.6.14   <co id="CO1-1"/>
+$ git switch my2.6.14</literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO1-1">
+<para>
+This step and the next one could be combined into a single step with
+    "checkout -b my2.6.14 v2.6.14".
+</para>
+</callout>
+</calloutlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Delete an unneeded branch
+</term>
+<listitem>
+<literallayout class="monospaced">$ git clone git://git.kernel.org/.../git.git my.git
+$ cd my.git
+$ git branch -d -r origin/todo origin/html origin/man   <co id="CO2-1"/>
+$ git branch -D test                                    <co id="CO2-2"/></literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO2-1">
+<para>
+Delete the remote-tracking branches "todo", "html" and "man". The next
+    <emphasis>fetch</emphasis> or <emphasis>pull</emphasis> will create them again unless you configure them not to.
+    See <citerefentry>
+<refentrytitle>git-fetch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</para>
+</callout>
+<callout arearefs="CO2-2">
+<para>
+Delete the "test" branch even if the "master" branch (or whichever branch
+    is currently checked out) does not have all commits from the test branch.
+</para>
+</callout>
+</calloutlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Listing branches from a specific remote
+</term>
+<listitem>
+<literallayout class="monospaced">$ git branch -r -l '&lt;remote&gt;/&lt;pattern&gt;'                 <co id="CO3-1"/>
+$ git for-each-ref 'refs/remotes/&lt;remote&gt;/&lt;pattern&gt;'    <co id="CO3-2"/></literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO3-1">
+<para>
+Using <literal>-a</literal> would conflate &lt;remote&gt; with any local branches you happen to
+    have been prefixed with the same &lt;remote&gt; pattern.
+</para>
+</callout>
+<callout arearefs="CO3-2">
+<para>
+<literal>for-each-ref</literal> can take a wide range of options. See <citerefentry>
+<refentrytitle>git-for-each-ref</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+</para>
+</callout>
+</calloutlist>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Patterns will normally need quoting.</simpara>
+</refsect1>
+<refsect1 id="_notes">
+<title>NOTES</title>
+<simpara>If you are creating a branch that you want to switch to immediately,
+it is easier to use the "git switch" command with its <literal>-c</literal> option to
+do the same thing with a single command.</simpara>
+<simpara>The options <literal>--contains</literal>, <literal>--no-contains</literal>, <literal>--merged</literal> and <literal>--no-merged</literal>
+serve four related but different purposes:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+<literal>--contains &lt;commit&gt;</literal> is used to find all branches which will need
+  special attention if &lt;commit&gt; were to be rebased or amended, since those
+  branches contain the specified &lt;commit&gt;.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>--no-contains &lt;commit&gt;</literal> is the inverse of that, i.e. branches that don&#8217;t
+  contain the specified &lt;commit&gt;.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>--merged</literal> is used to find all branches which can be safely deleted,
+  since those branches are fully contained by HEAD.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>--no-merged</literal> is used to find branches which are candidates for merging
+  into HEAD, since those branches are not fully contained by HEAD.
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>When combining multiple <literal>--contains</literal> and <literal>--no-contains</literal> filters, only
+references that contain at least one of the <literal>--contains</literal> commits and
+contain none of the <literal>--no-contains</literal> commits are shown.</simpara>
+<simpara>When combining multiple <literal>--merged</literal> and <literal>--no-merged</literal> filters, only
+references that are reachable from at least one of the <literal>--merged</literal>
+commits and from none of the <literal>--no-merged</literal> commits are shown.</simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-check-ref-format</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-fetch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-remote</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<ulink url="user-manual.html#what-is-a-branch">&#8220;Understanding history: What is
+a branch?&#8221;</ulink> in the Git User&#8217;s Manual.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-revert</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-revert</refname>
+  <refpurpose>Revert some existing commits</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git revert</emphasis> [--[no-]edit] [-n] [-m parent-number] [-s] [-S[&lt;keyid&gt;]] &lt;commit&gt;&#8230;
+<emphasis>git revert</emphasis> (--continue | --skip | --abort | --quit)</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Given one or more existing commits, revert the changes that the
+related patches introduce, and record some new commits that record
+them.  This requires your working tree to be clean (no modifications
+from the HEAD commit).</simpara>
+<simpara>Note: <emphasis>git revert</emphasis> is used to record some new commits to reverse the
+effect of some earlier commits (often only a faulty one).  If you want to
+throw away all uncommitted changes in your working directory, you
+should see <citerefentry>
+<refentrytitle>git-reset</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>, particularly the <literal>--hard</literal> option.  If
+you want to extract specific files as they were in another commit, you
+should see <citerefentry>
+<refentrytitle>git-restore</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>, specifically the <literal>--source</literal>
+option. Take care with these alternatives as
+both will discard uncommitted changes in your working directory.</simpara>
+<simpara>See "Reset, restore and revert" in <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for the differences
+between the three commands.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+&lt;commit&gt;&#8230;
+</term>
+<listitem>
+<simpara>
+        Commits to revert.
+        For a more complete list of ways to spell commit names, see
+        <citerefentry>
+<refentrytitle>gitrevisions</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>.
+        Sets of commits can also be given but no traversal is done by
+        default, see <citerefentry>
+<refentrytitle>git-rev-list</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> and its <literal>--no-walk</literal>
+        option.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-e
+</term>
+<term>
+--edit
+</term>
+<listitem>
+<simpara>
+        With this option, <emphasis>git revert</emphasis> will let you edit the commit
+        message prior to committing the revert. This is the default if
+        you run the command from a terminal.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-m parent-number
+</term>
+<term>
+--mainline parent-number
+</term>
+<listitem>
+<simpara>
+        Usually you cannot revert a merge because you do not know which
+        side of the merge should be considered the mainline.  This
+        option specifies the parent number (starting from 1) of
+        the mainline and allows revert to reverse the change
+        relative to the specified parent.
+</simpara>
+<simpara>Reverting a merge commit declares that you will never want the tree changes
+brought in by the merge.  As a result, later merges will only bring in tree
+changes introduced by commits that are not ancestors of the previously
+reverted merge.  This may or may not be what you want.</simpara>
+<simpara>See the <ulink url="howto/revert-a-faulty-merge.html">revert-a-faulty-merge How-To</ulink> for
+more details.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-edit
+</term>
+<listitem>
+<simpara>
+        With this option, <emphasis>git revert</emphasis> will not start the commit
+        message editor.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--cleanup=&lt;mode&gt;
+</term>
+<listitem>
+<simpara>
+        This option determines how the commit message will be cleaned up before
+        being passed on to the commit machinery. See <citerefentry>
+<refentrytitle>git-commit</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for more
+        details. In particular, if the <emphasis>&lt;mode&gt;</emphasis> is given a value of <literal>scissors</literal>,
+        scissors will be appended to <literal>MERGE_MSG</literal> before being passed on in the case
+        of a conflict.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-n
+</term>
+<term>
+--no-commit
+</term>
+<listitem>
+<simpara>
+        Usually the command automatically creates some commits with
+        commit log messages stating which commits were
+        reverted.  This flag applies the changes necessary
+        to revert the named commits to your working tree
+        and the index, but does not make the commits.  In addition,
+        when this option is used, your index does not have to match
+        the HEAD commit.  The revert is done against the
+        beginning state of your index.
+</simpara>
+<simpara>This is useful when reverting more than one commits'
+effect to your index in a row.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-S[&lt;keyid&gt;]
+</term>
+<term>
+--gpg-sign[=&lt;keyid&gt;]
+</term>
+<term>
+--no-gpg-sign
+</term>
+<listitem>
+<simpara>
+        GPG-sign commits. The <literal>keyid</literal> argument is optional and
+        defaults to the committer identity; if specified, it must be
+        stuck to the option without a space. <literal>--no-gpg-sign</literal> is useful to
+        countermand both <literal>commit.gpgSign</literal> configuration variable, and
+        earlier <literal>--gpg-sign</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-s
+</term>
+<term>
+--signoff
+</term>
+<listitem>
+<simpara>
+        Add a <literal>Signed-off-by</literal> trailer at the end of the commit message.
+        See the signoff option in <citerefentry>
+<refentrytitle>git-commit</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for more information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--strategy=&lt;strategy&gt;
+</term>
+<listitem>
+<simpara>
+        Use the given merge strategy.  Should only be used once.
+        See the MERGE STRATEGIES section in <citerefentry>
+<refentrytitle>git-merge</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+        for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-X&lt;option&gt;
+</term>
+<term>
+--strategy-option=&lt;option&gt;
+</term>
+<listitem>
+<simpara>
+        Pass the merge strategy-specific option through to the
+        merge strategy.  See <citerefentry>
+<refentrytitle>git-merge</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--rerere-autoupdate
+</term>
+<term>
+--no-rerere-autoupdate
+</term>
+<listitem>
+<simpara>
+        Allow the rerere mechanism to update the index with the
+        result of auto-conflict resolution if possible.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_sequencer_subcommands">
+<title>SEQUENCER SUBCOMMANDS</title>
+<variablelist>
+<varlistentry>
+<term>
+--continue
+</term>
+<listitem>
+<simpara>
+        Continue the operation in progress using the information in
+        <literal>.git/sequencer</literal>.  Can be used to continue after resolving
+        conflicts in a failed cherry-pick or revert.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--skip
+</term>
+<listitem>
+<simpara>
+        Skip the current commit and continue with the rest of the
+        sequence.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--quit
+</term>
+<listitem>
+<simpara>
+        Forget about the current operation in progress.  Can be used
+        to clear the sequencer state after a failed cherry-pick or
+        revert.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--abort
+</term>
+<listitem>
+<simpara>
+        Cancel the operation and return to the pre-sequence state.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<variablelist>
+<varlistentry>
+<term>
+<literal>git revert HEAD~3</literal>
+</term>
+<listitem>
+<simpara>
+        Revert the changes specified by the fourth last commit in HEAD
+        and create a new commit with the reverted changes.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>git revert -n master~5..master~2</literal>
+</term>
+<listitem>
+<simpara>
+        Revert the changes done by commits from the fifth last commit
+        in master (included) to the third last commit in master
+        (included), but do not create any commit with the reverted
+        changes. The revert only modifies the working tree and the
+        index.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-cherry-pick</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

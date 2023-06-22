@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-mv</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-mv</refname>
+  <refpurpose>Move or rename a file, a directory, or a symlink</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git mv</emphasis> &lt;options&gt;&#8230; &lt;args&gt;&#8230;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Move or rename a file, directory or symlink.</simpara>
+<literallayout class="monospaced">git mv [-v] [-f] [-n] [-k] &lt;source&gt; &lt;destination&gt;
+git mv [-v] [-f] [-n] [-k] &lt;source&gt; ... &lt;destination directory&gt;</literallayout>
+<simpara>In the first form, it renames &lt;source&gt;, which must exist and be either
+a file, symlink or directory, to &lt;destination&gt;.
+In the second form, the last argument has to be an existing
+directory; the given sources will be moved into this directory.</simpara>
+<simpara>The index is updated after successful completion, but the change must still be
+committed.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-f
+</term>
+<term>
+--force
+</term>
+<listitem>
+<simpara>
+        Force renaming or moving of a file even if the target exists
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-k
+</term>
+<listitem>
+<simpara>
+        Skip move or rename actions which would lead to an error
+        condition. An error happens when a source is neither existing nor
+        controlled by Git, or when it would overwrite an existing
+        file unless <literal>-f</literal> is given.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-n
+</term>
+<term>
+--dry-run
+</term>
+<listitem>
+<simpara>
+        Do nothing; only show what would happen
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-v
+</term>
+<term>
+--verbose
+</term>
+<listitem>
+<simpara>
+        Report the names of files as they are moved.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_submodules">
+<title>SUBMODULES</title>
+<simpara>Moving a submodule using a gitfile (which means they were cloned
+with a Git version 1.7.8 or newer) will update the gitfile and
+core.worktree setting to make the submodule work in the new location.
+It also will attempt to update the submodule.&lt;name&gt;.path setting in
+the <citerefentry>
+<refentrytitle>gitmodules</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry> file and stage that file (unless -n is used).</simpara>
+</refsect1>
+<refsect1 id="_bugs">
+<title>BUGS</title>
+<simpara>Each time a superproject update moves a populated submodule (e.g. when
+switching between commits before and after the move) a stale submodule
+checkout will remain in the old location and an empty directory will
+appear in the new location. To populate the submodule again in the new
+location the user will have to run "git submodule update"
+afterwards. Removing the old directory is only safe when it uses a
+gitfile, as otherwise the history of the submodule will be deleted
+too. Both steps will be obsolete when recursive submodule update has
+been implemented.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

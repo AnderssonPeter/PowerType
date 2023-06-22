@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-sh-i18n&#45;&#45;envsubst</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-sh-i18n--envsubst</refname>
+  <refpurpose>Git's own envsubst(1) for i18n fallbacks</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout>eval_gettext () {
+        printf "%s" "$1" | (
+                export PATH $(<emphasis>git sh-i18n&#45;&#45;envsubst</emphasis> --variables "$1");
+                <emphasis>git sh-i18n&#45;&#45;envsubst</emphasis> "$1"
+        )
+}</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>This is not a command the end user would want to run.  Ever.
+This documentation is meant for people who are studying the
+plumbing scripts and/or are writing new ones.</simpara>
+<simpara><emphasis>git sh-i18n&#45;&#45;envsubst</emphasis> is Git&#8217;s stripped-down copy of the GNU
+<literal>envsubst(1)</literal> program that comes with the GNU gettext package. It&#8217;s
+used internally by <citerefentry>
+<refentrytitle>git-sh-i18n</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> to interpolate the variables
+passed to the <literal>eval_gettext</literal> function.</simpara>
+<simpara>No promises are made about the interface, or that this
+program won&#8217;t disappear without warning in the next version
+of Git. Don&#8217;t use it.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

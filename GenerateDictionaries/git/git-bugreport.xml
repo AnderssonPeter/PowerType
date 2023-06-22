@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-bugreport</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-bugreport</refname>
+  <refpurpose>Collect information for user to file a bug report</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git bugreport</emphasis> [(-o | --output-directory) &lt;path&gt;] [(-s | --suffix) &lt;format&gt;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Captures information about the user&#8217;s machine, Git client, and repository state,
+as well as a form requesting information about the behavior the user observed,
+into a single text file which the user can then share, for example to the Git
+mailing list, in order to report an observed bug.</simpara>
+<simpara>The following information is requested from the user:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+Reproduction steps
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Expected behavior
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Actual behavior
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>The following information is captured automatically:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+<emphasis>git version --build-options</emphasis>
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+uname sysname, release, version, and machine strings
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Compiler-specific info string
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+A list of enabled hooks
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+$SHELL
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>This tool is invoked via the typical Git setup process, which means that in some
+cases, it might not be able to launch - for example, if a relevant config file
+is unreadable. In this kind of scenario, it may be helpful to manually gather
+the kind of information listed above when manually asking for help.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-o &lt;path&gt;
+</term>
+<term>
+--output-directory &lt;path&gt;
+</term>
+<listitem>
+<simpara>
+        Place the resulting bug report file in <literal>&lt;path&gt;</literal> instead of the current
+        directory.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-s &lt;format&gt;
+</term>
+<term>
+--suffix &lt;format&gt;
+</term>
+<listitem>
+<simpara>
+        Specify an alternate suffix for the bugreport name, to create a file
+        named <emphasis>git-bugreport-&lt;formatted suffix&gt;</emphasis>. This should take the form of a
+        strftime(3) format string; the current local time will be used.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

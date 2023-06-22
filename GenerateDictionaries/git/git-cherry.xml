@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-cherry</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-cherry</refname>
+  <refpurpose>Find commits yet to be applied to upstream</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git cherry</emphasis> [-v] [&lt;upstream&gt; [&lt;head&gt; [&lt;limit&gt;]]]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Determine whether there are commits in <literal>&lt;head&gt;..&lt;upstream&gt;</literal> that are
+equivalent to those in the range <literal>&lt;limit&gt;..&lt;head&gt;</literal>.</simpara>
+<simpara>The equivalence test is based on the diff, after removing whitespace
+and line numbers.  git-cherry therefore detects when commits have been
+"copied" by means of <citerefentry>
+<refentrytitle>git-cherry-pick</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>, <citerefentry>
+<refentrytitle>git-am</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> or
+<citerefentry>
+<refentrytitle>git-rebase</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+<simpara>Outputs the SHA1 of every commit in <literal>&lt;limit&gt;..&lt;head&gt;</literal>, prefixed with
+<literal>-</literal> for commits that have an equivalent in &lt;upstream&gt;, and <literal>+</literal> for
+commits that do not.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-v
+</term>
+<listitem>
+<simpara>
+        Show the commit subjects next to the SHA1s.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;upstream&gt;
+</term>
+<listitem>
+<simpara>
+        Upstream branch to search for equivalent commits.
+        Defaults to the upstream branch of HEAD.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;head&gt;
+</term>
+<listitem>
+<simpara>
+        Working branch; defaults to HEAD.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;limit&gt;
+</term>
+<listitem>
+<simpara>
+        Do not report commits up to (and including) limit.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<refsect2 id="_patch_workflows">
+<title>Patch workflows</title>
+<simpara>git-cherry is frequently used in patch-based workflows (see
+<citerefentry>
+<refentrytitle>gitworkflows</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>) to determine if a series of patches has been
+applied by the upstream maintainer.  In such a workflow you might
+create and send a topic branch like this:</simpara>
+<literallayout class="monospaced">$ git checkout -b topic origin/master
+# work and create some commits
+$ git format-patch origin/master
+$ git send-email ... 00*</literallayout><simpara></simpara>
+<simpara>Later, you can see whether your changes have been applied by saying
+(still on <literal>topic</literal>):</simpara>
+<literallayout class="monospaced">$ git fetch  # update your notion of origin/master
+$ git cherry -v</literallayout><simpara></simpara>
+</refsect2>
+<refsect2 id="_concrete_example">
+<title>Concrete example</title>
+<simpara>In a situation where topic consisted of three commits, and the
+maintainer applied two of them, the situation might look like:</simpara>
+<literallayout class="monospaced">$ git log --graph --oneline --decorate --boundary origin/master...topic
+* 7654321 (origin/master) upstream tip commit
+[... snip some other commits ...]
+* cccc111 cherry-pick of C
+* aaaa111 cherry-pick of A
+[... snip a lot more that has happened ...]
+| * cccc000 (topic) commit C
+| * bbbb000 commit B
+| * aaaa000 commit A
+|/
+o 1234567 branch point</literallayout><simpara></simpara>
+<simpara>In such cases, git-cherry shows a concise summary of what has yet to
+be applied:</simpara>
+<literallayout class="monospaced">$ git cherry origin/master topic
+- cccc000... commit C
++ bbbb000... commit B
+- aaaa000... commit A</literallayout><simpara></simpara>
+<simpara>Here, we see that the commits A and C (marked with <literal>-</literal>) can be
+dropped from your <literal>topic</literal> branch when you rebase it on top of
+<literal>origin/master</literal>, while the commit B (marked with <literal>+</literal>) still needs to
+be kept so that it will be sent to be applied to <literal>origin/master</literal>.</simpara>
+</refsect2>
+<refsect2 id="_using_a_limit">
+<title>Using a limit</title>
+<simpara>The optional &lt;limit&gt; is useful in cases where your topic is based on
+other work that is not in upstream.  Expanding on the previous
+example, this might look like:</simpara>
+<literallayout class="monospaced">$ git log --graph --oneline --decorate --boundary origin/master...topic
+* 7654321 (origin/master) upstream tip commit
+[... snip some other commits ...]
+* cccc111 cherry-pick of C
+* aaaa111 cherry-pick of A
+[... snip a lot more that has happened ...]
+| * cccc000 (topic) commit C
+| * bbbb000 commit B
+| * aaaa000 commit A
+| * 0000fff (base) unpublished stuff F
+[... snip ...]
+| * 0000aaa unpublished stuff A
+|/
+o 1234567 merge-base between upstream and topic</literallayout><simpara></simpara>
+<simpara>By specifying <literal>base</literal> as the limit, you can avoid listing commits
+between <literal>base</literal> and <literal>topic</literal>:</simpara>
+<literallayout class="monospaced">$ git cherry origin/master topic base
+- cccc000... commit C
++ bbbb000... commit B
+- aaaa000... commit A</literallayout><simpara></simpara>
+</refsect2>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-patch-id</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

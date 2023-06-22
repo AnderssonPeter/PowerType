@@ -1,0 +1,2487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-diff</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-diff</refname>
+  <refpurpose>Show changes between commits, commit and working tree, etc</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git diff</emphasis> [&lt;options&gt;] [&lt;commit&gt;] [--] [&lt;path&gt;&#8230;]
+<emphasis>git diff</emphasis> [&lt;options&gt;] --cached [--merge-base] [&lt;commit&gt;] [--] [&lt;path&gt;&#8230;]
+<emphasis>git diff</emphasis> [&lt;options&gt;] [--merge-base] &lt;commit&gt; [&lt;commit&gt;&#8230;] &lt;commit&gt; [--] [&lt;path&gt;&#8230;]
+<emphasis>git diff</emphasis> [&lt;options&gt;] &lt;commit&gt;&#8230;&lt;commit&gt; [--] [&lt;path&gt;&#8230;]
+<emphasis>git diff</emphasis> [&lt;options&gt;] &lt;blob&gt; &lt;blob&gt;
+<emphasis>git diff</emphasis> [&lt;options&gt;] --no-index [--] &lt;path&gt; &lt;path&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Show changes between the working tree and the index or a tree, changes
+between the index and a tree, changes between two trees, changes resulting
+from a merge, changes between two blob objects, or changes between two
+files on disk.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>git diff</emphasis> [&lt;options&gt;] [--] [&lt;path&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        This form is to view the changes you made relative to
+        the index (staging area for the next commit).  In other
+        words, the differences are what you <emphasis>could</emphasis> tell Git to
+        further add to the index but you still haven&#8217;t.  You can
+        stage these changes by using <citerefentry>
+<refentrytitle>git-add</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git diff</emphasis> [&lt;options&gt;] --no-index [--] &lt;path&gt; &lt;path&gt;
+</term>
+<listitem>
+<simpara>
+        This form is to compare the given two paths on the
+        filesystem.  You can omit the <literal>--no-index</literal> option when
+        running the command in a working tree controlled by Git and
+        at least one of the paths points outside the working tree,
+        or when running the command outside a working tree
+        controlled by Git. This form implies <literal>--exit-code</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git diff</emphasis> [&lt;options&gt;] --cached [--merge-base] [&lt;commit&gt;] [--] [&lt;path&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        This form is to view the changes you staged for the next
+        commit relative to the named &lt;commit&gt;.  Typically you
+        would want comparison with the latest commit, so if you
+        do not give &lt;commit&gt;, it defaults to HEAD.
+        If HEAD does not exist (e.g. unborn branches) and
+        &lt;commit&gt; is not given, it shows all staged changes.
+        --staged is a synonym of --cached.
+</simpara>
+<simpara>If --merge-base is given, instead of using &lt;commit&gt;, use the merge base
+of &lt;commit&gt; and HEAD.  <literal>git diff --cached --merge-base A</literal> is equivalent to
+<literal>git diff --cached $(git merge-base A HEAD)</literal>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git diff</emphasis> [&lt;options&gt;] [--merge-base] &lt;commit&gt; [--] [&lt;path&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        This form is to view the changes you have in your
+        working tree relative to the named &lt;commit&gt;.  You can
+        use HEAD to compare it with the latest commit, or a
+        branch name to compare with the tip of a different
+        branch.
+</simpara>
+<simpara>If --merge-base is given, instead of using &lt;commit&gt;, use the merge base
+of &lt;commit&gt; and HEAD.  <literal>git diff --merge-base A</literal> is equivalent to
+<literal>git diff $(git merge-base A HEAD)</literal>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git diff</emphasis> [&lt;options&gt;] [--merge-base] &lt;commit&gt; &lt;commit&gt; [--] [&lt;path&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        This is to view the changes between two arbitrary
+        &lt;commit&gt;.
+</simpara>
+<simpara>If --merge-base is given, use the merge base of the two commits for the
+"before" side.  <literal>git diff --merge-base A B</literal> is equivalent to
+<literal>git diff $(git merge-base A B) B</literal>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git diff</emphasis> [&lt;options&gt;] &lt;commit&gt; &lt;commit&gt;&#8230; &lt;commit&gt; [--] [&lt;path&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        This form is to view the results of a merge commit.  The first
+        listed &lt;commit&gt; must be the merge itself; the remaining two or
+        more commits should be its parents.  A convenient way to produce
+        the desired set of revisions is to use the <literal>^@</literal> suffix.
+        For instance, if <literal>master</literal> names a merge commit, <literal>git diff master
+        master^@</literal> gives the same combined diff as <literal>git show master</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git diff</emphasis> [&lt;options&gt;] &lt;commit&gt;..&lt;commit&gt; [--] [&lt;path&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        This is synonymous to the earlier form (without the <literal>..</literal>) for
+        viewing the changes between two arbitrary &lt;commit&gt;.  If &lt;commit&gt; on
+        one side is omitted, it will have the same effect as
+        using HEAD instead.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>git diff</emphasis> [&lt;options&gt;] &lt;commit&gt;...&lt;commit&gt; [--] [&lt;path&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        This form is to view the changes on the branch containing
+        and up to the second &lt;commit&gt;, starting at a common ancestor
+        of both &lt;commit&gt;.  <literal>git diff A...B</literal> is equivalent to
+        <literal>git diff $(git merge-base A B) B</literal>.  You can omit any one
+        of &lt;commit&gt;, which has the same effect as using HEAD instead.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Just in case you are doing something exotic, it should be
+noted that all of the &lt;commit&gt; in the above description, except
+in the <literal>--merge-base</literal> case and in the last two forms that use <literal>..</literal>
+notations, can be any &lt;tree&gt;.</simpara>
+<simpara>For a more complete list of ways to spell &lt;commit&gt;, see
+"SPECIFYING REVISIONS" section in <citerefentry>
+<refentrytitle>gitrevisions</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>.
+However, "diff" is about comparing two <emphasis>endpoints</emphasis>, not ranges,
+and the range notations (<literal>&lt;commit&gt;..&lt;commit&gt;</literal> and
+<literal>&lt;commit&gt;...&lt;commit&gt;</literal>) do not mean a range as defined in the
+"SPECIFYING RANGES" section in <citerefentry>
+<refentrytitle>gitrevisions</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>git diff</emphasis> [&lt;options&gt;] &lt;blob&gt; &lt;blob&gt;
+</term>
+<listitem>
+<simpara>
+        This form is to view the differences between the raw
+        contents of two blob objects.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-p
+</term>
+<term>
+-u
+</term>
+<term>
+--patch
+</term>
+<listitem>
+<simpara>
+        Generate patch (see section on generating patches).
+        This is the default.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-s
+</term>
+<term>
+--no-patch
+</term>
+<listitem>
+<simpara>
+        Suppress diff output. Useful for commands like <literal>git show</literal> that
+        show the patch by default, or to cancel the effect of <literal>--patch</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-U&lt;n&gt;
+</term>
+<term>
+--unified=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        Generate diffs with &lt;n&gt; lines of context instead of
+        the usual three.
+        Implies <literal>--patch</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--output=&lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        Output to a specific file instead of stdout.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--output-indicator-new=&lt;char&gt;
+</term>
+<term>
+--output-indicator-old=&lt;char&gt;
+</term>
+<term>
+--output-indicator-context=&lt;char&gt;
+</term>
+<listitem>
+<simpara>
+        Specify the character used to indicate new, old or context
+        lines in the generated patch. Normally they are <emphasis>+</emphasis>, <emphasis>-</emphasis> and
+        ' ' respectively.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--raw
+</term>
+<listitem>
+<simpara>
+        Generate the diff in raw format.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--patch-with-raw
+</term>
+<listitem>
+<simpara>
+        Synonym for <literal>-p --raw</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--indent-heuristic
+</term>
+<listitem>
+<simpara>
+        Enable the heuristic that shifts diff hunk boundaries to make patches
+        easier to read. This is the default.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-indent-heuristic
+</term>
+<listitem>
+<simpara>
+        Disable the indent heuristic.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--minimal
+</term>
+<listitem>
+<simpara>
+        Spend extra time to make sure the smallest possible
+        diff is produced.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--patience
+</term>
+<listitem>
+<simpara>
+        Generate a diff using the "patience diff" algorithm.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--histogram
+</term>
+<listitem>
+<simpara>
+        Generate a diff using the "histogram diff" algorithm.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--anchored=&lt;text&gt;
+</term>
+<listitem>
+<simpara>
+        Generate a diff using the "anchored diff" algorithm.
+</simpara>
+<simpara>This option may be specified more than once.</simpara>
+<simpara>If a line exists in both the source and destination, exists only once,
+and starts with this text, this algorithm attempts to prevent it from
+appearing as a deletion or addition in the output. It uses the "patience
+diff" algorithm internally.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--diff-algorithm={patience|minimal|histogram|myers}
+</term>
+<listitem>
+<simpara>
+        Choose a diff algorithm. The variants are as follows:
+</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<literal>default</literal>, <literal>myers</literal>
+</term>
+<listitem>
+<simpara>
+        The basic greedy diff algorithm. Currently, this is the default.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>minimal</literal>
+</term>
+<listitem>
+<simpara>
+        Spend extra time to make sure the smallest possible diff is
+        produced.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>patience</literal>
+</term>
+<listitem>
+<simpara>
+        Use "patience diff" algorithm when generating patches.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>histogram</literal>
+</term>
+<listitem>
+<simpara>
+        This algorithm extends the patience algorithm to "support
+        low-occurrence common elements".
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>For instance, if you configured the <literal>diff.algorithm</literal> variable to a
+non-default value and want to use the default one, then you
+have to use <literal>--diff-algorithm=default</literal> option.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stat[=&lt;width&gt;[,&lt;name-width&gt;[,&lt;count&gt;]]]
+</term>
+<listitem>
+<simpara>
+        Generate a diffstat. By default, as much space as necessary
+        will be used for the filename part, and the rest for the graph
+        part. Maximum width defaults to terminal width, or 80 columns
+        if not connected to a terminal, and can be overridden by
+        <literal>&lt;width&gt;</literal>. The width of the filename part can be limited by
+        giving another width <literal>&lt;name-width&gt;</literal> after a comma. The width
+        of the graph part can be limited by using
+        <literal>--stat-graph-width=&lt;width&gt;</literal> (affects all commands generating
+        a stat graph) or by setting <literal>diff.statGraphWidth=&lt;width&gt;</literal>
+        (does not affect <literal>git format-patch</literal>).
+        By giving a third parameter <literal>&lt;count&gt;</literal>, you can limit the
+        output to the first <literal>&lt;count&gt;</literal> lines, followed by <literal>...</literal> if
+        there are more.
+</simpara>
+<simpara>These parameters can also be set individually with <literal>--stat-width=&lt;width&gt;</literal>,
+<literal>--stat-name-width=&lt;name-width&gt;</literal> and <literal>--stat-count=&lt;count&gt;</literal>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--compact-summary
+</term>
+<listitem>
+<simpara>
+        Output a condensed summary of extended header information such
+        as file creations or deletions ("new" or "gone", optionally "+l"
+        if it&#8217;s a symlink) and mode changes ("+x" or "-x" for adding
+        or removing executable bit respectively) in diffstat. The
+        information is put between the filename part and the graph
+        part. Implies <literal>--stat</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--numstat
+</term>
+<listitem>
+<simpara>
+        Similar to <literal>--stat</literal>, but shows number of added and
+        deleted lines in decimal notation and pathname without
+        abbreviation, to make it more machine friendly.  For
+        binary files, outputs two <literal>-</literal> instead of saying
+        <literal>0 0</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--shortstat
+</term>
+<listitem>
+<simpara>
+        Output only the last line of the <literal>--stat</literal> format containing total
+        number of modified files, as well as number of added and deleted
+        lines.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-X[&lt;param1,param2,&#8230;&gt;]
+</term>
+<term>
+--dirstat[=&lt;param1,param2,&#8230;&gt;]
+</term>
+<listitem>
+<simpara>
+        Output the distribution of relative amount of changes for each
+        sub-directory. The behavior of <literal>--dirstat</literal> can be customized by
+        passing it a comma separated list of parameters.
+        The defaults are controlled by the <literal>diff.dirstat</literal> configuration
+        variable (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+        The following parameters are available:
+</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<literal>changes</literal>
+</term>
+<listitem>
+<simpara>
+        Compute the dirstat numbers by counting the lines that have been
+        removed from the source, or added to the destination. This ignores
+        the amount of pure code movements within a file.  In other words,
+        rearranging lines in a file is not counted as much as other changes.
+        This is the default behavior when no parameter is given.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>lines</literal>
+</term>
+<listitem>
+<simpara>
+        Compute the dirstat numbers by doing the regular line-based diff
+        analysis, and summing the removed/added line counts. (For binary
+        files, count 64-byte chunks instead, since binary files have no
+        natural concept of lines). This is a more expensive <literal>--dirstat</literal>
+        behavior than the <literal>changes</literal> behavior, but it does count rearranged
+        lines within a file as much as other changes. The resulting output
+        is consistent with what you get from the other <literal>--*stat</literal> options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>files</literal>
+</term>
+<listitem>
+<simpara>
+        Compute the dirstat numbers by counting the number of files changed.
+        Each changed file counts equally in the dirstat analysis. This is
+        the computationally cheapest <literal>--dirstat</literal> behavior, since it does
+        not have to look at the file contents at all.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>cumulative</literal>
+</term>
+<listitem>
+<simpara>
+        Count changes in a child directory for the parent directory as well.
+        Note that when using <literal>cumulative</literal>, the sum of the percentages
+        reported may exceed 100%. The default (non-cumulative) behavior can
+        be specified with the <literal>noncumulative</literal> parameter.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;limit&gt;
+</term>
+<listitem>
+<simpara>
+        An integer parameter specifies a cut-off percent (3% by default).
+        Directories contributing less than this percentage of the changes
+        are not shown in the output.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Example: The following will count changed files, while ignoring
+directories with less than 10% of the total amount of changed files,
+and accumulating child directory counts in the parent directories:
+<literal>--dirstat=files,10,cumulative</literal>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--cumulative
+</term>
+<listitem>
+<simpara>
+        Synonym for --dirstat=cumulative
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--dirstat-by-file[=&lt;param1,param2&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        Synonym for --dirstat=files,param1,param2&#8230;
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--summary
+</term>
+<listitem>
+<simpara>
+        Output a condensed summary of extended header information
+        such as creations, renames and mode changes.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--patch-with-stat
+</term>
+<listitem>
+<simpara>
+        Synonym for <literal>-p --stat</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-z
+</term>
+<listitem>
+<simpara>
+        When <literal>--raw</literal>, <literal>--numstat</literal>, <literal>--name-only</literal> or <literal>--name-status</literal> has been
+        given, do not munge pathnames and use NULs as output field terminators.
+</simpara>
+<simpara>Without this option, pathnames with "unusual" characters are quoted as
+explained for the configuration variable <literal>core.quotePath</literal> (see
+<citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--name-only
+</term>
+<listitem>
+<simpara>
+        Show only names of changed files. The file names are often encoded in UTF-8.
+        For more information see the discussion about encoding in the <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+        manual page.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--name-status
+</term>
+<listitem>
+<simpara>
+        Show only names and status of changed files. See the description
+        of the <literal>--diff-filter</literal> option on what the status letters mean.
+        Just like <literal>--name-only</literal> the file names are often encoded in UTF-8.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--submodule[=&lt;format&gt;]
+</term>
+<listitem>
+<simpara>
+        Specify how differences in submodules are shown.  When specifying
+        <literal>--submodule=short</literal> the <emphasis>short</emphasis> format is used.  This format just
+        shows the names of the commits at the beginning and end of the range.
+        When <literal>--submodule</literal> or <literal>--submodule=log</literal> is specified, the <emphasis>log</emphasis>
+        format is used.  This format lists the commits in the range like
+        <citerefentry>
+<refentrytitle>git-submodule</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> <literal>summary</literal> does.  When <literal>--submodule=diff</literal>
+        is specified, the <emphasis>diff</emphasis> format is used.  This format shows an
+        inline diff of the changes in the submodule contents between the
+        commit range.  Defaults to <literal>diff.submodule</literal> or the <emphasis>short</emphasis> format
+        if the config option is unset.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--color[=&lt;when&gt;]
+</term>
+<listitem>
+<simpara>
+        Show colored diff.
+        <literal>--color</literal> (i.e. without <emphasis>=&lt;when&gt;</emphasis>) is the same as <literal>--color=always</literal>.
+        <emphasis>&lt;when&gt;</emphasis> can be one of <literal>always</literal>, <literal>never</literal>, or <literal>auto</literal>.
+        It can be changed by the <literal>color.ui</literal> and <literal>color.diff</literal>
+        configuration settings.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-color
+</term>
+<listitem>
+<simpara>
+        Turn off colored diff.
+        This can be used to override configuration settings.
+        It is the same as <literal>--color=never</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--color-moved[=&lt;mode&gt;]
+</term>
+<listitem>
+<simpara>
+        Moved lines of code are colored differently.
+        It can be changed by the <literal>diff.colorMoved</literal> configuration setting.
+        The &lt;mode&gt; defaults to <emphasis>no</emphasis> if the option is not given
+        and to <emphasis>zebra</emphasis> if the option with no mode is given.
+        The mode must be one of:
+</simpara>
+<variablelist>
+<varlistentry>
+<term>
+no
+</term>
+<listitem>
+<simpara>
+        Moved lines are not highlighted.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+default
+</term>
+<listitem>
+<simpara>
+        Is a synonym for <literal>zebra</literal>. This may change to a more sensible mode
+        in the future.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+plain
+</term>
+<listitem>
+<simpara>
+        Any line that is added in one location and was removed
+        in another location will be colored with <emphasis>color.diff.newMoved</emphasis>.
+        Similarly <emphasis>color.diff.oldMoved</emphasis> will be used for removed lines
+        that are added somewhere else in the diff. This mode picks up any
+        moved line, but it is not very useful in a review to determine
+        if a block of code was moved without permutation.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+blocks
+</term>
+<listitem>
+<simpara>
+        Blocks of moved text of at least 20 alphanumeric characters
+        are detected greedily. The detected blocks are
+        painted using either the <emphasis>color.diff.{old,new}Moved</emphasis> color.
+        Adjacent blocks cannot be told apart.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+zebra
+</term>
+<listitem>
+<simpara>
+        Blocks of moved text are detected as in <emphasis>blocks</emphasis> mode. The blocks
+        are painted using either the <emphasis>color.diff.{old,new}Moved</emphasis> color or
+        <emphasis>color.diff.{old,new}MovedAlternative</emphasis>. The change between
+        the two colors indicates that a new block was detected.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+dimmed-zebra
+</term>
+<listitem>
+<simpara>
+        Similar to <emphasis>zebra</emphasis>, but additional dimming of uninteresting parts
+        of moved code is performed. The bordering lines of two adjacent
+        blocks are considered interesting, the rest is uninteresting.
+        <literal>dimmed_zebra</literal> is a deprecated synonym.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-color-moved
+</term>
+<listitem>
+<simpara>
+        Turn off move detection. This can be used to override configuration
+        settings. It is the same as <literal>--color-moved=no</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--color-moved-ws=&lt;modes&gt;
+</term>
+<listitem>
+<simpara>
+        This configures how whitespace is ignored when performing the
+        move detection for <literal>--color-moved</literal>.
+        It can be set by the <literal>diff.colorMovedWS</literal> configuration setting.
+        These modes can be given as a comma separated list:
+</simpara>
+<variablelist>
+<varlistentry>
+<term>
+no
+</term>
+<listitem>
+<simpara>
+        Do not ignore whitespace when performing move detection.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+ignore-space-at-eol
+</term>
+<listitem>
+<simpara>
+        Ignore changes in whitespace at EOL.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+ignore-space-change
+</term>
+<listitem>
+<simpara>
+        Ignore changes in amount of whitespace.  This ignores whitespace
+        at line end, and considers all other sequences of one or
+        more whitespace characters to be equivalent.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+ignore-all-space
+</term>
+<listitem>
+<simpara>
+        Ignore whitespace when comparing lines. This ignores differences
+        even if one line has whitespace where the other line has none.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+allow-indentation-change
+</term>
+<listitem>
+<simpara>
+        Initially ignore any whitespace in the move detection, then
+        group the moved code blocks only into a block if the change in
+        whitespace is the same per line. This is incompatible with the
+        other modes.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-color-moved-ws
+</term>
+<listitem>
+<simpara>
+        Do not ignore whitespace when performing move detection. This can be
+        used to override configuration settings. It is the same as
+        <literal>--color-moved-ws=no</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--word-diff[=&lt;mode&gt;]
+</term>
+<listitem>
+<simpara>
+        Show a word diff, using the &lt;mode&gt; to delimit changed words.
+        By default, words are delimited by whitespace; see
+        <literal>--word-diff-regex</literal> below.  The &lt;mode&gt; defaults to <emphasis>plain</emphasis>, and
+        must be one of:
+</simpara>
+<variablelist>
+<varlistentry>
+<term>
+color
+</term>
+<listitem>
+<simpara>
+        Highlight changed words using only colors.  Implies <literal>--color</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+plain
+</term>
+<listitem>
+<simpara>
+        Show words as <literal>[-removed-]</literal> and <literal>{+added+}</literal>.  Makes no
+        attempts to escape the delimiters if they appear in the input,
+        so the output may be ambiguous.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+porcelain
+</term>
+<listitem>
+<simpara>
+        Use a special line-based format intended for script
+        consumption.  Added/removed/unchanged runs are printed in the
+        usual unified diff format, starting with a <literal>+</literal>/<literal>-</literal>/` `
+        character at the beginning of the line and extending to the
+        end of the line.  Newlines in the input are represented by a
+        tilde <literal>~</literal> on a line of its own.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+none
+</term>
+<listitem>
+<simpara>
+        Disable word diff again.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Note that despite the name of the first mode, color is used to
+highlight the changed parts in all modes if enabled.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--word-diff-regex=&lt;regex&gt;
+</term>
+<listitem>
+<simpara>
+        Use &lt;regex&gt; to decide what a word is, instead of considering
+        runs of non-whitespace to be a word.  Also implies
+        <literal>--word-diff</literal> unless it was already enabled.
+</simpara>
+<simpara>Every non-overlapping match of the
+&lt;regex&gt; is considered a word.  Anything between these matches is
+considered whitespace and ignored(!) for the purposes of finding
+differences.  You may want to append <literal>|[^[:space:]]</literal> to your regular
+expression to make sure that it matches all non-whitespace characters.
+A match that contains a newline is silently truncated(!) at the
+newline.</simpara>
+<simpara>For example, <literal>--word-diff-regex=.</literal> will treat each character as a word
+and, correspondingly, show differences character by character.</simpara>
+<simpara>The regex can also be set via a diff driver or configuration option, see
+<citerefentry>
+<refentrytitle>gitattributes</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry> or <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.  Giving it explicitly
+overrides any diff driver or configuration setting.  Diff drivers
+override configuration settings.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--color-words[=&lt;regex&gt;]
+</term>
+<listitem>
+<simpara>
+        Equivalent to <literal>--word-diff=color</literal> plus (if a regex was
+        specified) <literal>--word-diff-regex=&lt;regex&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-renames
+</term>
+<listitem>
+<simpara>
+        Turn off rename detection, even when the configuration
+        file gives the default to do so.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]rename-empty
+</term>
+<listitem>
+<simpara>
+        Whether to use empty blobs as rename source.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--check
+</term>
+<listitem>
+<simpara>
+        Warn if changes introduce conflict markers or whitespace errors.
+        What are considered whitespace errors is controlled by <literal>core.whitespace</literal>
+        configuration.  By default, trailing whitespaces (including
+        lines that consist solely of whitespaces) and a space character
+        that is immediately followed by a tab character inside the
+        initial indent of the line are considered whitespace errors.
+        Exits with non-zero status if problems are found. Not compatible
+        with --exit-code.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ws-error-highlight=&lt;kind&gt;
+</term>
+<listitem>
+<simpara>
+        Highlight whitespace errors in the <literal>context</literal>, <literal>old</literal> or <literal>new</literal>
+        lines of the diff.  Multiple values are separated by comma,
+        <literal>none</literal> resets previous values, <literal>default</literal> reset the list to
+        <literal>new</literal> and <literal>all</literal> is a shorthand for <literal>old,new,context</literal>.  When
+        this option is not given, and the configuration variable
+        <literal>diff.wsErrorHighlight</literal> is not set, only whitespace errors in
+        <literal>new</literal> lines are highlighted. The whitespace errors are colored
+        with <literal>color.diff.whitespace</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--full-index
+</term>
+<listitem>
+<simpara>
+        Instead of the first handful of characters, show the full
+        pre- and post-image blob object names on the "index"
+        line when generating patch format output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--binary
+</term>
+<listitem>
+<simpara>
+        In addition to <literal>--full-index</literal>, output a binary diff that
+        can be applied with <literal>git-apply</literal>.
+        Implies <literal>--patch</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--abbrev[=&lt;n&gt;]
+</term>
+<listitem>
+<simpara>
+        Instead of showing the full 40-byte hexadecimal object
+        name in diff-raw format output and diff-tree header
+        lines, show the shortest prefix that is at least <emphasis>&lt;n&gt;</emphasis>
+        hexdigits long that uniquely refers the object.
+        In diff-patch output format, <literal>--full-index</literal> takes higher
+        precedence, i.e. if <literal>--full-index</literal> is specified, full blob
+        names will be shown regardless of <literal>--abbrev</literal>.
+        Non default number of digits can be specified with <literal>--abbrev=&lt;n&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-B[&lt;n&gt;][/&lt;m&gt;]
+</term>
+<term>
+--break-rewrites[=[&lt;n&gt;][/&lt;m&gt;]]
+</term>
+<listitem>
+<simpara>
+        Break complete rewrite changes into pairs of delete and
+        create. This serves two purposes:
+</simpara>
+<simpara>It affects the way a change that amounts to a total rewrite of a file
+not as a series of deletion and insertion mixed together with a very
+few lines that happen to match textually as the context, but as a
+single deletion of everything old followed by a single insertion of
+everything new, and the number <literal>m</literal> controls this aspect of the -B
+option (defaults to 60%). <literal>-B/70%</literal> specifies that less than 30% of the
+original should remain in the result for Git to consider it a total
+rewrite (i.e. otherwise the resulting patch will be a series of
+deletion and insertion mixed together with context lines).</simpara>
+<simpara>When used with -M, a totally-rewritten file is also considered as the
+source of a rename (usually -M only considers a file that disappeared
+as the source of a rename), and the number <literal>n</literal> controls this aspect of
+the -B option (defaults to 50%). <literal>-B20%</literal> specifies that a change with
+addition and deletion compared to 20% or more of the file&#8217;s size are
+eligible for being picked up as a possible source of a rename to
+another file.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-M[&lt;n&gt;]
+</term>
+<term>
+--find-renames[=&lt;n&gt;]
+</term>
+<listitem>
+<simpara>
+        Detect renames.
+        If <literal>n</literal> is specified, it is a threshold on the similarity
+        index (i.e. amount of addition/deletions compared to the
+        file&#8217;s size). For example, <literal>-M90%</literal> means Git should consider a
+        delete/add pair to be a rename if more than 90% of the file
+        hasn&#8217;t changed.  Without a <literal>%</literal> sign, the number is to be read as
+        a fraction, with a decimal point before it.  I.e., <literal>-M5</literal> becomes
+        0.5, and is thus the same as <literal>-M50%</literal>.  Similarly, <literal>-M05</literal> is
+        the same as <literal>-M5%</literal>.  To limit detection to exact renames, use
+        <literal>-M100%</literal>.  The default similarity index is 50%.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-C[&lt;n&gt;]
+</term>
+<term>
+--find-copies[=&lt;n&gt;]
+</term>
+<listitem>
+<simpara>
+        Detect copies as well as renames.  See also <literal>--find-copies-harder</literal>.
+        If <literal>n</literal> is specified, it has the same meaning as for <literal>-M&lt;n&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--find-copies-harder
+</term>
+<listitem>
+<simpara>
+        For performance reasons, by default, <literal>-C</literal> option finds copies only
+        if the original file of the copy was modified in the same
+        changeset.  This flag makes the command
+        inspect unmodified files as candidates for the source of
+        copy.  This is a very expensive operation for large
+        projects, so use it with caution.  Giving more than one
+        <literal>-C</literal> option has the same effect.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-D
+</term>
+<term>
+--irreversible-delete
+</term>
+<listitem>
+<simpara>
+        Omit the preimage for deletes, i.e. print only the header but not
+        the diff between the preimage and <literal>/dev/null</literal>. The resulting patch
+        is not meant to be applied with <literal>patch</literal> or <literal>git apply</literal>; this is
+        solely for people who want to just concentrate on reviewing the
+        text after the change. In addition, the output obviously lacks
+        enough information to apply such a patch in reverse, even manually,
+        hence the name of the option.
+</simpara>
+<simpara>When used together with <literal>-B</literal>, omit also the preimage in the deletion part
+of a delete/create pair.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-l&lt;num&gt;
+</term>
+<listitem>
+<simpara>
+        The <literal>-M</literal> and <literal>-C</literal> options involve some preliminary steps that
+        can detect subsets of renames/copies cheaply, followed by an
+        exhaustive fallback portion that compares all remaining
+        unpaired destinations to all relevant sources.  (For renames,
+        only remaining unpaired sources are relevant; for copies, all
+        original sources are relevant.)  For N sources and
+        destinations, this exhaustive check is O(N^2).  This option
+        prevents the exhaustive portion of rename/copy detection from
+        running if the number of source/destination files involved
+        exceeds the specified number.  Defaults to diff.renameLimit.
+        Note that a value of 0 is treated as unlimited.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--diff-filter=[(A|C|D|M|R|T|U|X|B)&#8230;[*]]
+</term>
+<listitem>
+<simpara>
+        Select only files that are Added (<literal>A</literal>), Copied (<literal>C</literal>),
+        Deleted (<literal>D</literal>), Modified (<literal>M</literal>), Renamed (<literal>R</literal>), have their
+        type (i.e. regular file, symlink, submodule, &#8230;) changed (<literal>T</literal>),
+        are Unmerged (<literal>U</literal>), are
+        Unknown (<literal>X</literal>), or have had their pairing Broken (<literal>B</literal>).
+        Any combination of the filter characters (including none) can be used.
+        When <literal>*</literal> (All-or-none) is added to the combination, all
+        paths are selected if there is any file that matches
+        other criteria in the comparison; if there is no file
+        that matches other criteria, nothing is selected.
+</simpara>
+<simpara>Also, these upper-case letters can be downcased to exclude.  E.g.
+<literal>--diff-filter=ad</literal> excludes added and deleted paths.</simpara>
+<simpara>Note that not all diffs can feature all types. For instance, diffs
+from the index to the working tree can never have Added entries
+(because the set of paths included in the diff is limited by what is in
+the index).  Similarly, copied and renamed entries cannot appear if
+detection for those types is disabled.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-S&lt;string&gt;
+</term>
+<listitem>
+<simpara>
+        Look for differences that change the number of occurrences of
+        the specified string (i.e. addition/deletion) in a file.
+        Intended for the scripter&#8217;s use.
+</simpara>
+<simpara>It is useful when you&#8217;re looking for an exact block of code (like a
+struct), and want to know the history of that block since it first
+came into being: use the feature iteratively to feed the interesting
+block in the preimage back into <literal>-S</literal>, and keep going until you get the
+very first version of the block.</simpara>
+<simpara>Binary files are searched as well.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-G&lt;regex&gt;
+</term>
+<listitem>
+<simpara>
+        Look for differences whose patch text contains added/removed
+        lines that match &lt;regex&gt;.
+</simpara>
+<simpara>To illustrate the difference between <literal>-S&lt;regex&gt; --pickaxe-regex</literal> and
+<literal>-G&lt;regex&gt;</literal>, consider a commit with the following diff in the same
+file:</simpara>
+<literallayout class="monospaced">+    return frotz(nitfol, two-&gt;ptr, 1, 0);
+...
+-    hit = frotz(nitfol, mf2.ptr, 1, 0);</literallayout><simpara></simpara>
+<simpara>While <literal>git log -G"frotz\(nitfol"</literal> will show this commit, <literal>git log
+-S"frotz\(nitfol" --pickaxe-regex</literal> will not (because the number of
+occurrences of that string did not change).</simpara>
+<simpara>Unless <literal>--text</literal> is supplied patches of binary files without a textconv
+filter will be ignored.</simpara>
+<simpara>See the <emphasis>pickaxe</emphasis> entry in <citerefentry>
+<refentrytitle>gitdiffcore</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry> for more
+information.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--find-object=&lt;object-id&gt;
+</term>
+<listitem>
+<simpara>
+        Look for differences that change the number of occurrences of
+        the specified object. Similar to <literal>-S</literal>, just the argument is different
+        in that it doesn&#8217;t search for a specific string but for a specific
+        object id.
+</simpara>
+<simpara>The object can be a blob or a submodule commit. It implies the <literal>-t</literal> option in
+<literal>git-log</literal> to also find trees.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--pickaxe-all
+</term>
+<listitem>
+<simpara>
+        When <literal>-S</literal> or <literal>-G</literal> finds a change, show all the changes in that
+        changeset, not just the files that contain the change
+        in &lt;string&gt;.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--pickaxe-regex
+</term>
+<listitem>
+<simpara>
+        Treat the &lt;string&gt; given to <literal>-S</literal> as an extended POSIX regular
+        expression to match.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-O&lt;orderfile&gt;
+</term>
+<listitem>
+<simpara>
+        Control the order in which files appear in the output.
+        This overrides the <literal>diff.orderFile</literal> configuration variable
+        (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).  To cancel <literal>diff.orderFile</literal>,
+        use <literal>-O/dev/null</literal>.
+</simpara>
+<simpara>The output order is determined by the order of glob patterns in
+&lt;orderfile&gt;.
+All files with pathnames that match the first pattern are output
+first, all files with pathnames that match the second pattern (but not
+the first) are output next, and so on.
+All files with pathnames that do not match any pattern are output
+last, as if there was an implicit match-all pattern at the end of the
+file.
+If multiple pathnames have the same rank (they match the same pattern
+but no earlier patterns), their output order relative to each other is
+the normal order.</simpara>
+<simpara>&lt;orderfile&gt; is parsed as follows:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+Blank lines are ignored, so they can be used as separators for
+   readability.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Lines starting with a hash ("<literal>#</literal>") are ignored, so they can be used
+   for comments.  Add a backslash ("<literal>\</literal>") to the beginning of the
+   pattern if it starts with a hash.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Each other line contains a single pattern.
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>Patterns have the same syntax and semantics as patterns used for
+fnmatch(3) without the FNM_PATHNAME flag, except a pathname also
+matches a pattern if removing any number of the final pathname
+components matches the pattern.  For example, the pattern "<literal>foo*bar</literal>"
+matches "<literal>fooasdfbar</literal>" and "<literal>foo/bar/baz/asdf</literal>" but not "<literal>foobarx</literal>".</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--skip-to=&lt;file&gt;
+</term>
+<term>
+--rotate-to=&lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        Discard the files before the named &lt;file&gt; from the output
+        (i.e. <emphasis>skip to</emphasis>), or move them to the end of the output
+        (i.e. <emphasis>rotate to</emphasis>).  These were invented primarily for use
+        of the <literal>git difftool</literal> command, and may not be very useful
+        otherwise.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-R
+</term>
+<listitem>
+<simpara>
+        Swap two inputs; that is, show differences from index or
+        on-disk file to tree contents.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--relative[=&lt;path&gt;]
+</term>
+<term>
+--no-relative
+</term>
+<listitem>
+<simpara>
+        When run from a subdirectory of the project, it can be
+        told to exclude changes outside the directory and show
+        pathnames relative to it with this option.  When you are
+        not in a subdirectory (e.g. in a bare repository), you
+        can name which subdirectory to make the output relative
+        to by giving a &lt;path&gt; as an argument.
+        <literal>--no-relative</literal> can be used to countermand both <literal>diff.relative</literal> config
+        option and previous <literal>--relative</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-a
+</term>
+<term>
+--text
+</term>
+<listitem>
+<simpara>
+        Treat all files as text.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-cr-at-eol
+</term>
+<listitem>
+<simpara>
+        Ignore carriage-return at the end of line when doing a comparison.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-space-at-eol
+</term>
+<listitem>
+<simpara>
+        Ignore changes in whitespace at EOL.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-b
+</term>
+<term>
+--ignore-space-change
+</term>
+<listitem>
+<simpara>
+        Ignore changes in amount of whitespace.  This ignores whitespace
+        at line end, and considers all other sequences of one or
+        more whitespace characters to be equivalent.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-w
+</term>
+<term>
+--ignore-all-space
+</term>
+<listitem>
+<simpara>
+        Ignore whitespace when comparing lines.  This ignores
+        differences even if one line has whitespace where the other
+        line has none.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-blank-lines
+</term>
+<listitem>
+<simpara>
+        Ignore changes whose lines are all blank.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-I&lt;regex&gt;
+</term>
+<term>
+--ignore-matching-lines=&lt;regex&gt;
+</term>
+<listitem>
+<simpara>
+        Ignore changes whose all lines match &lt;regex&gt;.  This option may
+        be specified more than once.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--inter-hunk-context=&lt;lines&gt;
+</term>
+<listitem>
+<simpara>
+        Show the context between diff hunks, up to the specified number
+        of lines, thereby fusing hunks that are close to each other.
+        Defaults to <literal>diff.interHunkContext</literal> or 0 if the config option
+        is unset.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-W
+</term>
+<term>
+--function-context
+</term>
+<listitem>
+<simpara>
+        Show whole function as context lines for each change.
+        The function names are determined in the same way as
+        <literal>git diff</literal> works out patch hunk headers (see <emphasis>Defining a
+        custom hunk-header</emphasis> in <citerefentry>
+<refentrytitle>gitattributes</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--exit-code
+</term>
+<listitem>
+<simpara>
+        Make the program exit with codes similar to diff(1).
+        That is, it exits with 1 if there were differences and
+        0 means no differences.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--quiet
+</term>
+<listitem>
+<simpara>
+        Disable all output of the program. Implies <literal>--exit-code</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ext-diff
+</term>
+<listitem>
+<simpara>
+        Allow an external diff helper to be executed. If you set an
+        external diff driver with <citerefentry>
+<refentrytitle>gitattributes</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>, you need
+        to use this option with <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> and friends.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-ext-diff
+</term>
+<listitem>
+<simpara>
+        Disallow external diff drivers.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--textconv
+</term>
+<term>
+--no-textconv
+</term>
+<listitem>
+<simpara>
+        Allow (or disallow) external text conversion filters to be run
+        when comparing binary files. See <citerefentry>
+<refentrytitle>gitattributes</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry> for
+        details. Because textconv filters are typically a one-way
+        conversion, the resulting diff is suitable for human
+        consumption, but cannot be applied. For this reason, textconv
+        filters are enabled by default only for <citerefentry>
+<refentrytitle>git-diff</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> and
+        <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>, but not for <citerefentry>
+<refentrytitle>git-format-patch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> or
+        diff plumbing commands.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-submodules[=&lt;when&gt;]
+</term>
+<listitem>
+<simpara>
+        Ignore changes to submodules in the diff generation. &lt;when&gt; can be
+        either "none", "untracked", "dirty" or "all", which is the default.
+        Using "none" will consider the submodule modified when it either contains
+        untracked or modified files or its HEAD differs from the commit recorded
+        in the superproject and can be used to override any settings of the
+        <emphasis>ignore</emphasis> option in <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> or <citerefentry>
+<refentrytitle>gitmodules</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>. When
+        "untracked" is used submodules are not considered dirty when they only
+        contain untracked content (but they are still scanned for modified
+        content). Using "dirty" ignores all changes to the work tree of submodules,
+        only changes to the commits stored in the superproject are shown (this was
+        the behavior until 1.7.0). Using "all" hides all changes to submodules.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--src-prefix=&lt;prefix&gt;
+</term>
+<listitem>
+<simpara>
+        Show the given source prefix instead of "a/".
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--dst-prefix=&lt;prefix&gt;
+</term>
+<listitem>
+<simpara>
+        Show the given destination prefix instead of "b/".
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-prefix
+</term>
+<listitem>
+<simpara>
+        Do not show any source or destination prefix.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--line-prefix=&lt;prefix&gt;
+</term>
+<listitem>
+<simpara>
+        Prepend an additional prefix to every line of output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ita-invisible-in-index
+</term>
+<listitem>
+<simpara>
+        By default entries added by "git add -N" appear as an existing
+        empty file in "git diff" and a new file in "git diff --cached".
+        This option makes the entry appear as a new file in "git diff"
+        and non-existent in "git diff --cached". This option could be
+        reverted with <literal>--ita-visible-in-index</literal>. Both options are
+        experimental and could be removed in future.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>For more detailed explanation on these common options, see also
+<citerefentry>
+<refentrytitle>gitdiffcore</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+-1 --base
+</term>
+<term>
+-2 --ours
+</term>
+<term>
+-3 --theirs
+</term>
+<listitem>
+<simpara>
+        Compare the working tree with the "base" version (stage #1),
+        "our branch" (stage #2) or "their branch" (stage #3).  The
+        index contains these stages only for unmerged entries i.e.
+        while resolving conflicts.  See <citerefentry>
+<refentrytitle>git-read-tree</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+        section "3-Way Merge" for detailed information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-0
+</term>
+<listitem>
+<simpara>
+        Omit diff output for unmerged entries and just show
+        "Unmerged".  Can be used only when comparing the working tree
+        with the index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;path&gt;&#8230;
+</term>
+<listitem>
+<simpara>
+        The &lt;paths&gt; parameters, when given, are used to limit
+        the diff to the named paths (you can give directory
+        names and get diff for all files under them).
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_raw_output_format">
+<title>Raw output format</title>
+<simpara>The raw output format from "git-diff-index", "git-diff-tree",
+"git-diff-files" and "git diff --raw" are very similar.</simpara>
+<simpara>These commands all compare two sets of things; what is
+compared differs:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+git-diff-index &lt;tree-ish&gt;
+</term>
+<listitem>
+<simpara>
+        compares the &lt;tree-ish&gt; and the files on the filesystem.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+git-diff-index --cached &lt;tree-ish&gt;
+</term>
+<listitem>
+<simpara>
+        compares the &lt;tree-ish&gt; and the index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+git-diff-tree [-r] &lt;tree-ish-1&gt; &lt;tree-ish-2&gt; [&lt;pattern&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        compares the trees named by the two arguments.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+git-diff-files [&lt;pattern&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        compares the index and the files on the filesystem.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>The "git-diff-tree" command begins its output by printing the hash of
+what is being compared. After that, all the commands print one output
+line per changed file.</simpara>
+<simpara>An output line is formatted this way:</simpara>
+<literallayout class="monospaced">in-place edit  :100644 100644 bcd1234 0123456 M file0
+copy-edit      :100644 100644 abcd123 1234567 C68 file1 file2
+rename-edit    :100644 100644 abcd123 1234567 R86 file1 file3
+create         :000000 100644 0000000 1234567 A file4
+delete         :100644 000000 1234567 0000000 D file5
+unmerged       :000000 000000 0000000 0000000 U file6</literallayout><simpara></simpara>
+<simpara>That is, from the left to the right:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+a colon.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+mode for "src"; 000000 if creation or unmerged.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a space.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+mode for "dst"; 000000 if deletion or unmerged.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a space.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+sha1 for "src"; 0{40} if creation or unmerged.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a space.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+sha1 for "dst"; 0{40} if creation, unmerged or "look at work tree".
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a space.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+status, followed by optional "score" number.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a tab or a NUL when <literal>-z</literal> option is used.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+path for "src"
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a tab or a NUL when <literal>-z</literal> option is used; only exists for C or R.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+path for "dst"; only exists for C or R.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+an LF or a NUL when <literal>-z</literal> option is used, to terminate the record.
+</simpara>
+</listitem>
+</orderedlist>
+<simpara>Possible status letters are:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+A: addition of a file
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+C: copy of a file into a new one
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+D: deletion of a file
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+M: modification of the contents or mode of a file
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+R: renaming of a file
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+T: change in the type of the file (regular file, symbolic link or submodule)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+U: file is unmerged (you must complete the merge before it can
+  be committed)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+X: "unknown" change type (most probably a bug, please report it)
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>Status letters C and R are always followed by a score (denoting the
+percentage of similarity between the source and target of the move or
+copy).  Status letter M may be followed by a score (denoting the
+percentage of dissimilarity) for file rewrites.</simpara>
+<simpara>&lt;sha1&gt; is shown as all 0&#8217;s if a file is new on the filesystem
+and it is out of sync with the index.</simpara>
+<simpara>Example:</simpara>
+<literallayout class="monospaced">:100644 100644 5be4a4a 0000000 M file.c</literallayout><simpara></simpara>
+<simpara>Without the <literal>-z</literal> option, pathnames with "unusual" characters are
+quoted as explained for the configuration variable <literal>core.quotePath</literal>
+(see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).  Using <literal>-z</literal> the filename is output
+verbatim and the line is terminated by a NUL byte.</simpara>
+</refsect1>
+<refsect1 id="_diff_format_for_merges">
+<title>diff format for merges</title>
+<simpara>"git-diff-tree", "git-diff-files" and "git-diff --raw"
+can take <literal>-c</literal> or <literal>--cc</literal> option
+to generate diff output also for merge commits.  The output differs
+from the format described above in the following way:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+there is a colon for each parent
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+there are more "src" modes and "src" sha1
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+status is concatenated status characters for each parent
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+no optional "score" number
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+tab-separated pathname(s) of the file
+</simpara>
+</listitem>
+</orderedlist>
+<simpara>For <literal>-c</literal> and <literal>--cc</literal>, only the destination or final path is shown even
+if the file was renamed on any side of history.  With
+<literal>--combined-all-paths</literal>, the name of the path in each parent is shown
+followed by the name of the path in the merge commit.</simpara>
+<simpara>Examples for <literal>-c</literal> and <literal>--cc</literal> without <literal>--combined-all-paths</literal>:</simpara>
+<literallayout class="monospaced">::100644 100644 100644 fabadb8 cc95eb0 4866510 MM       desc.c
+::100755 100755 100755 52b7a2d 6d1ac04 d2ac7d7 RM       bar.sh
+::100644 100644 100644 e07d6c5 9042e82 ee91881 RR       phooey.c</literallayout><simpara></simpara>
+<simpara>Examples when <literal>--combined-all-paths</literal> added to either <literal>-c</literal> or <literal>--cc</literal>:</simpara>
+<literallayout class="monospaced">::100644 100644 100644 fabadb8 cc95eb0 4866510 MM       desc.c  desc.c  desc.c
+::100755 100755 100755 52b7a2d 6d1ac04 d2ac7d7 RM       foo.sh  bar.sh  bar.sh
+::100644 100644 100644 e07d6c5 9042e82 ee91881 RR       fooey.c fuey.c  phooey.c</literallayout><simpara></simpara>
+<simpara>Note that <emphasis>combined diff</emphasis> lists only files which were modified from
+all parents.</simpara>
+</refsect1>
+<refsect1 id="_generating_patch_text_with_p">
+<title>Generating patch text with -p</title>
+<simpara>Running
+<citerefentry>
+<refentrytitle>git-diff</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-show</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-diff-index</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-diff-tree</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>, or
+<citerefentry>
+<refentrytitle>git-diff-files</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+with the <literal>-p</literal> option produces patch text.
+You can customize the creation of patch text via the
+<literal>GIT_EXTERNAL_DIFF</literal> and the <literal>GIT_DIFF_OPTS</literal> environment variables
+(see <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>), and the <literal>diff</literal> attribute (see <citerefentry>
+<refentrytitle>gitattributes</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>).</simpara>
+<simpara>What the -p option produces is slightly different from the traditional
+diff format:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+It is preceded with a "git diff" header that looks like this:
+</simpara>
+<literallayout class="monospaced">diff --git a/file1 b/file2</literallayout>
+<simpara>The <literal>a/</literal> and <literal>b/</literal> filenames are the same unless rename/copy is
+involved.  Especially, even for a creation or a deletion,
+<literal>/dev/null</literal> is <emphasis>not</emphasis> used in place of the <literal>a/</literal> or <literal>b/</literal> filenames.</simpara>
+<simpara>When rename/copy is involved, <literal>file1</literal> and <literal>file2</literal> show the
+name of the source file of the rename/copy and the name of
+the file that rename/copy produces, respectively.</simpara>
+</listitem>
+<listitem>
+<simpara>
+It is followed by one or more extended header lines:
+</simpara>
+<literallayout class="monospaced">old mode &lt;mode&gt;
+new mode &lt;mode&gt;
+deleted file mode &lt;mode&gt;
+new file mode &lt;mode&gt;
+copy from &lt;path&gt;
+copy to &lt;path&gt;
+rename from &lt;path&gt;
+rename to &lt;path&gt;
+similarity index &lt;number&gt;
+dissimilarity index &lt;number&gt;
+index &lt;hash&gt;..&lt;hash&gt; &lt;mode&gt;</literallayout>
+<simpara>File modes are printed as 6-digit octal numbers including the file type
+and file permission bits.</simpara>
+<simpara>Path names in extended headers do not include the <literal>a/</literal> and <literal>b/</literal> prefixes.</simpara>
+<simpara>The similarity index is the percentage of unchanged lines, and
+the dissimilarity index is the percentage of changed lines.  It
+is a rounded down integer, followed by a percent sign.  The
+similarity index value of 100% is thus reserved for two equal
+files, while 100% dissimilarity means that no line from the old
+file made it into the new one.</simpara>
+<simpara>The index line includes the blob object names before and after the change.
+The &lt;mode&gt; is included if the file mode does not change; otherwise,
+separate lines indicate the old and the new mode.</simpara>
+</listitem>
+<listitem>
+<simpara>
+Pathnames with "unusual" characters are quoted as explained for
+    the configuration variable <literal>core.quotePath</literal> (see
+    <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+All the <literal>file1</literal> files in the output refer to files before the
+    commit, and all the <literal>file2</literal> files refer to files after the commit.
+    It is incorrect to apply each change to each file sequentially.  For
+    example, this patch will swap a and b:
+</simpara>
+<literallayout class="monospaced">diff --git a/a b/b
+rename from a
+rename to b
+diff --git a/b b/a
+rename from b
+rename to a</literallayout>
+</listitem>
+<listitem>
+<simpara>
+Hunk headers mention the name of the function to which the hunk
+    applies.  See "Defining a custom hunk-header" in
+    <citerefentry>
+<refentrytitle>gitattributes</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry> for details of how to tailor to this to
+    specific languages.
+</simpara>
+</listitem>
+</orderedlist>
+</refsect1>
+<refsect1 id="_combined_diff_format">
+<title>Combined diff format</title>
+<simpara>Any diff-generating command can take the <literal>-c</literal> or <literal>--cc</literal> option to
+produce a <emphasis>combined diff</emphasis> when showing a merge. This is the default
+format when showing merges with <citerefentry>
+<refentrytitle>git-diff</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> or
+<citerefentry>
+<refentrytitle>git-show</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>. Note also that you can give suitable
+<literal>--diff-merges</literal> option to any of these commands to force generation of
+diffs in specific format.</simpara>
+<simpara>A "combined diff" format looks like this:</simpara>
+<literallayout class="monospaced">diff --combined describe.c
+index fabadb8,cc95eb0..4866510
+--- a/describe.c
++++ b/describe.c
+@@@ -98,20 -98,12 +98,20 @@@
+        return (a_date &gt; b_date) ? -1 : (a_date == b_date) ? 0 : 1;
+  }
+
+- static void describe(char *arg)
+ -static void describe(struct commit *cmit, int last_one)
+++static void describe(char *arg, int last_one)
+  {
+ +      unsigned char sha1[20];
+ +      struct commit *cmit;
+        struct commit_list *list;
+        static int initialized = 0;
+        struct commit_name *n;
+
+ +      if (get_sha1(arg, sha1) &lt; 0)
+ +              usage(describe_usage);
+ +      cmit = lookup_commit_reference(sha1);
+ +      if (!cmit)
+ +              usage(describe_usage);
+ +
+        if (!initialized) {
+                initialized = 1;
+                for_each_ref(get_name);</literallayout><simpara></simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+It is preceded with a "git diff" header, that looks like
+     this (when the <literal>-c</literal> option is used):
+</simpara>
+<literallayout class="monospaced">diff --combined file</literallayout>
+<simpara>or like this (when the <literal>--cc</literal> option is used):</simpara>
+<literallayout class="monospaced">diff --cc file</literallayout>
+</listitem>
+<listitem>
+<simpara>
+It is followed by one or more extended header lines
+     (this example shows a merge with two parents):
+</simpara>
+<literallayout class="monospaced">index &lt;hash&gt;,&lt;hash&gt;..&lt;hash&gt;
+mode &lt;mode&gt;,&lt;mode&gt;..&lt;mode&gt;
+new file mode &lt;mode&gt;
+deleted file mode &lt;mode&gt;,&lt;mode&gt;</literallayout>
+<simpara>The <literal>mode &lt;mode&gt;,&lt;mode&gt;..&lt;mode&gt;</literal> line appears only if at least one of
+the &lt;mode&gt; is different from the rest. Extended headers with
+information about detected contents movement (renames and
+copying detection) are designed to work with diff of two
+&lt;tree-ish&gt; and are not used by combined diff format.</simpara>
+</listitem>
+<listitem>
+<simpara>
+It is followed by two-line from-file/to-file header
+</simpara>
+<literallayout class="monospaced">--- a/file
++++ b/file</literallayout>
+<simpara>Similar to two-line header for traditional <emphasis>unified</emphasis> diff
+format, <literal>/dev/null</literal> is used to signal created or deleted
+files.</simpara>
+<simpara>However, if the --combined-all-paths option is provided, instead of a
+two-line from-file/to-file you get a N+1 line from-file/to-file header,
+where N is the number of parents in the merge commit</simpara>
+<literallayout class="monospaced">--- a/file
+--- a/file
+--- a/file
++++ b/file</literallayout>
+<simpara>This extended format can be useful if rename or copy detection is
+active, to allow you to see the original name of the file in different
+parents.</simpara>
+</listitem>
+<listitem>
+<simpara>
+Chunk header format is modified to prevent people from
+     accidentally feeding it to <literal>patch -p1</literal>. Combined diff format
+     was created for review of merge commit changes, and was not
+     meant to be applied. The change is similar to the change in the
+     extended <emphasis>index</emphasis> header:
+</simpara>
+<literallayout class="monospaced">@@@ &lt;from-file-range&gt; &lt;from-file-range&gt; &lt;to-file-range&gt; @@@</literallayout>
+<simpara>There are (number of parents + 1) <literal>@</literal> characters in the chunk
+header for combined diff format.</simpara>
+</listitem>
+</orderedlist>
+<simpara>Unlike the traditional <emphasis>unified</emphasis> diff format, which shows two
+files A and B with a single column that has <literal>-</literal> (minus&#8201;&#8212;&#8201;appears in A but removed in B), <literal>+</literal> (plus&#8201;&#8212;&#8201;missing in A but
+added to B), or <literal>" "</literal> (space&#8201;&#8212;&#8201;unchanged) prefix, this format
+compares two or more files file1, file2,&#8230; with one file X, and
+shows how X differs from each of fileN.  One column for each of
+fileN is prepended to the output line to note how X&#8217;s line is
+different from it.</simpara>
+<simpara>A <literal>-</literal> character in the column N means that the line appears in
+fileN but it does not appear in the result.  A <literal>+</literal> character
+in the column N means that the line appears in the result,
+and fileN does not have that line (in other words, the line was
+added, from the point of view of that parent).</simpara>
+<simpara>In the above example output, the function signature was changed
+from both files (hence two <literal>-</literal> removals from both file1 and
+file2, plus <literal>++</literal> to mean one line that was added does not appear
+in either file1 or file2).  Also eight other lines are the same
+from file1 but do not appear in file2 (hence prefixed with <literal>+</literal>).</simpara>
+<simpara>When shown by <literal>git diff-tree -c</literal>, it compares the parents of a
+merge commit with the merge result (i.e. file1..fileN are the
+parents).  When shown by <literal>git diff-files -c</literal>, it compares the
+two unresolved merge parents with the working tree file
+(i.e. file1 is stage 2 aka "our version", file2 is stage 3 aka
+"their version").</simpara>
+</refsect1>
+<refsect1 id="_other_diff_formats">
+<title>other diff formats</title>
+<simpara>The <literal>--summary</literal> option describes newly added, deleted, renamed and
+copied files.  The <literal>--stat</literal> option adds diffstat(1) graph to the
+output.  These options can be combined with other options, such as
+<literal>-p</literal>, and are meant for human consumption.</simpara>
+<simpara>When showing a change that involves a rename or a copy, <literal>--stat</literal> output
+formats the pathnames compactly by combining common prefix and suffix of
+the pathnames.  For example, a change that moves <literal>arch/i386/Makefile</literal> to
+<literal>arch/x86/Makefile</literal> while modifying 4 lines will be shown like this:</simpara>
+<literallayout class="monospaced">arch/{i386 =&gt; x86}/Makefile    |   4 +--</literallayout><simpara></simpara>
+<simpara>The <literal>--numstat</literal> option gives the diffstat(1) information but is designed
+for easier machine consumption.  An entry in <literal>--numstat</literal> output looks
+like this:</simpara>
+<literallayout class="monospaced">1       2       README
+3       1       arch/{i386 =&gt; x86}/Makefile</literallayout><simpara></simpara>
+<simpara>That is, from left to right:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+the number of added lines;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a tab;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the number of deleted lines;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a tab;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+pathname (possibly with rename/copy information);
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a newline.
+</simpara>
+</listitem>
+</orderedlist>
+<simpara>When <literal>-z</literal> output option is in effect, the output is formatted this way:</simpara>
+<literallayout class="monospaced">1       2       README NUL
+3       1       NUL arch/i386/Makefile NUL arch/x86/Makefile NUL</literallayout><simpara></simpara>
+<simpara>That is:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+the number of added lines;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a tab;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the number of deleted lines;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a tab;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a NUL (only exists if renamed/copied);
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+pathname in preimage;
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a NUL (only exists if renamed/copied);
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+pathname in postimage (only exists if renamed/copied);
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a NUL.
+</simpara>
+</listitem>
+</orderedlist>
+<simpara>The extra <literal>NUL</literal> before the preimage path in renamed case is to allow
+scripts that read the output to tell if the current record being read is
+a single-path record or a rename/copy record without reading ahead.
+After reading added and deleted lines, reading up to <literal>NUL</literal> would yield
+the pathname, but if that is <literal>NUL</literal>, the record will show two paths.</simpara>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<variablelist>
+<varlistentry>
+<term>
+Various ways to check your working tree
+</term>
+<listitem>
+<literallayout class="monospaced">$ git diff            <co id="CO1-1"/>
+$ git diff --cached   <co id="CO1-2"/>
+$ git diff HEAD       <co id="CO1-3"/></literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO1-1">
+<para>
+Changes in the working tree not yet staged for the next commit.
+</para>
+</callout>
+<callout arearefs="CO1-2">
+<para>
+Changes between the index and your last commit; what you
+    would be committing if you run <literal>git commit</literal> without <literal>-a</literal> option.
+</para>
+</callout>
+<callout arearefs="CO1-3">
+<para>
+Changes in the working tree since your last commit; what you
+    would be committing if you run <literal>git commit -a</literal>
+</para>
+</callout>
+</calloutlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Comparing with arbitrary commits
+</term>
+<listitem>
+<literallayout class="monospaced">$ git diff test            <co id="CO2-1"/>
+$ git diff HEAD -- ./test  <co id="CO2-2"/>
+$ git diff HEAD^ HEAD      <co id="CO2-3"/></literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO2-1">
+<para>
+Instead of using the tip of the current branch, compare with the
+    tip of "test" branch.
+</para>
+</callout>
+<callout arearefs="CO2-2">
+<para>
+Instead of comparing with the tip of "test" branch, compare with
+    the tip of the current branch, but limit the comparison to the
+    file "test".
+</para>
+</callout>
+<callout arearefs="CO2-3">
+<para>
+Compare the version before the last commit and the last commit.
+</para>
+</callout>
+</calloutlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Comparing branches
+</term>
+<listitem>
+<literallayout class="monospaced">$ git diff topic master    <co id="CO3-1"/>
+$ git diff topic..master   <co id="CO3-2"/>
+$ git diff topic...master  <co id="CO3-3"/></literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO3-1">
+<para>
+Changes between the tips of the topic and the master branches.
+</para>
+</callout>
+<callout arearefs="CO3-2">
+<para>
+Same as above.
+</para>
+</callout>
+<callout arearefs="CO3-3">
+<para>
+Changes that occurred on the master branch since when the topic
+    branch was started off it.
+</para>
+</callout>
+</calloutlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Limiting the diff output
+</term>
+<listitem>
+<literallayout class="monospaced">$ git diff --diff-filter=MRC            <co id="CO4-1"/>
+$ git diff --name-status                <co id="CO4-2"/>
+$ git diff arch/i386 include/asm-i386   <co id="CO4-3"/></literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO4-1">
+<para>
+Show only modification, rename, and copy, but not addition
+    or deletion.
+</para>
+</callout>
+<callout arearefs="CO4-2">
+<para>
+Show only names and the nature of change, but not actual
+    diff output.
+</para>
+</callout>
+<callout arearefs="CO4-3">
+<para>
+Limit diff output to named subtrees.
+</para>
+</callout>
+</calloutlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Munging the diff output
+</term>
+<listitem>
+<literallayout class="monospaced">$ git diff --find-copies-harder -B -C  <co id="CO5-1"/>
+$ git diff -R                          <co id="CO5-2"/></literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO5-1">
+<para>
+Spend extra cycles to find renames, copies and complete
+    rewrites (very expensive).
+</para>
+</callout>
+<callout arearefs="CO5-2">
+<para>
+Output diff in reverse.
+</para>
+</callout>
+</calloutlist>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara>diff(1),
+<citerefentry>
+<refentrytitle>git-difftool</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>gitdiffcore</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-format-patch</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-apply</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-show</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

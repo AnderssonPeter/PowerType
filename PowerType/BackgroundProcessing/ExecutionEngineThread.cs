@@ -129,6 +129,11 @@ internal class ExecutionEngineThread : IDisposable
         var resultObject = result.Single().BaseObject;
         if (resultObject is PowerTypeDictionary dictionary)
         {
+            if (!dictionary.Platforms.HasFlag(PlatformIdentification.CurrentPlatform))
+            {
+                //This dictionary is not supported on the current platform
+                return;
+            }
             dictionary.Initialize(SystemTime.Instance);
             dictionary.Validate();
             suggestor = new DictionarySuggestor(dictionary);
@@ -141,7 +146,6 @@ internal class ExecutionEngineThread : IDisposable
         {
             throw new InvalidOperationException("Didn't receive a PowerTypeDictionary or ISuggestor");
         }
-
         lock (dictionariesLocker)
         {
             dictionaries.Add(new DictionaryInformation(command.File, suggestor));

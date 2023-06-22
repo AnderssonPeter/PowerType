@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-am</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-am</refname>
+  <refpurpose>Apply a series of patches from a mailbox</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git am</emphasis> [--signoff] [--keep] [--[no-]keep-cr] [--[no-]utf8]
+         [--[no-]3way] [--interactive] [--committer-date-is-author-date]
+         [--ignore-date] [--ignore-space-change | --ignore-whitespace]
+         [--whitespace=&lt;option&gt;] [-C&lt;n&gt;] [-p&lt;n&gt;] [--directory=&lt;dir&gt;]
+         [--exclude=&lt;path&gt;] [--include=&lt;path&gt;] [--reject] [-q | --quiet]
+         [--[no-]scissors] [-S[&lt;keyid&gt;]] [--patch-format=&lt;format&gt;]
+         [--quoted-cr=&lt;action&gt;]
+         [(&lt;mbox&gt; | &lt;Maildir&gt;)&#8230;]
+<emphasis>git am</emphasis> (--continue | --skip | --abort | --quit | --show-current-patch[=(diff|raw)])</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Splits mail messages in a mailbox into commit log message,
+authorship information and patches, and applies them to the
+current branch.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+(&lt;mbox&gt;|&lt;Maildir&gt;)&#8230;
+</term>
+<listitem>
+<simpara>
+        The list of mailbox files to read patches from. If you do not
+        supply this argument, the command reads from the standard input.
+        If you supply directories, they will be treated as Maildirs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-s
+</term>
+<term>
+--signoff
+</term>
+<listitem>
+<simpara>
+        Add a <literal>Signed-off-by</literal> trailer to the commit message, using
+        the committer identity of yourself.
+        See the signoff option in <citerefentry>
+<refentrytitle>git-commit</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for more information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-k
+</term>
+<term>
+--keep
+</term>
+<listitem>
+<simpara>
+        Pass <literal>-k</literal> flag to <emphasis>git mailinfo</emphasis> (see <citerefentry>
+<refentrytitle>git-mailinfo</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--keep-non-patch
+</term>
+<listitem>
+<simpara>
+        Pass <literal>-b</literal> flag to <emphasis>git mailinfo</emphasis> (see <citerefentry>
+<refentrytitle>git-mailinfo</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]keep-cr
+</term>
+<listitem>
+<simpara>
+        With <literal>--keep-cr</literal>, call <emphasis>git mailsplit</emphasis> (see <citerefentry>
+<refentrytitle>git-mailsplit</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>)
+        with the same option, to prevent it from stripping CR at the end of
+        lines. <literal>am.keepcr</literal> configuration variable can be used to specify the
+        default behaviour.  <literal>--no-keep-cr</literal> is useful to override <literal>am.keepcr</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-c
+</term>
+<term>
+--scissors
+</term>
+<listitem>
+<simpara>
+        Remove everything in body before a scissors line (see
+        <citerefentry>
+<refentrytitle>git-mailinfo</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>). Can be activated by default using
+        the <literal>mailinfo.scissors</literal> configuration variable.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-scissors
+</term>
+<listitem>
+<simpara>
+        Ignore scissors lines (see <citerefentry>
+<refentrytitle>git-mailinfo</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--quoted-cr=&lt;action&gt;
+</term>
+<listitem>
+<simpara>
+        This flag will be passed down to <emphasis>git mailinfo</emphasis> (see <citerefentry>
+<refentrytitle>git-mailinfo</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-m
+</term>
+<term>
+--message-id
+</term>
+<listitem>
+<simpara>
+        Pass the <literal>-m</literal> flag to <emphasis>git mailinfo</emphasis> (see <citerefentry>
+<refentrytitle>git-mailinfo</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>),
+        so that the Message-ID header is added to the commit message.
+        The <literal>am.messageid</literal> configuration variable can be used to specify
+        the default behaviour.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-message-id
+</term>
+<listitem>
+<simpara>
+        Do not add the Message-ID header to the commit message.
+        <literal>no-message-id</literal> is useful to override <literal>am.messageid</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-q
+</term>
+<term>
+--quiet
+</term>
+<listitem>
+<simpara>
+        Be quiet. Only print error messages.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-u
+</term>
+<term>
+--utf8
+</term>
+<listitem>
+<simpara>
+        Pass <literal>-u</literal> flag to <emphasis>git mailinfo</emphasis> (see <citerefentry>
+<refentrytitle>git-mailinfo</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+        The proposed commit log message taken from the e-mail
+        is re-coded into UTF-8 encoding (configuration variable
+        <literal>i18n.commitEncoding</literal> can be used to specify project&#8217;s
+        preferred encoding if it is not UTF-8).
+</simpara>
+<simpara>This was optional in prior versions of git, but now it is the
+default.   You can use <literal>--no-utf8</literal> to override this.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-utf8
+</term>
+<listitem>
+<simpara>
+        Pass <literal>-n</literal> flag to <emphasis>git mailinfo</emphasis> (see
+        <citerefentry>
+<refentrytitle>git-mailinfo</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-3
+</term>
+<term>
+--3way
+</term>
+<term>
+--no-3way
+</term>
+<listitem>
+<simpara>
+        When the patch does not apply cleanly, fall back on
+        3-way merge if the patch records the identity of blobs
+        it is supposed to apply to and we have those blobs
+        available locally. <literal>--no-3way</literal> can be used to override
+        am.threeWay configuration variable. For more information,
+        see am.threeWay in <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--rerere-autoupdate
+</term>
+<term>
+--no-rerere-autoupdate
+</term>
+<listitem>
+<simpara>
+        Allow the rerere mechanism to update the index with the
+        result of auto-conflict resolution if possible.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-space-change
+</term>
+<term>
+--ignore-whitespace
+</term>
+<term>
+--whitespace=&lt;option&gt;
+</term>
+<term>
+-C&lt;n&gt;
+</term>
+<term>
+-p&lt;n&gt;
+</term>
+<term>
+--directory=&lt;dir&gt;
+</term>
+<term>
+--exclude=&lt;path&gt;
+</term>
+<term>
+--include=&lt;path&gt;
+</term>
+<term>
+--reject
+</term>
+<listitem>
+<simpara>
+        These flags are passed to the <emphasis>git apply</emphasis> (see <citerefentry>
+<refentrytitle>git-apply</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>)
+        program that applies
+        the patch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--patch-format
+</term>
+<listitem>
+<simpara>
+        By default the command will try to detect the patch format
+        automatically. This option allows the user to bypass the automatic
+        detection and specify the patch format that the patch(es) should be
+        interpreted as. Valid formats are mbox, mboxrd,
+        stgit, stgit-series and hg.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-i
+</term>
+<term>
+--interactive
+</term>
+<listitem>
+<simpara>
+        Run interactively.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--committer-date-is-author-date
+</term>
+<listitem>
+<simpara>
+        By default the command records the date from the e-mail
+        message as the commit author date, and uses the time of
+        commit creation as the committer date. This allows the
+        user to lie about the committer date by using the same
+        value as the author date.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-date
+</term>
+<listitem>
+<simpara>
+        By default the command records the date from the e-mail
+        message as the commit author date, and uses the time of
+        commit creation as the committer date. This allows the
+        user to lie about the author date by using the same
+        value as the committer date.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--skip
+</term>
+<listitem>
+<simpara>
+        Skip the current patch.  This is only meaningful when
+        restarting an aborted patch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-S[&lt;keyid&gt;]
+</term>
+<term>
+--gpg-sign[=&lt;keyid&gt;]
+</term>
+<term>
+--no-gpg-sign
+</term>
+<listitem>
+<simpara>
+        GPG-sign commits. The <literal>keyid</literal> argument is optional and
+        defaults to the committer identity; if specified, it must be
+        stuck to the option without a space. <literal>--no-gpg-sign</literal> is useful to
+        countermand both <literal>commit.gpgSign</literal> configuration variable, and
+        earlier <literal>--gpg-sign</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--continue
+</term>
+<term>
+-r
+</term>
+<term>
+--resolved
+</term>
+<listitem>
+<simpara>
+        After a patch failure (e.g. attempting to apply
+        conflicting patch), the user has applied it by hand and
+        the index file stores the result of the application.
+        Make a commit using the authorship and commit log
+        extracted from the e-mail message and the current index
+        file, and continue.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--resolvemsg=&lt;msg&gt;
+</term>
+<listitem>
+<simpara>
+        When a patch failure occurs, &lt;msg&gt; will be printed
+        to the screen before exiting.  This overrides the
+        standard message informing you to use <literal>--continue</literal>
+        or <literal>--skip</literal> to handle the failure.  This is solely
+        for internal use between <emphasis>git rebase</emphasis> and <emphasis>git am</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--abort
+</term>
+<listitem>
+<simpara>
+        Restore the original branch and abort the patching operation.
+        Revert contents of files involved in the am operation to their
+        pre-am state.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--quit
+</term>
+<listitem>
+<simpara>
+        Abort the patching operation but keep HEAD and the index
+        untouched.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--show-current-patch[=(diff|raw)]
+</term>
+<listitem>
+<simpara>
+        Show the message at which <literal>git am</literal> has stopped due to
+        conflicts.  If <literal>raw</literal> is specified, show the raw contents of
+        the e-mail message; if <literal>diff</literal>, show the diff portion only.
+        Defaults to <literal>raw</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_discussion">
+<title>DISCUSSION</title>
+<simpara>The commit author name is taken from the "From: " line of the
+message, and commit author date is taken from the "Date: " line
+of the message.  The "Subject: " line is used as the title of
+the commit, after stripping common prefix "[PATCH &lt;anything&gt;]".
+The "Subject: " line is supposed to concisely describe what the
+commit is about in one line of text.</simpara>
+<simpara>"From: ", "Date: ", and "Subject: " lines starting the body override the
+respective commit author name and title values taken from the headers.</simpara>
+<simpara>The commit message is formed by the title taken from the
+"Subject: ", a blank line and the body of the message up to
+where the patch begins.  Excess whitespace at the end of each
+line is automatically stripped.</simpara>
+<simpara>The patch is expected to be inline, directly following the
+message.  Any line that is of the form:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+three-dashes and end-of-line, or
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a line that begins with "diff -", or
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+a line that begins with "Index: "
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>is taken as the beginning of a patch, and the commit log message
+is terminated before the first occurrence of such a line.</simpara>
+<simpara>When initially invoking <literal>git am</literal>, you give it the names of the mailboxes
+to process.  Upon seeing the first patch that does not apply, it
+aborts in the middle.  You can recover from this in one of two ways:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+skip the current patch by re-running the command with the <literal>--skip</literal>
+  option.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+hand resolve the conflict in the working directory, and update
+  the index file to bring it into a state that the patch should
+  have produced.  Then run the command with the <literal>--continue</literal> option.
+</simpara>
+</listitem>
+</orderedlist>
+<simpara>The command refuses to process new mailboxes until the current
+operation is finished, so if you decide to start over from scratch,
+run <literal>git am --abort</literal> before running the command with mailbox
+names.</simpara>
+<simpara>Before any patches are applied, ORIG_HEAD is set to the tip of the
+current branch.  This is useful if you have problems with multiple
+commits, like running <emphasis>git am</emphasis> on the wrong branch or an error in the
+commits that is more easily fixed by changing the mailbox (e.g.
+errors in the "From:" lines).</simpara>
+</refsect1>
+<refsect1 id="_hooks">
+<title>HOOKS</title>
+<simpara>This command can run <literal>applypatch-msg</literal>, <literal>pre-applypatch</literal>,
+and <literal>post-applypatch</literal> hooks.  See <citerefentry>
+<refentrytitle>githooks</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry> for more
+information.</simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-apply</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

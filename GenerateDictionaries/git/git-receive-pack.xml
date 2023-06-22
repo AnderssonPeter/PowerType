@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-receive-pack</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-receive-pack</refname>
+  <refpurpose>Receive what is pushed into the repository</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git-receive-pack</emphasis> &lt;directory&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Invoked by <emphasis>git send-pack</emphasis> and updates the repository with the
+information fed from the remote end.</simpara>
+<simpara>This command is usually not invoked directly by the end user.
+The UI for the protocol is on the <emphasis>git send-pack</emphasis> side, and the
+program pair is meant to be used to push updates to remote
+repository.  For pull operations, see <citerefentry>
+<refentrytitle>git-fetch-pack</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+<simpara>The command allows for creation and fast-forwarding of sha1 refs
+(heads/tags) on the remote end (strictly speaking, it is the
+local end <emphasis>git-receive-pack</emphasis> runs, but to the user who is sitting at
+the send-pack end, it is updating the remote.  Confused?)</simpara>
+<simpara>There are other real-world examples of using update and
+post-update hooks found in the Documentation/howto directory.</simpara>
+<simpara><emphasis>git-receive-pack</emphasis> honours the receive.denyNonFastForwards config
+option, which tells it if updates to a ref should be denied if they
+are not fast-forwards.</simpara>
+<simpara>A number of other receive.* config options are available to tweak
+its behavior, see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+&lt;directory&gt;
+</term>
+<listitem>
+<simpara>
+        The repository to sync into.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--http-backend-info-refs
+</term>
+<listitem>
+<simpara>
+        Used by <citerefentry>
+<refentrytitle>git-http-backend</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> to serve up
+        <literal>$GIT_URL/info/refs?service=git-receive-pack</literal> requests. See
+        <literal>--http-backend-info-refs</literal> in <citerefentry>
+<refentrytitle>git-upload-pack</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_pre_receive_hook">
+<title>PRE-RECEIVE HOOK</title>
+<simpara>Before any ref is updated, if $GIT_DIR/hooks/pre-receive file exists
+and is executable, it will be invoked once with no parameters.  The
+standard input of the hook will be one line per ref to be updated:</simpara>
+<literallayout class="monospaced">sha1-old SP sha1-new SP refname LF</literallayout>
+<simpara>The refname value is relative to $GIT_DIR; e.g. for the master
+head this is "refs/heads/master".  The two sha1 values before
+each refname are the object names for the refname before and after
+the update.  Refs to be created will have sha1-old equal to 0{40},
+while refs to be deleted will have sha1-new equal to 0{40}, otherwise
+sha1-old and sha1-new should be valid objects in the repository.</simpara>
+<simpara>When accepting a signed push (see <citerefentry>
+<refentrytitle>git-push</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>), the signed
+push certificate is stored in a blob and an environment variable
+<literal>GIT_PUSH_CERT</literal> can be consulted for its object name.  See the
+description of <literal>post-receive</literal> hook for an example.  In addition, the
+certificate is verified using GPG and the result is exported with
+the following environment variables:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<literal>GIT_PUSH_CERT_SIGNER</literal>
+</term>
+<listitem>
+<simpara>
+        The name and the e-mail address of the owner of the key that
+        signed the push certificate.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>GIT_PUSH_CERT_KEY</literal>
+</term>
+<listitem>
+<simpara>
+        The GPG key ID of the key that signed the push certificate.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>GIT_PUSH_CERT_STATUS</literal>
+</term>
+<listitem>
+<simpara>
+        The status of GPG verification of the push certificate,
+        using the same mnemonic as used in <literal>%G?</literal> format of <literal>git log</literal>
+        family of commands (see <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>GIT_PUSH_CERT_NONCE</literal>
+</term>
+<listitem>
+<simpara>
+        The nonce string the process asked the signer to include
+        in the push certificate.  If this does not match the value
+        recorded on the "nonce" header in the push certificate, it
+        may indicate that the certificate is a valid one that is
+        being replayed from a separate "git push" session.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>GIT_PUSH_CERT_NONCE_STATUS</literal>
+</term>
+<listitem>
+<variablelist>
+<varlistentry>
+<term>
+<literal>UNSOLICITED</literal>
+</term>
+<listitem>
+<simpara>
+        "git push --signed" sent a nonce when we did not ask it to
+        send one.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>MISSING</literal>
+</term>
+<listitem>
+<simpara>
+        "git push --signed" did not send any nonce header.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>BAD</literal>
+</term>
+<listitem>
+<simpara>
+        "git push --signed" sent a bogus nonce.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>OK</literal>
+</term>
+<listitem>
+<simpara>
+        "git push --signed" sent the nonce we asked it to send.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>SLOP</literal>
+</term>
+<listitem>
+<simpara>
+        "git push --signed" sent a nonce different from what we
+        asked it to send now, but in a previous session.  See
+        <literal>GIT_PUSH_CERT_NONCE_SLOP</literal> environment variable.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>GIT_PUSH_CERT_NONCE_SLOP</literal>
+</term>
+<listitem>
+<simpara>
+        "git push --signed" sent a nonce different from what we
+        asked it to send now, but in a different session whose
+        starting time is different by this many seconds from the
+        current session.  Only meaningful when
+        <literal>GIT_PUSH_CERT_NONCE_STATUS</literal> says <literal>SLOP</literal>.
+        Also read about <literal>receive.certNonceSlop</literal> variable in
+        <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>This hook is called before any refname is updated and before any
+fast-forward checks are performed.</simpara>
+<simpara>If the pre-receive hook exits with a non-zero exit status no updates
+will be performed, and the update, post-receive and post-update
+hooks will not be invoked either.  This can be useful to quickly
+bail out if the update is not to be supported.</simpara>
+<simpara>See the notes on the quarantine environment below.</simpara>
+</refsect1>
+<refsect1 id="_update_hook">
+<title>UPDATE HOOK</title>
+<simpara>Before each ref is updated, if $GIT_DIR/hooks/update file exists
+and is executable, it is invoked once per ref, with three parameters:</simpara>
+<literallayout class="monospaced">$GIT_DIR/hooks/update refname sha1-old sha1-new</literallayout>
+<simpara>The refname parameter is relative to $GIT_DIR; e.g. for the master
+head this is "refs/heads/master".  The two sha1 arguments are
+the object names for the refname before and after the update.
+Note that the hook is called before the refname is updated,
+so either sha1-old is 0{40} (meaning there is no such ref yet),
+or it should match what is recorded in refname.</simpara>
+<simpara>The hook should exit with non-zero status if it wants to disallow
+updating the named ref.  Otherwise it should exit with zero.</simpara>
+<simpara>Successful execution (a zero exit status) of this hook does not
+ensure the ref will actually be updated, it is only a prerequisite.
+As such it is not a good idea to send notices (e.g. email) from
+this hook.  Consider using the post-receive hook instead.</simpara>
+</refsect1>
+<refsect1 id="_post_receive_hook">
+<title>POST-RECEIVE HOOK</title>
+<simpara>After all refs were updated (or attempted to be updated), if any
+ref update was successful, and if $GIT_DIR/hooks/post-receive
+file exists and is executable, it will be invoked once with no
+parameters.  The standard input of the hook will be one line
+for each successfully updated ref:</simpara>
+<literallayout class="monospaced">sha1-old SP sha1-new SP refname LF</literallayout>
+<simpara>The refname value is relative to $GIT_DIR; e.g. for the master
+head this is "refs/heads/master".  The two sha1 values before
+each refname are the object names for the refname before and after
+the update.  Refs that were created will have sha1-old equal to
+0{40}, while refs that were deleted will have sha1-new equal to
+0{40}, otherwise sha1-old and sha1-new should be valid objects in
+the repository.</simpara>
+<simpara>The <literal>GIT_PUSH_CERT*</literal> environment variables can be inspected, just as
+in <literal>pre-receive</literal> hook, after accepting a signed push.</simpara>
+<simpara>Using this hook, it is easy to generate mails describing the updates
+to the repository.  This example script sends one mail message per
+ref listing the commits pushed to the repository, and logs the push
+certificates of signed pushes with good signatures to a logger
+service:</simpara>
+<literallayout class="monospaced">#!/bin/sh
+# mail out commit update information.
+while read oval nval ref
+do
+        if expr "$oval" : '0*$' &gt;/dev/null
+        then
+                echo "Created a new ref, with the following commits:"
+                git rev-list --pretty "$nval"
+        else
+                echo "New commits:"
+                git rev-list --pretty "$nval" "^$oval"
+        fi |
+        mail -s "Changes to ref $ref" commit-list@mydomain
+done
+# log signed push certificate, if any
+if test -n "${GIT_PUSH_CERT-}" &amp;&amp; test ${GIT_PUSH_CERT_STATUS} = G
+then
+        (
+                echo expected nonce is ${GIT_PUSH_NONCE}
+                git cat-file blob ${GIT_PUSH_CERT}
+        ) | mail -s "push certificate from $GIT_PUSH_CERT_SIGNER" push-log@mydomain
+fi
+exit 0</literallayout><simpara></simpara>
+<simpara>The exit code from this hook invocation is ignored, however a
+non-zero exit code will generate an error message.</simpara>
+<simpara>Note that it is possible for refname to not have sha1-new when this
+hook runs.  This can easily occur if another user modifies the ref
+after it was updated by <emphasis>git-receive-pack</emphasis>, but before the hook was able
+to evaluate it.  It is recommended that hooks rely on sha1-new
+rather than the current value of refname.</simpara>
+</refsect1>
+<refsect1 id="_post_update_hook">
+<title>POST-UPDATE HOOK</title>
+<simpara>After all other processing, if at least one ref was updated, and
+if $GIT_DIR/hooks/post-update file exists and is executable, then
+post-update will be called with the list of refs that have been updated.
+This can be used to implement any repository wide cleanup tasks.</simpara>
+<simpara>The exit code from this hook invocation is ignored; the only thing
+left for <emphasis>git-receive-pack</emphasis> to do at that point is to exit itself
+anyway.</simpara>
+<simpara>This hook can be used, for example, to run <literal>git update-server-info</literal>
+if the repository is packed and is served via a dumb transport.</simpara>
+<literallayout class="monospaced">#!/bin/sh
+exec git update-server-info</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_quarantine_environment">
+<title>QUARANTINE ENVIRONMENT</title>
+<simpara>When <literal>receive-pack</literal> takes in objects, they are placed into a temporary
+"quarantine" directory within the <literal>$GIT_DIR/objects</literal> directory and
+migrated into the main object store only after the <literal>pre-receive</literal> hook
+has completed. If the push fails before then, the temporary directory is
+removed entirely.</simpara>
+<simpara>This has a few user-visible effects and caveats:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+Pushes which fail due to problems with the incoming pack, missing
+     objects, or due to the <literal>pre-receive</literal> hook will not leave any
+     on-disk data. This is usually helpful to prevent repeated failed
+     pushes from filling up your disk, but can make debugging more
+     challenging.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Any objects created by the <literal>pre-receive</literal> hook will be created in
+     the quarantine directory (and migrated only if it succeeds).
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+The <literal>pre-receive</literal> hook MUST NOT update any refs to point to
+     quarantined objects. Other programs accessing the repository will
+     not be able to see the objects (and if the pre-receive hook fails,
+     those refs would become corrupted). For safety, any ref updates
+     from within <literal>pre-receive</literal> are automatically rejected.
+</simpara>
+</listitem>
+</orderedlist>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-send-pack</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>, <citerefentry>
+<refentrytitle>gitnamespaces</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

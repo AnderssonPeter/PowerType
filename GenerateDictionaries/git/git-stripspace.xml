@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-stripspace</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-stripspace</refname>
+  <refpurpose>Remove unnecessary whitespace</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git stripspace</emphasis> [-s | --strip-comments]
+<emphasis>git stripspace</emphasis> [-c | --comment-lines]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Read text, such as commit messages, notes, tags and branch
+descriptions, from the standard input and clean it in the manner
+used by Git.</simpara>
+<simpara>With no arguments, this will:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+remove trailing whitespace from all lines
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+collapse multiple consecutive empty lines into one empty line
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+remove empty lines from the beginning and end of the input
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+add a missing <emphasis>\n</emphasis> to the last line if necessary.
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>In the case where the input consists entirely of whitespace characters, no
+output will be produced.</simpara>
+<simpara><emphasis role="strong">NOTE</emphasis>: This is intended for cleaning metadata, prefer the <literal>--whitespace=fix</literal>
+mode of <citerefentry>
+<refentrytitle>git-apply</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for correcting whitespace of patches or files in
+the repository.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-s
+</term>
+<term>
+--strip-comments
+</term>
+<listitem>
+<simpara>
+        Skip and remove all lines starting with comment character (default <emphasis>#</emphasis>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-c
+</term>
+<term>
+--comment-lines
+</term>
+<listitem>
+<simpara>
+        Prepend comment character and blank to each line. Lines will automatically
+        be terminated with a newline. On empty lines, only the comment character
+        will be prepended.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<simpara>Given the following noisy input with <emphasis>$</emphasis> indicating the end of a line:</simpara>
+<literallayout class="monospaced">|A brief introduction   $
+|   $
+|$
+|A new paragraph$
+|# with a commented-out line    $
+|explaining lots of stuff.$
+|$
+|# An old paragraph, also commented-out. $
+|      $
+|The end.$
+|  $</literallayout><simpara></simpara>
+<simpara>Use <emphasis>git stripspace</emphasis> with no arguments to obtain:</simpara>
+<literallayout class="monospaced">|A brief introduction$
+|$
+|A new paragraph$
+|# with a commented-out line$
+|explaining lots of stuff.$
+|$
+|# An old paragraph, also commented-out.$
+|$
+|The end.$</literallayout><simpara></simpara>
+<simpara>Use <emphasis>git stripspace --strip-comments</emphasis> to obtain:</simpara>
+<literallayout class="monospaced">|A brief introduction$
+|$
+|A new paragraph$
+|explaining lots of stuff.$
+|$
+|The end.$</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

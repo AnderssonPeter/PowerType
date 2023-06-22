@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-reflog</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-reflog</refname>
+  <refpurpose>Manage reflog information</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git reflog</emphasis> &lt;subcommand&gt; &lt;options&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>The command takes various subcommands, and different options
+depending on the subcommand:</simpara>
+<literallayout><emphasis>git reflog</emphasis> [<emphasis>show</emphasis>] [log-options] [&lt;ref&gt;]
+<emphasis>git reflog expire</emphasis> [--expire=&lt;time&gt;] [--expire-unreachable=&lt;time&gt;]
+        [--rewrite] [--updateref] [--stale-fix]
+        [--dry-run | -n] [--verbose] [--all [--single-worktree] | &lt;refs&gt;&#8230;]
+<emphasis>git reflog delete</emphasis> [--rewrite] [--updateref]
+        [--dry-run | -n] [--verbose] ref@{specifier}&#8230;
+<emphasis>git reflog exists</emphasis> &lt;ref&gt;</literallayout>
+<simpara></simpara>
+<simpara>Reference logs, or "reflogs", record when the tips of branches and
+other references were updated in the local repository. Reflogs are
+useful in various Git commands, to specify the old value of a
+reference. For example, <literal>HEAD@{2}</literal> means "where HEAD used to be two
+moves ago", <literal>master@{one.week.ago}</literal> means "where master used to point
+to one week ago in this local repository", and so on. See
+<citerefentry>
+<refentrytitle>gitrevisions</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry> for more details.</simpara>
+<simpara>This command manages the information recorded in the reflogs.</simpara>
+<simpara>The "show" subcommand (which is also the default, in the absence of
+any subcommands) shows the log of the reference provided in the
+command-line (or <literal>HEAD</literal>, by default). The reflog covers all recent
+actions, and in addition the <literal>HEAD</literal> reflog records branch switching.
+<literal>git reflog show</literal> is an alias for <literal>git log -g --abbrev-commit
+--pretty=oneline</literal>; see <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for more information.</simpara>
+<simpara>The "expire" subcommand prunes older reflog entries. Entries older
+than <literal>expire</literal> time, or entries older than <literal>expire-unreachable</literal> time
+and not reachable from the current tip, are removed from the reflog.
+This is typically not used directly by end users&#8201;&#8212;&#8201;instead, see
+<citerefentry>
+<refentrytitle>git-gc</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+<simpara>The "delete" subcommand deletes single entries from the reflog. Its
+argument must be an <emphasis>exact</emphasis> entry (e.g. "<literal>git reflog delete
+master@{2}</literal>"). This subcommand is also typically not used directly by
+end users.</simpara>
+<simpara>The "exists" subcommand checks whether a ref has a reflog.  It exits
+with zero status if the reflog exists, and non-zero status if it does
+not.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<refsect2 id="_options_for_literal_show_literal">
+<title>Options for <literal>show</literal></title>
+<simpara><literal>git reflog show</literal> accepts any of the options accepted by <literal>git log</literal>.</simpara>
+</refsect2>
+<refsect2 id="_options_for_literal_expire_literal">
+<title>Options for <literal>expire</literal></title>
+<variablelist>
+<varlistentry>
+<term>
+--all
+</term>
+<listitem>
+<simpara>
+        Process the reflogs of all references.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--single-worktree
+</term>
+<listitem>
+<simpara>
+        By default when <literal>--all</literal> is specified, reflogs from all working
+        trees are processed. This option limits the processing to reflogs
+        from the current working tree only.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--expire=&lt;time&gt;
+</term>
+<listitem>
+<simpara>
+        Prune entries older than the specified time. If this option is
+        not specified, the expiration time is taken from the
+        configuration setting <literal>gc.reflogExpire</literal>, which in turn
+        defaults to 90 days. <literal>--expire=all</literal> prunes entries regardless
+        of their age; <literal>--expire=never</literal> turns off pruning of reachable
+        entries (but see <literal>--expire-unreachable</literal>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--expire-unreachable=&lt;time&gt;
+</term>
+<listitem>
+<simpara>
+        Prune entries older than <literal>&lt;time&gt;</literal> that are not reachable from
+        the current tip of the branch. If this option is not
+        specified, the expiration time is taken from the configuration
+        setting <literal>gc.reflogExpireUnreachable</literal>, which in turn defaults
+        to 30 days. <literal>--expire-unreachable=all</literal> prunes unreachable
+        entries regardless of their age; <literal>--expire-unreachable=never</literal>
+        turns off early pruning of unreachable entries (but see
+        <literal>--expire</literal>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--updateref
+</term>
+<listitem>
+<simpara>
+        Update the reference to the value of the top reflog entry (i.e.
+        &lt;ref&gt;@{0}) if the previous top entry was pruned.  (This
+        option is ignored for symbolic references.)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--rewrite
+</term>
+<listitem>
+<simpara>
+        If a reflog entry&#8217;s predecessor is pruned, adjust its "old"
+        SHA-1 to be equal to the "new" SHA-1 field of the entry that
+        now precedes it.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stale-fix
+</term>
+<listitem>
+<simpara>
+        Prune any reflog entries that point to "broken commits". A
+        broken commit is a commit that is not reachable from any of
+        the reference tips and that refers, directly or indirectly, to
+        a missing commit, tree, or blob object.
+</simpara>
+<simpara>This computation involves traversing all the reachable objects, i.e. it
+has the same cost as <emphasis>git prune</emphasis>.  It is primarily intended to fix
+corruption caused by garbage collecting using older versions of Git,
+which didn&#8217;t protect objects referred to by reflogs.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-n
+</term>
+<term>
+--dry-run
+</term>
+<listitem>
+<simpara>
+        Do not actually prune any entries; just show what would have
+        been pruned.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--verbose
+</term>
+<listitem>
+<simpara>
+        Print extra information on screen.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect2>
+<refsect2 id="_options_for_literal_delete_literal">
+<title>Options for <literal>delete</literal></title>
+<simpara><literal>git reflog delete</literal> accepts options <literal>--updateref</literal>, <literal>--rewrite</literal>, <literal>-n</literal>,
+<literal>--dry-run</literal>, and <literal>--verbose</literal>, with the same meanings as when they are
+used with <literal>expire</literal>.</simpara>
+</refsect2>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

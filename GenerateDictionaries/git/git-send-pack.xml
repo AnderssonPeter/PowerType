@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-send-pack</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-send-pack</refname>
+  <refpurpose>Push objects over Git protocol to another repository</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git send-pack</emphasis> [--dry-run] [--force] [--receive-pack=&lt;git-receive-pack&gt;]
+                [--verbose] [--thin] [--atomic]
+                [--[no-]signed|--signed=(true|false|if-asked)]
+                [&lt;host&gt;:]&lt;directory&gt; (--all | &lt;ref&gt;&#8230;)</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Usually you would want to use <emphasis>git push</emphasis>, which is a
+higher-level wrapper of this command, instead. See <citerefentry>
+<refentrytitle>git-push</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+<simpara>Invokes <emphasis>git-receive-pack</emphasis> on a possibly remote repository, and
+updates it from the current repository, sending named refs.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--receive-pack=&lt;git-receive-pack&gt;
+</term>
+<listitem>
+<simpara>
+        Path to the <emphasis>git-receive-pack</emphasis> program on the remote
+        end.  Sometimes useful when pushing to a remote
+        repository over ssh, and you do not have the program in
+        a directory on the default $PATH.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--exec=&lt;git-receive-pack&gt;
+</term>
+<listitem>
+<simpara>
+        Same as --receive-pack=&lt;git-receive-pack&gt;.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--all
+</term>
+<listitem>
+<simpara>
+        Instead of explicitly specifying which refs to update,
+        update all heads that locally exist.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin
+</term>
+<listitem>
+<simpara>
+        Take the list of refs from stdin, one per line. If there
+        are refs specified on the command line in addition to this
+        option, then the refs from stdin are processed after those
+        on the command line.
+</simpara>
+<simpara>If <literal>--stateless-rpc</literal> is specified together with this option then
+the list of refs must be in packet format (pkt-line). Each ref must
+be in a separate packet, and the list must end with a flush packet.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--dry-run
+</term>
+<listitem>
+<simpara>
+        Do everything except actually send the updates.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--force
+</term>
+<listitem>
+<simpara>
+        Usually, the command refuses to update a remote ref that
+        is not an ancestor of the local ref used to overwrite it.
+        This flag disables the check.  What this means is that
+        the remote repository can lose commits; use it with
+        care.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--verbose
+</term>
+<listitem>
+<simpara>
+        Run verbosely.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--thin
+</term>
+<listitem>
+<simpara>
+        Send a "thin" pack, which records objects in deltified form based
+        on objects not included in the pack to reduce network traffic.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--atomic
+</term>
+<listitem>
+<simpara>
+        Use an atomic transaction for updating the refs. If any of the refs
+        fails to update then the entire push will fail without changing any
+        refs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]signed
+</term>
+<term>
+--signed=(true|false|if-asked)
+</term>
+<listitem>
+<simpara>
+        GPG-sign the push request to update refs on the receiving
+        side, to allow it to be checked by the hooks and/or be
+        logged.  If <literal>false</literal> or <literal>--no-signed</literal>, no signing will be
+        attempted.  If <literal>true</literal> or <literal>--signed</literal>, the push will fail if the
+        server does not support signed pushes.  If set to <literal>if-asked</literal>,
+        sign if and only if the server supports signed pushes.  The push
+        will also fail if the actual call to <literal>gpg --sign</literal> fails.  See
+        <citerefentry>
+<refentrytitle>git-receive-pack</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for the details on the receiving end.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--push-option=&lt;string&gt;
+</term>
+<listitem>
+<simpara>
+        Pass the specified string as a push option for consumption by
+        hooks on the server side.  If the server doesn&#8217;t support push
+        options, error out.  See <citerefentry>
+<refentrytitle>git-push</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> and
+        <citerefentry>
+<refentrytitle>githooks</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry> for details.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;host&gt;
+</term>
+<listitem>
+<simpara>
+        A remote host to house the repository.  When this
+        part is specified, <emphasis>git-receive-pack</emphasis> is invoked via
+        ssh.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;directory&gt;
+</term>
+<listitem>
+<simpara>
+        The repository to update.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;ref&gt;&#8230;
+</term>
+<listitem>
+<simpara>
+        The remote refs to update.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_specifying_the_refs">
+<title>SPECIFYING THE REFS</title>
+<simpara>There are three ways to specify which refs to update on the
+remote end.</simpara>
+<simpara>With <literal>--all</literal> flag, all refs that exist locally are transferred to
+the remote side.  You cannot specify any <emphasis>&lt;ref&gt;</emphasis> if you use
+this flag.</simpara>
+<simpara>Without <literal>--all</literal> and without any <emphasis>&lt;ref&gt;</emphasis>, the heads that exist
+both on the local side and on the remote side are updated.</simpara>
+<simpara>When one or more <emphasis>&lt;ref&gt;</emphasis> are specified explicitly (whether on the
+command line or via <literal>--stdin</literal>), it can be either a
+single pattern, or a pair of such pattern separated by a colon
+":" (this means that a ref name cannot have a colon in it).  A
+single pattern <emphasis>&lt;name&gt;</emphasis> is just a shorthand for <emphasis>&lt;name&gt;:&lt;name&gt;</emphasis>.</simpara>
+<simpara>Each pattern pair consists of the source side (before the colon)
+and the destination side (after the colon).  The ref to be
+pushed is determined by finding a match that matches the source
+side, and where it is pushed is determined by using the
+destination side. The rules used to match a ref are the same
+rules used by <emphasis>git rev-parse</emphasis> to resolve a symbolic ref
+name. See <citerefentry>
+<refentrytitle>git-rev-parse</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+It is an error if &lt;src&gt; does not match exactly one of the
+   local refs.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+It is an error if &lt;dst&gt; matches more than one remote refs.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+If &lt;dst&gt; does not match any remote ref, either
+</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+it has to start with "refs/"; &lt;dst&gt; is used as the
+     destination literally in this case.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+&lt;src&gt; == &lt;dst&gt; and the ref that matched the &lt;src&gt; must not
+     exist in the set of remote refs; the ref matched &lt;src&gt;
+     locally is used as the name of the destination.
+</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</itemizedlist>
+<simpara>Without &#8216;--force`, the &lt;src&gt; ref is stored at the remote only if
+&lt;dst&gt; does not exist, or &lt;dst&gt; is a proper subset (i.e. an
+ancestor) of &lt;src&gt;.  This check, known as "fast-forward check",
+is performed in order to avoid accidentally overwriting the
+remote ref and lose other peoples&#8217; commits from there.</simpara>
+<simpara>With <literal>--force</literal>, the fast-forward check is disabled for all refs.</simpara>
+<simpara>Optionally, a &lt;ref&gt; parameter can be prefixed with a plus <emphasis>+</emphasis> sign
+to disable the fast-forward check only on that ref.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

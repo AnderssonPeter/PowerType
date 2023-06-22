@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-merge-tree</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-merge-tree</refname>
+  <refpurpose>Show three-way merge without touching index</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git merge-tree</emphasis> &lt;base-tree&gt; &lt;branch1&gt; &lt;branch2&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Reads three tree-ish, and output trivial merge results and
+conflicting stages to the standard output.  This is similar to
+what three-way <emphasis>git read-tree -m</emphasis> does, but instead of storing the
+results in the index, the command outputs the entries to the
+standard output.</simpara>
+<simpara>This is meant to be used by higher level scripts to compute
+merge results outside of the index, and stuff the results back into the
+index.  For this reason, the output from the command omits
+entries that match the &lt;branch1&gt; tree.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

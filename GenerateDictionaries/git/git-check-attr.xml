@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-check-attr</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-check-attr</refname>
+  <refpurpose>Display gitattributes information</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git check-attr</emphasis> [-a | --all | &lt;attr&gt;&#8230;] [--] &lt;pathname&gt;&#8230;
+<emphasis>git check-attr</emphasis> --stdin [-z] [-a | --all | &lt;attr&gt;&#8230;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>For every pathname, this command will list if each attribute is <emphasis>unspecified</emphasis>,
+<emphasis>set</emphasis>, or <emphasis>unset</emphasis> as a gitattribute on that pathname.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-a, --all
+</term>
+<listitem>
+<simpara>
+        List all attributes that are associated with the specified
+        paths.  If this option is used, then <emphasis>unspecified</emphasis> attributes
+        will not be included in the output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--cached
+</term>
+<listitem>
+<simpara>
+        Consider <literal>.gitattributes</literal> in the index only, ignoring the working tree.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin
+</term>
+<listitem>
+<simpara>
+        Read pathnames from the standard input, one per line,
+        instead of from the command-line.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-z
+</term>
+<listitem>
+<simpara>
+        The output format is modified to be machine-parsable.
+        If <literal>--stdin</literal> is also given, input paths are separated
+        with a NUL character instead of a linefeed character.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--
+</term>
+<listitem>
+<simpara>
+        Interpret all preceding arguments as attributes and all following
+        arguments as path names.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>If none of <literal>--stdin</literal>, <literal>--all</literal>, or <literal>--</literal> is used, the first argument
+will be treated as an attribute and the rest of the arguments as
+pathnames.</simpara>
+</refsect1>
+<refsect1 id="_output">
+<title>OUTPUT</title>
+<simpara>The output is of the form:
+&lt;path&gt; COLON SP &lt;attribute&gt; COLON SP &lt;info&gt; LF</simpara>
+<simpara>unless <literal>-z</literal> is in effect, in which case NUL is used as delimiter:
+&lt;path&gt; NUL &lt;attribute&gt; NUL &lt;info&gt; NUL</simpara>
+<simpara>&lt;path&gt; is the path of a file being queried, &lt;attribute&gt; is an attribute
+being queried and &lt;info&gt; can be either:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>unspecified</emphasis>
+</term>
+<listitem>
+<simpara>
+when the attribute is not defined for the path.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>unset</emphasis>
+</term>
+<listitem>
+<simpara>
+when the attribute is defined as false.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>set</emphasis>
+</term>
+<listitem>
+<simpara>
+when the attribute is defined as true.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;value&gt;
+</term>
+<listitem>
+<simpara>
+when a value has been assigned to the attribute.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Buffering happens as documented under the <literal>GIT_FLUSH</literal> option in
+<citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.  The caller is responsible for avoiding deadlocks
+caused by overfilling an input buffer or reading from an empty output
+buffer.</simpara>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<simpara>In the examples, the following <emphasis>.gitattributes</emphasis> file is used:</simpara>
+<literallayout class="monospaced">*.java diff=java -crlf myAttr
+NoMyAttr.java !myAttr
+README caveat=unspecified</literallayout><simpara></simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+Listing a single attribute:
+</simpara>
+</listitem>
+</itemizedlist>
+<literallayout class="monospaced">$ git check-attr diff org/example/MyClass.java
+org/example/MyClass.java: diff: java</literallayout><simpara></simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+Listing multiple attributes for a file:
+</simpara>
+</listitem>
+</itemizedlist>
+<literallayout class="monospaced">$ git check-attr crlf diff myAttr -- org/example/MyClass.java
+org/example/MyClass.java: crlf: unset
+org/example/MyClass.java: diff: java
+org/example/MyClass.java: myAttr: set</literallayout><simpara></simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+Listing all attributes for a file:
+</simpara>
+</listitem>
+</itemizedlist>
+<literallayout class="monospaced">$ git check-attr --all -- org/example/MyClass.java
+org/example/MyClass.java: diff: java
+org/example/MyClass.java: myAttr: set</literallayout><simpara></simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+Listing an attribute for multiple files:
+</simpara>
+</listitem>
+</itemizedlist>
+<literallayout class="monospaced">$ git check-attr myAttr -- org/example/MyClass.java org/example/NoMyAttr.java
+org/example/MyClass.java: myAttr: set
+org/example/NoMyAttr.java: myAttr: unspecified</literallayout><simpara></simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+Not all values are equally unambiguous:
+</simpara>
+</listitem>
+</itemizedlist>
+<literallayout class="monospaced">$ git check-attr caveat README
+README: caveat: unspecified</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>gitattributes</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

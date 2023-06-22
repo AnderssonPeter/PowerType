@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-name-rev</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-name-rev</refname>
+  <refpurpose>Find symbolic names for given revs</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git name-rev</emphasis> [--tags] [--refs=&lt;pattern&gt;]
+               ( --all | --stdin | &lt;commit-ish&gt;&#8230; )</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Finds symbolic names suitable for human digestion for revisions given in any
+format parsable by <emphasis>git rev-parse</emphasis>.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--tags
+</term>
+<listitem>
+<simpara>
+        Do not use branch names, but only tags to name the commits
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--refs=&lt;pattern&gt;
+</term>
+<listitem>
+<simpara>
+        Only use refs whose names match a given shell pattern.  The pattern
+        can be one of branch name, tag name or fully qualified ref name. If
+        given multiple times, use refs whose names match any of the given shell
+        patterns. Use <literal>--no-refs</literal> to clear any previous ref patterns given.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--exclude=&lt;pattern&gt;
+</term>
+<listitem>
+<simpara>
+        Do not use any ref whose name matches a given shell pattern. The
+        pattern can be one of branch name, tag name or fully qualified ref
+        name. If given multiple times, a ref will be excluded when it matches
+        any of the given patterns. When used together with --refs, a ref will
+        be used as a match only when it matches at least one --refs pattern and
+        does not match any --exclude patterns. Use <literal>--no-exclude</literal> to clear the
+        list of exclude patterns.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--all
+</term>
+<listitem>
+<simpara>
+        List all commits reachable from all refs
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin
+</term>
+<listitem>
+<simpara>
+        Transform stdin by substituting all the 40-character SHA-1
+        hexes (say $hex) with "$hex ($rev_name)".  When used with
+        --name-only, substitute with "$rev_name", omitting $hex
+        altogether.  Intended for the scripter&#8217;s use.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--name-only
+</term>
+<listitem>
+<simpara>
+        Instead of printing both the SHA-1 and the name, print only
+        the name.  If given with --tags the usual tag prefix of
+        "tags/" is also omitted from the name, matching the output
+        of <literal>git-describe</literal> more closely.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-undefined
+</term>
+<listitem>
+<simpara>
+        Die with error code != 0 when a reference is undefined,
+        instead of printing <literal>undefined</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--always
+</term>
+<listitem>
+<simpara>
+        Show uniquely abbreviated commit object as fallback.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<simpara>Given a commit, find out where it is relative to the local refs. Say somebody
+wrote you about that fantastic commit 33db5f4d9027a10e477ccf054b2c1ab94f74c85a.
+Of course, you look into the commit, but that only tells you what happened, but
+not the context.</simpara>
+<simpara>Enter <emphasis>git name-rev</emphasis>:</simpara>
+<literallayout class="monospaced">% git name-rev 33db5f4d9027a10e477ccf054b2c1ab94f74c85a
+33db5f4d9027a10e477ccf054b2c1ab94f74c85a tags/v0.99~940</literallayout><simpara></simpara>
+<simpara>Now you are wiser, because you know that it happened 940 revisions before v0.99.</simpara>
+<simpara>Another nice thing you can do is:</simpara>
+<literallayout class="monospaced">% git log | git name-rev --stdin</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

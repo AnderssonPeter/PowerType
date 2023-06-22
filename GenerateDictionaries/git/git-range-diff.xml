@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-range-diff</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-range-diff</refname>
+  <refpurpose>Compare two commit ranges (e.g. two versions of a branch)</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git range-diff</emphasis> [--color=[&lt;when&gt;]] [--no-color] [&lt;diff-options&gt;]
+        [--no-dual-color] [--creation-factor=&lt;factor&gt;]
+        [--left-only | --right-only]
+        ( &lt;range1&gt; &lt;range2&gt; | &lt;rev1&gt;&#8230;&lt;rev2&gt; | &lt;base&gt; &lt;rev1&gt; &lt;rev2&gt; )</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>This command shows the differences between two versions of a patch
+series, or more generally, two commit ranges (ignoring merge commits).</simpara>
+<simpara>To that end, it first finds pairs of commits from both commit ranges
+that correspond with each other. Two commits are said to correspond when
+the diff between their patches (i.e. the author information, the commit
+message and the commit diff) is reasonably small compared to the
+patches' size. See ``Algorithm`` below for details.</simpara>
+<simpara>Finally, the list of matching commits is shown in the order of the
+second commit range, with unmatched commits being inserted just after
+all of their ancestors have been shown.</simpara>
+<simpara>There are three ways to specify the commit ranges:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+<literal>&lt;range1&gt; &lt;range2&gt;</literal>: Either commit range can be of the form
+  <literal>&lt;base&gt;..&lt;rev&gt;</literal>, <literal>&lt;rev&gt;^!</literal> or <literal>&lt;rev&gt;^-&lt;n&gt;</literal>. See <literal>SPECIFYING RANGES</literal>
+  in <citerefentry>
+<refentrytitle>gitrevisions</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry> for more details.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>&lt;rev1&gt;...&lt;rev2&gt;</literal>. This is equivalent to
+  <literal>&lt;rev2&gt;..&lt;rev1&gt; &lt;rev1&gt;..&lt;rev2&gt;</literal>.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>&lt;base&gt; &lt;rev1&gt; &lt;rev2&gt;</literal>: This is equivalent to <literal>&lt;base&gt;..&lt;rev1&gt;
+  &lt;base&gt;..&lt;rev2&gt;</literal>.
+</simpara>
+</listitem>
+</itemizedlist>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--no-dual-color
+</term>
+<listitem>
+<simpara>
+        When the commit diffs differ, &#8216;git range-diff` recreates the
+        original diffs&#8217; coloring, and adds outer -/+ diff markers with
+        the <emphasis role="strong">background</emphasis> being red/green to make it easier to see e.g.
+        when there was a change in what exact lines were added.
+</simpara>
+<simpara>Additionally, the commit diff lines that are only present in the first commit
+range are shown "dimmed" (this can be overridden using the <literal>color.diff.&lt;slot&gt;</literal>
+config setting where <literal>&lt;slot&gt;</literal> is one of <literal>contextDimmed</literal>, <literal>oldDimmed</literal> and
+<literal>newDimmed</literal>), and the commit diff lines that are only present in the second
+commit range are shown in bold (which can be overridden using the config
+settings <literal>color.diff.&lt;slot&gt;</literal> with <literal>&lt;slot&gt;</literal> being one of <literal>contextBold</literal>,
+<literal>oldBold</literal> or <literal>newBold</literal>).</simpara>
+<simpara>This is known to <literal>range-diff</literal> as "dual coloring". Use <literal>--no-dual-color</literal>
+to revert to color all lines according to the outer diff markers
+(and completely ignore the inner diff when it comes to color).</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--creation-factor=&lt;percent&gt;
+</term>
+<listitem>
+<simpara>
+        Set the creation/deletion cost fudge factor to <literal>&lt;percent&gt;</literal>.
+        Defaults to 60. Try a larger value if <literal>git range-diff</literal> erroneously
+        considers a large change a total rewrite (deletion of one commit
+        and addition of another), and a smaller one in the reverse case.
+        See the ``Algorithm`` section below for an explanation why this is
+        needed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--left-only
+</term>
+<listitem>
+<simpara>
+        Suppress commits that are missing from the first specified range
+        (or the "left range" when using the <literal>&lt;rev1&gt;...&lt;rev2&gt;</literal> format).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--right-only
+</term>
+<listitem>
+<simpara>
+        Suppress commits that are missing from the second specified range
+        (or the "right range" when using the <literal>&lt;rev1&gt;...&lt;rev2&gt;</literal> format).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]notes[=&lt;ref&gt;]
+</term>
+<listitem>
+<simpara>
+        This flag is passed to the <literal>git log</literal> program
+        (see <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>) that generates the patches.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;range1&gt; &lt;range2&gt;
+</term>
+<listitem>
+<simpara>
+        Compare the commits specified by the two ranges, where
+        <literal>&lt;range1&gt;</literal> is considered an older version of <literal>&lt;range2&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;rev1&gt;&#8230;&lt;rev2&gt;
+</term>
+<listitem>
+<simpara>
+        Equivalent to passing <literal>&lt;rev2&gt;..&lt;rev1&gt;</literal> and <literal>&lt;rev1&gt;..&lt;rev2&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;base&gt; &lt;rev1&gt; &lt;rev2&gt;
+</term>
+<listitem>
+<simpara>
+        Equivalent to passing <literal>&lt;base&gt;..&lt;rev1&gt;</literal> and <literal>&lt;base&gt;..&lt;rev2&gt;</literal>.
+        Note that <literal>&lt;base&gt;</literal> does not need to be the exact branch point
+        of the branches. Example: after rebasing a branch <literal>my-topic</literal>,
+        <literal>git range-diff my-topic@{u} my-topic@{1} my-topic</literal> would
+        show the differences introduced by the rebase.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara><literal>git range-diff</literal> also accepts the regular diff options (see
+<citerefentry>
+<refentrytitle>git-diff</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>), most notably the <literal>--color=[&lt;when&gt;]</literal> and
+<literal>--no-color</literal> options. These options are used when generating the "diff
+between patches", i.e. to compare the author, commit message and diff of
+corresponding old/new commits. There is currently no means to tweak most of the
+diff options passed to <literal>git log</literal> when generating those patches.</simpara>
+</refsect1>
+<refsect1 id="_output_stability">
+<title>OUTPUT STABILITY</title>
+<simpara>The output of the <literal>range-diff</literal> command is subject to change. It is
+intended to be human-readable porcelain output, not something that can
+be used across versions of Git to get a textually stable <literal>range-diff</literal>
+(as opposed to something like the <literal>--stable</literal> option to
+<citerefentry>
+<refentrytitle>git-patch-id</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>). There&#8217;s also no equivalent of
+<citerefentry>
+<refentrytitle>git-apply</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for <literal>range-diff</literal>, the output is not intended to
+be machine-readable.</simpara>
+<simpara>This is particularly true when passing in diff options. Currently some
+options like <literal>--stat</literal> can, as an emergent effect, produce output
+that&#8217;s quite useless in the context of <literal>range-diff</literal>. Future versions
+of <literal>range-diff</literal> may learn to interpret such options in a manner
+specific to <literal>range-diff</literal> (e.g. for <literal>--stat</literal> producing human-readable
+output which summarizes how the diffstat changed).</simpara>
+</refsect1>
+<refsect1 id="_configuration">
+<title>CONFIGURATION</title>
+<simpara>This command uses the <literal>diff.color.*</literal> and <literal>pager.range-diff</literal> settings
+(the latter is on by default).
+See <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<simpara>When a rebase required merge conflicts to be resolved, compare the changes
+introduced by the rebase directly afterwards using:</simpara>
+<literallayout class="monospaced">$ git range-diff @{u} @{1} @</literallayout><simpara></simpara>
+<simpara>A typical output of <literal>git range-diff</literal> would look like this:</simpara>
+<literallayout class="monospaced">-:  ------- &gt; 1:  0ddba11 Prepare for the inevitable!
+1:  c0debee = 2:  cab005e Add a helpful message at the start
+2:  f00dbal ! 3:  decafe1 Describe a bug
+    @@ -1,3 +1,3 @@
+     Author: A U Thor &lt;author@example.com&gt;
+
+    -TODO: Describe a bug
+    +Describe a bug
+    @@ -324,5 +324,6
+      This is expected.
+
+    -+What is unexpected is that it will also crash.
+    ++Unexpectedly, it also crashes. This is a bug, and the jury is
+    ++still out there how to fix it best. See ticket #314 for details.
+
+      Contact
+3:  bedead &lt; -:  ------- TO-UNDO</literallayout><simpara></simpara>
+<simpara>In this example, there are 3 old and 3 new commits, where the developer
+removed the 3rd, added a new one before the first two, and modified the
+commit message of the 2nd commit as well its diff.</simpara>
+<simpara>When the output goes to a terminal, it is color-coded by default, just
+like regular <literal>git diff</literal>'s output. In addition, the first line (adding a
+commit) is green, the last line (deleting a commit) is red, the second
+line (with a perfect match) is yellow like the commit header of <literal>git
+show</literal>'s output, and the third line colors the old commit red, the new
+one green and the rest like <literal>git show</literal>'s commit header.</simpara>
+<simpara>A naive color-coded diff of diffs is actually a bit hard to read,
+though, as it colors the entire lines red or green. The line that added
+"What is unexpected" in the old commit, for example, is completely red,
+even if the intent of the old commit was to add something.</simpara>
+<simpara>To help with that, <literal>range</literal> uses the <literal>--dual-color</literal> mode by default. In
+this mode, the diff of diffs will retain the original diff colors, and
+prefix the lines with -/+ markers that have their <emphasis role="strong">background</emphasis> red or
+green, to make it more obvious that they describe how the diff itself
+changed.</simpara>
+</refsect1>
+<refsect1 id="_algorithm">
+<title>Algorithm</title>
+<simpara>The general idea is this: we generate a cost matrix between the commits
+in both commit ranges, then solve the least-cost assignment.</simpara>
+<simpara>The cost matrix is populated thusly: for each pair of commits, both
+diffs are generated and the "diff of diffs" is generated, with 3 context
+lines, then the number of lines in that diff is used as cost.</simpara>
+<simpara>To avoid false positives (e.g. when a patch has been removed, and an
+unrelated patch has been added between two iterations of the same patch
+series), the cost matrix is extended to allow for that, by adding
+fixed-cost entries for wholesale deletes/adds.</simpara>
+<simpara>Example: Let commits <literal>1--2</literal> be the first iteration of a patch series and
+<literal>A--C</literal> the second iteration. Let&#8217;s assume that <literal>A</literal> is a cherry-pick of
+<literal>2,</literal> and <literal>C</literal> is a cherry-pick of <literal>1</literal> but with a small modification (say,
+a fixed typo). Visualize the commits as a bipartite graph:</simpara>
+<literallayout class="monospaced">    1            A
+
+    2            B
+
+                 C</literallayout><simpara></simpara>
+<simpara>We are looking for a "best" explanation of the new series in terms of
+the old one. We can represent an "explanation" as an edge in the graph:</simpara>
+<literallayout class="monospaced">    1            A
+               /
+    2 --------'  B
+
+                 C</literallayout><simpara></simpara>
+<simpara>This explanation comes for "free" because there was no change. Similarly
+<literal>C</literal> could be explained using <literal>1</literal>, but that comes at some cost c&gt;0
+because of the modification:</simpara>
+<literallayout class="monospaced">    1 ----.      A
+          |    /
+    2 ----+---'  B
+          |
+          `----- C
+          c&gt;0</literallayout><simpara></simpara>
+<simpara>In mathematical terms, what we are looking for is some sort of a minimum
+cost bipartite matching; &#8216;1` is matched to <literal>C</literal> at some cost, etc. The
+underlying graph is in fact a complete bipartite graph; the cost we
+associate with every edge is the size of the diff between the two
+commits&#8217; patches. To explain also new commits, we introduce dummy nodes
+on both sides:</simpara>
+<literallayout class="monospaced">    1 ----.      A
+          |    /
+    2 ----+---'  B
+          |
+    o     `----- C
+          c&gt;0
+    o            o
+
+    o            o</literallayout><simpara></simpara>
+<simpara>The cost of an edge <literal>o--C</literal> is the size of <literal>C</literal>'s diff, modified by a
+fudge factor that should be smaller than 100%. The cost of an edge
+<literal>o--o</literal> is free. The fudge factor is necessary because even if <literal>1</literal> and
+<literal>C</literal> have nothing in common, they may still share a few empty lines and
+such, possibly making the assignment <literal>1--C</literal>, <literal>o--o</literal> slightly cheaper
+than <literal>1--o</literal>, <literal>o--C</literal> even if <literal>1</literal> and <literal>C</literal> have nothing in common. With the
+fudge factor we require a much larger common part to consider patches as
+corresponding.</simpara>
+<simpara>The overall time needed to compute this algorithm is the time needed to
+compute n+m commit diffs and then n*m diffs of patches, plus the time
+needed to compute the least-cost assignment between n and m diffs. Git
+uses an implementation of the Jonker-Volgenant algorithm to solve the
+assignment problem, which has cubic runtime complexity. The matching
+found in this case will look like this:</simpara>
+<literallayout class="monospaced">    1 ----.      A
+          |    /
+    2 ----+---'  B
+       .--+-----'
+    o -'  `----- C
+          c&gt;0
+    o ---------- o
+
+    o ---------- o</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

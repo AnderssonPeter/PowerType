@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-mktree</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-mktree</refname>
+  <refpurpose>Build a tree-object from ls-tree formatted text</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git mktree</emphasis> [-z] [--missing] [--batch]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Reads standard input in non-recursive <literal>ls-tree</literal> output format, and creates
+a tree object.  The order of the tree entries is normalized by mktree so
+pre-sorting the input is not required.  The object name of the tree object
+built is written to the standard output.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-z
+</term>
+<listitem>
+<simpara>
+        Read the NUL-terminated <literal>ls-tree -z</literal> output instead.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--missing
+</term>
+<listitem>
+<simpara>
+        Allow missing objects.  The default behaviour (without this option)
+        is to verify that each tree entry&#8217;s sha1 identifies an existing
+        object.  This option has no effect on the treatment of gitlink entries
+        (aka "submodules") which are always allowed to be missing.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--batch
+</term>
+<listitem>
+<simpara>
+        Allow building of more than one tree object before exiting.  Each
+        tree is separated by as single blank line. The final new-line is
+        optional.  Note - if the <literal>-z</literal> option is used, lines are terminated
+        with NUL.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-rm</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-rm</refname>
+  <refpurpose>Remove files from the working tree and from the index</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git rm</emphasis> [-f | --force] [-n] [-r] [--cached] [--ignore-unmatch]
+          [--quiet] [--pathspec-from-file=&lt;file&gt; [--pathspec-file-nul]]
+          [--] [&lt;pathspec&gt;&#8230;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Remove files matching pathspec from the index, or from the working tree
+and the index. <literal>git rm</literal> will not remove a file from just your working
+directory. (There is no option to remove a file only from the working
+tree and yet keep it in the index; use <literal>/bin/rm</literal> if you want to do
+that.) The files being removed have to be identical to the tip of the
+branch, and no updates to their contents can be staged in the index,
+though that default behavior can be overridden with the <literal>-f</literal> option.
+When <literal>--cached</literal> is given, the staged content has to
+match either the tip of the branch or the file on disk,
+allowing the file to be removed from just the index. When
+sparse-checkouts are in use (see <citerefentry>
+<refentrytitle>git-sparse-checkout</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>),
+<literal>git rm</literal> will only remove paths within the sparse-checkout patterns.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+&lt;pathspec&gt;&#8230;
+</term>
+<listitem>
+<simpara>
+        Files to remove.  A leading directory name (e.g. <literal>dir</literal> to remove
+        <literal>dir/file1</literal> and <literal>dir/file2</literal>) can be given to remove all files in
+        the directory, and recursively all sub-directories, but this
+        requires the <literal>-r</literal> option to be explicitly given.
+</simpara>
+<simpara>The command removes only the paths that are known to Git.</simpara>
+<simpara>File globbing matches across directory boundaries.  Thus, given two
+directories <literal>d</literal> and <literal>d2</literal>, there is a difference between using
+<literal>git rm 'd*'</literal> and <literal>git rm 'd/*'</literal>, as the former will also remove all
+of directory <literal>d2</literal>.</simpara>
+<simpara>For more details, see the <emphasis>pathspec</emphasis> entry in <citerefentry>
+<refentrytitle>gitglossary</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-f
+</term>
+<term>
+--force
+</term>
+<listitem>
+<simpara>
+        Override the up-to-date check.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-n
+</term>
+<term>
+--dry-run
+</term>
+<listitem>
+<simpara>
+        Don&#8217;t actually remove any file(s).  Instead, just show
+        if they exist in the index and would otherwise be removed
+        by the command.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-r
+</term>
+<listitem>
+<simpara>
+        Allow recursive removal when a leading directory name is
+        given.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--
+</term>
+<listitem>
+<simpara>
+        This option can be used to separate command-line options from
+        the list of files, (useful when filenames might be mistaken
+        for command-line options).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--cached
+</term>
+<listitem>
+<simpara>
+        Use this option to unstage and remove paths only from the index.
+        Working tree files, whether modified or not, will be
+        left alone.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-unmatch
+</term>
+<listitem>
+<simpara>
+        Exit with a zero status even if no files matched.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--sparse
+</term>
+<listitem>
+<simpara>
+        Allow updating index entries outside of the sparse-checkout cone.
+        Normally, <literal>git rm</literal> refuses to update index entries whose paths do
+        not fit within the sparse-checkout cone. See
+        <citerefentry>
+<refentrytitle>git-sparse-checkout</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for more.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-q
+</term>
+<term>
+--quiet
+</term>
+<listitem>
+<simpara>
+        <literal>git rm</literal> normally outputs one line (in the form of an <literal>rm</literal> command)
+        for each file removed. This option suppresses that output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--pathspec-from-file=&lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        Pathspec is passed in <literal>&lt;file&gt;</literal> instead of commandline args. If
+        <literal>&lt;file&gt;</literal> is exactly <literal>-</literal> then standard input is used. Pathspec
+        elements are separated by LF or CR/LF. Pathspec elements can be
+        quoted as explained for the configuration variable <literal>core.quotePath</literal>
+        (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>). See also <literal>--pathspec-file-nul</literal> and
+        global <literal>--literal-pathspecs</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--pathspec-file-nul
+</term>
+<listitem>
+<simpara>
+        Only meaningful with <literal>--pathspec-from-file</literal>. Pathspec elements are
+        separated with NUL character and all other characters are taken
+        literally (including newlines and quotes).
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_removing_files_that_have_disappeared_from_the_filesystem">
+<title>REMOVING FILES THAT HAVE DISAPPEARED FROM THE FILESYSTEM</title>
+<simpara>There is no option for <literal>git rm</literal> to remove from the index only
+the paths that have disappeared from the filesystem. However,
+depending on the use case, there are several ways that can be
+done.</simpara>
+<refsect2 id="_using_8220_git_commit_a_8221">
+<title>Using &#8220;git commit -a&#8221;</title>
+<simpara>If you intend that your next commit should record all modifications
+of tracked files in the working tree and record all removals of
+files that have been removed from the working tree with <literal>rm</literal>
+(as opposed to <literal>git rm</literal>), use <literal>git commit -a</literal>, as it will
+automatically notice and record all removals.  You can also have a
+similar effect without committing by using <literal>git add -u</literal>.</simpara>
+</refsect2>
+<refsect2 id="_using_8220_git_add_a_8221">
+<title>Using &#8220;git add -A&#8221;</title>
+<simpara>When accepting a new code drop for a vendor branch, you probably
+want to record both the removal of paths and additions of new paths
+as well as modifications of existing paths.</simpara>
+<simpara>Typically you would first remove all tracked files from the working
+tree using this command:</simpara>
+<literallayout class="monospaced">git ls-files -z | xargs -0 rm -f</literallayout><simpara></simpara>
+<simpara>and then untar the new code in the working tree. Alternately
+you could <emphasis>rsync</emphasis> the changes into the working tree.</simpara>
+<simpara>After that, the easiest way to record all removals, additions, and
+modifications in the working tree is:</simpara>
+<literallayout class="monospaced">git add -A</literallayout><simpara></simpara>
+<simpara>See <citerefentry>
+<refentrytitle>git-add</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+</refsect2>
+<refsect2 id="_other_ways">
+<title>Other ways</title>
+<simpara>If all you really want to do is to remove from the index the files
+that are no longer present in the working tree (perhaps because
+your working tree is dirty so that you cannot use <literal>git commit -a</literal>),
+use the following command:</simpara>
+<literallayout class="monospaced">git diff --name-only --diff-filter=D -z | xargs -0 git rm --cached</literallayout><simpara></simpara>
+</refsect2>
+</refsect1>
+<refsect1 id="_submodules">
+<title>SUBMODULES</title>
+<simpara>Only submodules using a gitfile (which means they were cloned
+with a Git version 1.7.8 or newer) will be removed from the work
+tree, as their repository lives inside the .git directory of the
+superproject. If a submodule (or one of those nested inside it)
+still uses a .git directory, <literal>git rm</literal> will move the submodules
+git directory into the superprojects git directory to protect
+the submodule&#8217;s history. If it exists the submodule.&lt;name&gt; section
+in the <citerefentry>
+<refentrytitle>gitmodules</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry> file will also be removed and that file
+will be staged (unless --cached or -n are used).</simpara>
+<simpara>A submodule is considered up to date when the HEAD is the same as
+recorded in the index, no tracked files are modified and no untracked
+files that aren&#8217;t ignored are present in the submodules work tree.
+Ignored files are deemed expendable and won&#8217;t stop a submodule&#8217;s work
+tree from being removed.</simpara>
+<simpara>If you only want to remove the local checkout of a submodule from your
+work tree without committing the removal, use <citerefentry>
+<refentrytitle>git-submodule</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> <literal>deinit</literal>
+instead. Also see <citerefentry>
+<refentrytitle>gitsubmodules</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry> for details on submodule removal.</simpara>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<variablelist>
+<varlistentry>
+<term>
+<literal>git rm Documentation/\*.txt</literal>
+</term>
+<listitem>
+<simpara>
+        Removes all <literal>*.txt</literal> files from the index that are under the
+        <literal>Documentation</literal> directory and any of its subdirectories.
+</simpara>
+<simpara>Note that the asterisk <literal>*</literal> is quoted from the shell in this
+example; this lets Git, and not the shell, expand the pathnames
+of files and subdirectories under the <literal>Documentation/</literal> directory.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>git rm -f git-*.sh</literal>
+</term>
+<listitem>
+<simpara>
+        Because this example lets the shell expand the asterisk
+        (i.e. you are listing the files explicitly), it
+        does not remove <literal>subdir/git-foo.sh</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_bugs">
+<title>BUGS</title>
+<simpara>Each time a superproject update removes a populated submodule
+(e.g. when switching between commits before and after the removal) a
+stale submodule checkout will remain in the old location. Removing the
+old directory is only safe when it uses a gitfile, as otherwise the
+history of the submodule will be deleted too. This step will be
+obsolete when recursive submodule update has been implemented.</simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-add</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

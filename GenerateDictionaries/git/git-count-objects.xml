@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-count-objects</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-count-objects</refname>
+  <refpurpose>Count unpacked number of objects and their disk consumption</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git count-objects</emphasis> [-v] [-H | --human-readable]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>This counts the number of unpacked object files and disk space consumed by
+them, to help you decide when it is a good time to repack.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-v
+</term>
+<term>
+--verbose
+</term>
+<listitem>
+<simpara>
+        Report in more detail:
+</simpara>
+<simpara>count: the number of loose objects</simpara>
+<simpara>size: disk space consumed by loose objects, in KiB (unless -H is specified)</simpara>
+<simpara>in-pack: the number of in-pack objects</simpara>
+<simpara>size-pack: disk space consumed by the packs, in KiB (unless -H is specified)</simpara>
+<simpara>prune-packable: the number of loose objects that are also present in
+the packs. These objects could be pruned using <literal>git prune-packed</literal>.</simpara>
+<simpara>garbage: the number of files in object database that are neither valid loose
+objects nor valid packs</simpara>
+<simpara>size-garbage: disk space consumed by garbage files, in KiB (unless -H is
+specified)</simpara>
+<simpara>alternate: absolute path of alternate object databases; may appear
+multiple times, one line per path. Note that if the path contains
+non-printable characters, it may be surrounded by double-quotes and
+contain C-style backslashed escape sequences.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-H
+</term>
+<term>
+--human-readable
+</term>
+<listitem>
+<simpara>
+Print sizes in human readable format
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

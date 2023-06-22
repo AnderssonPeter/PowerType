@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-commit-graph</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-commit-graph</refname>
+  <refpurpose>Write and verify Git commit-graph files</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git commit-graph verify</emphasis> [--object-dir &lt;dir&gt;] [--shallow] [--[no-]progress]
+<emphasis>git commit-graph write</emphasis> &lt;options&gt; [--object-dir &lt;dir&gt;] [--[no-]progress]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Manage the serialized commit-graph file.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--object-dir
+</term>
+<listitem>
+<simpara>
+        Use given directory for the location of packfiles and commit-graph
+        file. This parameter exists to specify the location of an alternate
+        that only has the objects directory, not a full <literal>.git</literal> directory. The
+        commit-graph file is expected to be in the <literal>&lt;dir&gt;/info</literal> directory and
+        the packfiles are expected to be in <literal>&lt;dir&gt;/pack</literal>. If the directory
+        could not be made into an absolute path, or does not match any known
+        object directory, <literal>git commit-graph ...</literal> will exit with non-zero
+        status.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]progress
+</term>
+<listitem>
+<simpara>
+        Turn progress on/off explicitly. If neither is specified, progress is
+        shown if standard error is connected to a terminal.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_commands">
+<title>COMMANDS</title>
+<variablelist>
+<varlistentry>
+<term>
+<emphasis>write</emphasis>
+</term>
+<listitem>
+<simpara>
+Write a commit-graph file based on the commits found in packfiles. If
+the config option <literal>core.commitGraph</literal> is disabled, then this command will
+output a warning, then return success without writing a commit-graph file.
+</simpara>
+<simpara>With the <literal>--stdin-packs</literal> option, generate the new commit graph by
+walking objects only in the specified pack-indexes. (Cannot be combined
+with <literal>--stdin-commits</literal> or <literal>--reachable</literal>.)</simpara>
+<simpara>With the <literal>--stdin-commits</literal> option, generate the new commit graph by
+walking commits starting at the commits specified in stdin as a list
+of OIDs in hex, one OID per line. OIDs that resolve to non-commits
+(either directly, or by peeling tags) are silently ignored. OIDs that
+are malformed, or do not exist generate an error. (Cannot be combined
+with <literal>--stdin-packs</literal> or <literal>--reachable</literal>.)</simpara>
+<simpara>With the <literal>--reachable</literal> option, generate the new commit graph by walking
+commits starting at all refs. (Cannot be combined with <literal>--stdin-commits</literal>
+or <literal>--stdin-packs</literal>.)</simpara>
+<simpara>With the <literal>--append</literal> option, include all commits that are present in the
+existing commit-graph file.</simpara>
+<simpara>With the <literal>--changed-paths</literal> option, compute and write information about the
+paths changed between a commit and its first parent. This operation can
+take a while on large repositories. It provides significant performance gains
+for getting history of a directory or a file with <literal>git log -- &lt;path&gt;</literal>. If
+this option is given, future commit-graph writes will automatically assume
+that this option was intended. Use <literal>--no-changed-paths</literal> to stop storing this
+data.</simpara>
+<simpara>With the <literal>--max-new-filters=&lt;n&gt;</literal> option, generate at most <literal>n</literal> new Bloom
+filters (if <literal>--changed-paths</literal> is specified). If <literal>n</literal> is <literal>-1</literal>, no limit is
+enforced. Only commits present in the new layer count against this
+limit. To retroactively compute Bloom filters over earlier layers, it is
+advised to use <literal>--split=replace</literal>.  Overrides the <literal>commitGraph.maxNewFilters</literal>
+configuration.</simpara>
+<simpara>With the <literal>--split[=&lt;strategy&gt;]</literal> option, write the commit-graph as a
+chain of multiple commit-graph files stored in
+<literal>&lt;dir&gt;/info/commit-graphs</literal>. Commit-graph layers are merged based on the
+strategy and other splitting options. The new commits not already in the
+commit-graph are added in a new "tip" file. This file is merged with the
+existing file if the following merge conditions are met:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+If <literal>--split=no-merge</literal> is specified, a merge is never performed, and
+the remaining options are ignored. <literal>--split=replace</literal> overwrites the
+existing chain with a new one. A bare <literal>--split</literal> defers to the remaining
+options. (Note that merging a chain of commit graphs replaces the
+existing chain with a length-1 chain where the first and only
+incremental holds the entire graph).
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+If <literal>--size-multiple=&lt;X&gt;</literal> is not specified, let <literal>X</literal> equal 2. If the new
+tip file would have <literal>N</literal> commits and the previous tip has <literal>M</literal> commits and
+<literal>X</literal> times <literal>N</literal> is greater than  <literal>M</literal>, instead merge the two files into a
+single file.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+If <literal>--max-commits=&lt;M&gt;</literal> is specified with <literal>M</literal> a positive integer, and the
+new tip file would have more than <literal>M</literal> commits, then instead merge the new
+tip with the previous tip.
+</simpara>
+<simpara>Finally, if <literal>--expire-time=&lt;datetime&gt;</literal> is not specified, let <literal>datetime</literal>
+be the current time. After writing the split commit-graph, delete all
+unused commit-graph whose modified times are older than <literal>datetime</literal>.</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<emphasis>verify</emphasis>
+</term>
+<listitem>
+<simpara>
+Read the commit-graph file and verify its contents against the object
+database. Used to check for corrupted data.
+</simpara>
+<simpara>With the <literal>--shallow</literal> option, only check the tip commit-graph file in
+a chain of split commit-graphs.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<itemizedlist>
+<listitem>
+<simpara>
+Write a commit-graph file for the packed commits in your local <literal>.git</literal>
+  directory.
+</simpara>
+<literallayout class="monospaced">$ git commit-graph write</literallayout><simpara></simpara>
+</listitem>
+<listitem>
+<simpara>
+Write a commit-graph file, extending the current commit-graph file
+  using commits in <literal>&lt;pack-index&gt;</literal>.
+</simpara>
+<literallayout class="monospaced">$ echo &lt;pack-index&gt; | git commit-graph write --stdin-packs</literallayout><simpara></simpara>
+</listitem>
+<listitem>
+<simpara>
+Write a commit-graph file containing all reachable commits.
+</simpara>
+<literallayout class="monospaced">$ git show-ref -s | git commit-graph write --stdin-commits</literallayout><simpara></simpara>
+</listitem>
+<listitem>
+<simpara>
+Write a commit-graph file containing all commits in the current
+  commit-graph file along with those reachable from <literal>HEAD</literal>.
+</simpara>
+<literallayout class="monospaced">$ git rev-parse HEAD | git commit-graph write --stdin-commits --append</literallayout><simpara></simpara>
+</listitem>
+</itemizedlist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

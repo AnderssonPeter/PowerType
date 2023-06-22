@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-restore</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-restore</refname>
+  <refpurpose>Restore working tree files</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git restore</emphasis> [&lt;options&gt;] [--source=&lt;tree&gt;] [--staged] [--worktree] [--] &lt;pathspec&gt;&#8230;
+<emphasis>git restore</emphasis> [&lt;options&gt;] [--source=&lt;tree&gt;] [--staged] [--worktree] --pathspec-from-file=&lt;file&gt; [--pathspec-file-nul]
+<emphasis>git restore</emphasis> (-p|--patch) [&lt;options&gt;] [--source=&lt;tree&gt;] [--staged] [--worktree] [--] [&lt;pathspec&gt;&#8230;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Restore specified paths in the working tree with some contents from a
+restore source. If a path is tracked but does not exist in the restore
+source, it will be removed to match the source.</simpara>
+<simpara>The command can also be used to restore the content in the index with
+<literal>--staged</literal>, or restore both the working tree and the index with
+<literal>--staged --worktree</literal>.</simpara>
+<simpara>By default, if <literal>--staged</literal> is given, the contents are restored from <literal>HEAD</literal>,
+otherwise from the index. Use <literal>--source</literal> to restore from a different commit.</simpara>
+<simpara>See "Reset, restore and revert" in <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for the differences
+between the three commands.</simpara>
+<simpara>THIS COMMAND IS EXPERIMENTAL. THE BEHAVIOR MAY CHANGE.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-s &lt;tree&gt;
+</term>
+<term>
+--source=&lt;tree&gt;
+</term>
+<listitem>
+<simpara>
+        Restore the working tree files with the content from the given
+        tree. It is common to specify the source tree by naming a
+        commit, branch or tag associated with it.
+</simpara>
+<simpara>If not specified, the contents are restored from <literal>HEAD</literal> if <literal>--staged</literal> is
+given, otherwise from the index.</simpara>
+<simpara>As a special case, you may use <literal>"A...B"</literal> as a shortcut for the
+merge base of <literal>A</literal> and <literal>B</literal> if there is exactly one merge base. You can
+leave out at most one of <literal>A</literal> and <literal>B</literal>, in which case it defaults to <literal>HEAD</literal>.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-p
+</term>
+<term>
+--patch
+</term>
+<listitem>
+<simpara>
+        Interactively select hunks in the difference between the
+        restore source and the restore location. See the &#8220;Interactive
+        Mode&#8221; section of <citerefentry>
+<refentrytitle>git-add</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> to learn how to operate
+        the <literal>--patch</literal> mode.
+</simpara>
+<simpara>Note that <literal>--patch</literal> can accept no pathspec and will prompt to restore
+all modified paths.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-W
+</term>
+<term>
+--worktree
+</term>
+<term>
+-S
+</term>
+<term>
+--staged
+</term>
+<listitem>
+<simpara>
+        Specify the restore location. If neither option is specified,
+        by default the working tree is restored. Specifying <literal>--staged</literal>
+        will only restore the index. Specifying both restores both.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-q
+</term>
+<term>
+--quiet
+</term>
+<listitem>
+<simpara>
+        Quiet, suppress feedback messages. Implies <literal>--no-progress</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--progress
+</term>
+<term>
+--no-progress
+</term>
+<listitem>
+<simpara>
+        Progress status is reported on the standard error stream
+        by default when it is attached to a terminal, unless <literal>--quiet</literal>
+        is specified. This flag enables progress reporting even if not
+        attached to a terminal, regardless of <literal>--quiet</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ours
+</term>
+<term>
+--theirs
+</term>
+<listitem>
+<simpara>
+        When restoring files in the working tree from the index, use
+        stage #2 (<emphasis>ours</emphasis>) or #3 (<emphasis>theirs</emphasis>) for unmerged paths.
+</simpara>
+<simpara>Note that during <literal>git rebase</literal> and <literal>git pull --rebase</literal>, <emphasis>ours</emphasis> and
+<emphasis>theirs</emphasis> may appear swapped. See the explanation of the same options
+in <citerefentry>
+<refentrytitle>git-checkout</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for details.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-m
+</term>
+<term>
+--merge
+</term>
+<listitem>
+<simpara>
+        When restoring files on the working tree from the index,
+        recreate the conflicted merge in the unmerged paths.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--conflict=&lt;style&gt;
+</term>
+<listitem>
+<simpara>
+        The same as <literal>--merge</literal> option above, but changes the way the
+        conflicting hunks are presented, overriding the
+        <literal>merge.conflictStyle</literal> configuration variable.  Possible values
+        are "merge" (default) and "diff3" (in addition to what is
+        shown by "merge" style, shows the original contents).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-unmerged
+</term>
+<listitem>
+<simpara>
+        When restoring files on the working tree from the index, do
+        not abort the operation if there are unmerged entries and
+        neither <literal>--ours</literal>, <literal>--theirs</literal>, <literal>--merge</literal> or <literal>--conflict</literal> is
+        specified. Unmerged paths on the working tree are left alone.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-skip-worktree-bits
+</term>
+<listitem>
+<simpara>
+        In sparse checkout mode, by default is to only update entries
+        matched by <literal>&lt;pathspec&gt;</literal> and sparse patterns in
+        $GIT_DIR/info/sparse-checkout. This option ignores the sparse
+        patterns and unconditionally restores any files in
+        <literal>&lt;pathspec&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--recurse-submodules
+</term>
+<term>
+--no-recurse-submodules
+</term>
+<listitem>
+<simpara>
+        If <literal>&lt;pathspec&gt;</literal> names an active submodule and the restore location
+        includes the working tree, the submodule will only be updated if
+        this option is given, in which case its working tree will be
+        restored to the commit recorded in the superproject, and any local
+        modifications overwritten. If nothing (or
+        <literal>--no-recurse-submodules</literal>) is used, submodules working trees will
+        not be updated. Just like <citerefentry>
+<refentrytitle>git-checkout</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>, this will detach
+        <literal>HEAD</literal> of the submodule.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--overlay
+</term>
+<term>
+--no-overlay
+</term>
+<listitem>
+<simpara>
+        In overlay mode, the command never removes files when
+        restoring. In no-overlay mode, tracked files that do not
+        appear in the <literal>--source</literal> tree are removed, to make them match
+        <literal>&lt;tree&gt;</literal> exactly. The default is no-overlay mode.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--pathspec-from-file=&lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        Pathspec is passed in <literal>&lt;file&gt;</literal> instead of commandline args. If
+        <literal>&lt;file&gt;</literal> is exactly <literal>-</literal> then standard input is used. Pathspec
+        elements are separated by LF or CR/LF. Pathspec elements can be
+        quoted as explained for the configuration variable <literal>core.quotePath</literal>
+        (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>). See also <literal>--pathspec-file-nul</literal> and
+        global <literal>--literal-pathspecs</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--pathspec-file-nul
+</term>
+<listitem>
+<simpara>
+        Only meaningful with <literal>--pathspec-from-file</literal>. Pathspec elements are
+        separated with NUL character and all other characters are taken
+        literally (including newlines and quotes).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--
+</term>
+<listitem>
+<simpara>
+        Do not interpret any more arguments as options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;pathspec&gt;&#8230;
+</term>
+<listitem>
+<simpara>
+        Limits the paths affected by the operation.
+</simpara>
+<simpara>For more details, see the <emphasis>pathspec</emphasis> entry in <citerefentry>
+<refentrytitle>gitglossary</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<simpara>The following sequence switches to the <literal>master</literal> branch, reverts the
+<literal>Makefile</literal> to two revisions back, deletes hello.c by mistake, and gets
+it back from the index.</simpara>
+<literallayout class="monospaced">$ git switch master
+$ git restore --source master~2 Makefile  <co id="CO1-1"/>
+$ rm -f hello.c
+$ git restore hello.c                     <co id="CO1-2"/></literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO1-1">
+<para>
+take a file out of another commit
+</para>
+</callout>
+<callout arearefs="CO1-2">
+<para>
+restore hello.c from the index
+</para>
+</callout>
+</calloutlist>
+<simpara>If you want to restore <emphasis>all</emphasis> C source files to match the version in
+the index, you can say</simpara>
+<literallayout class="monospaced">$ git restore '*.c'</literallayout><simpara></simpara>
+<simpara>Note the quotes around <literal>*.c</literal>.  The file <literal>hello.c</literal> will also be
+restored, even though it is no longer in the working tree, because the
+file globbing is used to match entries in the index (not in the
+working tree by the shell).</simpara>
+<simpara>To restore all files in the current directory</simpara>
+<literallayout class="monospaced">$ git restore .</literallayout><simpara></simpara>
+<simpara>or to restore all working tree files with <emphasis>top</emphasis> pathspec magic (see
+<citerefentry>
+<refentrytitle>gitglossary</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>)</simpara>
+<literallayout class="monospaced">$ git restore :/</literallayout><simpara></simpara>
+<simpara>To restore a file in the index to match the version in <literal>HEAD</literal> (this is
+the same as using <citerefentry>
+<refentrytitle>git-reset</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>)</simpara>
+<literallayout class="monospaced">$ git restore --staged hello.c</literallayout><simpara></simpara>
+<simpara>or you can restore both the index and the working tree (this the same
+as using <citerefentry>
+<refentrytitle>git-checkout</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>)</simpara>
+<literallayout class="monospaced">$ git restore --source=HEAD --staged --worktree hello.c</literallayout><simpara></simpara>
+<simpara>or the short form which is more practical but less readable:</simpara>
+<literallayout class="monospaced">$ git restore -s@ -SW hello.c</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-checkout</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-reset</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

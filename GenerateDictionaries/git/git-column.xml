@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-column</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-column</refname>
+  <refpurpose>Display data in columns</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git column</emphasis> [--command=&lt;name&gt;] [--[raw-]mode=&lt;mode&gt;] [--width=&lt;width&gt;]
+             [--indent=&lt;string&gt;] [--nl=&lt;string&gt;] [--padding=&lt;n&gt;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>This command formats the lines of its standard input into a table with
+multiple columns. Each input line occupies one cell of the table. It
+is used internally by other git commands to format output into
+columns.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--command=&lt;name&gt;
+</term>
+<listitem>
+<simpara>
+        Look up layout mode using configuration variable column.&lt;name&gt; and
+        column.ui.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--mode=&lt;mode&gt;
+</term>
+<listitem>
+<simpara>
+        Specify layout mode. See configuration variable column.ui for option
+        syntax in <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--raw-mode=&lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        Same as --mode but take mode encoded as a number. This is mainly used
+        by other commands that have already parsed layout mode.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--width=&lt;width&gt;
+</term>
+<listitem>
+<simpara>
+        Specify the terminal width. By default <emphasis>git column</emphasis> will detect the
+        terminal width, or fall back to 80 if it is unable to do so.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--indent=&lt;string&gt;
+</term>
+<listitem>
+<simpara>
+        String to be printed at the beginning of each line.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--nl=&lt;string&gt;
+</term>
+<listitem>
+<simpara>
+        String to be printed at the end of each line,
+        including newline character.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--padding=&lt;N&gt;
+</term>
+<listitem>
+<simpara>
+        The number of spaces between columns. One space by default.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<simpara>Format data by columns:</simpara>
+<literallayout class="monospaced">$ seq 1 24 | git column --mode=column --padding=5
+1      4      7      10     13     16     19     22
+2      5      8      11     14     17     20     23
+3      6      9      12     15     18     21     24</literallayout><simpara></simpara>
+<simpara>Format data by rows:</simpara>
+<literallayout class="monospaced">$ seq 1 21 | git column --mode=row --padding=5
+1      2      3      4      5      6      7
+8      9      10     11     12     13     14
+15     16     17     18     19     20     21</literallayout><simpara></simpara>
+<simpara>List some tags in a table with unequal column widths:</simpara>
+<literallayout class="monospaced">$ git tag --list 'v2.4.*' --column=row,dense
+v2.4.0  v2.4.0-rc0  v2.4.0-rc1  v2.4.0-rc2  v2.4.0-rc3
+v2.4.1  v2.4.10     v2.4.11     v2.4.12     v2.4.2
+v2.4.3  v2.4.4      v2.4.5      v2.4.6      v2.4.7
+v2.4.8  v2.4.9</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

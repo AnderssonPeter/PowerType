@@ -1,0 +1,1302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-shortlog</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-shortlog</refname>
+  <refpurpose>Summarize 'git log' output</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git shortlog</emphasis> [&lt;options&gt;] [&lt;revision range&gt;] [[--] &lt;path&gt;&#8230;]
+git log --pretty=short | <emphasis>git shortlog</emphasis> [&lt;options&gt;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Summarizes <emphasis>git log</emphasis> output in a format suitable for inclusion
+in release announcements. Each commit will be grouped by author and title.</simpara>
+<simpara>Additionally, "[PATCH]" will be stripped from the commit description.</simpara>
+<simpara>If no revisions are passed on the command line and either standard input
+is not a terminal or there is no current branch, <emphasis>git shortlog</emphasis> will
+output a summary of the log read from standard input, without
+reference to the current repository.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-n
+</term>
+<term>
+--numbered
+</term>
+<listitem>
+<simpara>
+        Sort output according to the number of commits per author instead
+        of author alphabetic order.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-s
+</term>
+<term>
+--summary
+</term>
+<listitem>
+<simpara>
+        Suppress commit description and provide a commit count summary only.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-e
+</term>
+<term>
+--email
+</term>
+<listitem>
+<simpara>
+        Show the email address of each author.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--format[=&lt;format&gt;]
+</term>
+<listitem>
+<simpara>
+        Instead of the commit subject, use some other information to
+        describe each commit.  <emphasis>&lt;format&gt;</emphasis> can be any string accepted
+        by the <literal>--format</literal> option of <emphasis>git log</emphasis>, such as <emphasis>* [%h] %s</emphasis>.
+        (See the "PRETTY FORMATS" section of <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.)
+</simpara>
+<literallayout class="monospaced">Each pretty-printed commit will be rewrapped before it is shown.</literallayout>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--group=&lt;type&gt;
+</term>
+<listitem>
+<simpara>
+        Group commits based on <literal>&lt;type&gt;</literal>. If no <literal>--group</literal> option is
+        specified, the default is <literal>author</literal>. <literal>&lt;type&gt;</literal> is one of:
+</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+<literal>author</literal>, commits are grouped by author
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>committer</literal>, commits are grouped by committer (the same as <literal>-c</literal>)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>trailer:&lt;field&gt;</literal>, the <literal>&lt;field&gt;</literal> is interpreted as a case-insensitive
+   commit message trailer (see <citerefentry>
+<refentrytitle>git-interpret-trailers</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>). For
+   example, if your project uses <literal>Reviewed-by</literal> trailers, you might want
+   to see who has been reviewing with
+   <literal>git shortlog -ns --group=trailer:reviewed-by</literal>.
+</simpara>
+<simpara>Note that commits that do not include the trailer will not be counted.
+Likewise, commits with multiple trailers (e.g., multiple signoffs) may
+be counted more than once (but only once per unique trailer value in
+that commit).</simpara>
+<simpara>Shortlog will attempt to parse each trailer value as a <literal>name &lt;email&gt;</literal>
+identity. If successful, the mailmap is applied and the email is omitted
+unless the <literal>--email</literal> option is specified. If the value cannot be parsed
+as an identity, it will be taken literally and completely.</simpara>
+</listitem>
+</itemizedlist>
+<simpara>If <literal>--group</literal> is specified multiple times, commits are counted under each
+value (but again, only once per unique value in that commit). For
+example, <literal>git shortlog --group=author --group=trailer:co-authored-by</literal>
+counts both authors and co-authors.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-c
+</term>
+<term>
+--committer
+</term>
+<listitem>
+<simpara>
+        This is an alias for <literal>--group=committer</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-w[&lt;width&gt;[,&lt;indent1&gt;[,&lt;indent2&gt;]]]
+</term>
+<listitem>
+<simpara>
+        Linewrap the output by wrapping each line at <literal>width</literal>.  The first
+        line of each entry is indented by <literal>indent1</literal> spaces, and the second
+        and subsequent lines are indented by <literal>indent2</literal> spaces. <literal>width</literal>,
+        <literal>indent1</literal>, and <literal>indent2</literal> default to 76, 6 and 9 respectively.
+</simpara>
+<simpara>If width is <literal>0</literal> (zero) then indent the lines of the output without wrapping
+them.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;revision range&gt;
+</term>
+<listitem>
+<simpara>
+        Show only commits in the specified revision range.  When no
+        &lt;revision range&gt; is specified, it defaults to <literal>HEAD</literal> (i.e. the
+        whole history leading to the current commit).  <literal>origin..HEAD</literal>
+        specifies all the commits reachable from the current commit
+        (i.e. <literal>HEAD</literal>), but not from <literal>origin</literal>. For a complete list of
+        ways to spell &lt;revision range&gt;, see the "Specifying Ranges"
+        section of <citerefentry>
+<refentrytitle>gitrevisions</refentrytitle><manvolnum>7</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+[--] &lt;path&gt;&#8230;
+</term>
+<listitem>
+<simpara>
+        Consider only commits that are enough to explain how the files
+        that match the specified paths came to be.
+</simpara>
+<simpara>Paths may need to be prefixed with <literal>--</literal> to separate them from
+options or the revision range, when confusion arises.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<refsect2 id="_commit_limiting">
+<title>Commit Limiting</title>
+<simpara>Besides specifying a range of commits that should be listed using the
+special notations explained in the description, additional commit
+limiting may be applied.</simpara>
+<simpara>Using more options generally further limits the output (e.g.
+<literal>--since=&lt;date1&gt;</literal> limits to commits newer than <literal>&lt;date1&gt;</literal>, and using it
+with <literal>--grep=&lt;pattern&gt;</literal> further limits to commits whose log message
+has a line that matches <literal>&lt;pattern&gt;</literal>), unless otherwise noted.</simpara>
+<simpara>Note that these are applied before commit
+ordering and formatting options, such as <literal>--reverse</literal>.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+-&lt;number&gt;
+</term>
+<term>
+-n &lt;number&gt;
+</term>
+<term>
+--max-count=&lt;number&gt;
+</term>
+<listitem>
+<simpara>
+        Limit the number of commits to output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--skip=&lt;number&gt;
+</term>
+<listitem>
+<simpara>
+        Skip <emphasis>number</emphasis> commits before starting to show the commit output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--since=&lt;date&gt;
+</term>
+<term>
+--after=&lt;date&gt;
+</term>
+<listitem>
+<simpara>
+        Show commits more recent than a specific date.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--until=&lt;date&gt;
+</term>
+<term>
+--before=&lt;date&gt;
+</term>
+<listitem>
+<simpara>
+        Show commits older than a specific date.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--author=&lt;pattern&gt;
+</term>
+<term>
+--committer=&lt;pattern&gt;
+</term>
+<listitem>
+<simpara>
+        Limit the commits output to ones with author/committer
+        header lines that match the specified pattern (regular
+        expression).  With more than one <literal>--author=&lt;pattern&gt;</literal>,
+        commits whose author matches any of the given patterns are
+        chosen (similarly for multiple <literal>--committer=&lt;pattern&gt;</literal>).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--grep-reflog=&lt;pattern&gt;
+</term>
+<listitem>
+<simpara>
+        Limit the commits output to ones with reflog entries that
+        match the specified pattern (regular expression). With
+        more than one <literal>--grep-reflog</literal>, commits whose reflog message
+        matches any of the given patterns are chosen.  It is an
+        error to use this option unless <literal>--walk-reflogs</literal> is in use.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--grep=&lt;pattern&gt;
+</term>
+<listitem>
+<simpara>
+        Limit the commits output to ones with log message that
+        matches the specified pattern (regular expression).  With
+        more than one <literal>--grep=&lt;pattern&gt;</literal>, commits whose message
+        matches any of the given patterns are chosen (but see
+        <literal>--all-match</literal>).
+</simpara>
+<simpara>When <literal>--notes</literal> is in effect, the message from the notes is
+matched as if it were part of the log message.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--all-match
+</term>
+<listitem>
+<simpara>
+        Limit the commits output to ones that match all given <literal>--grep</literal>,
+        instead of ones that match at least one.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--invert-grep
+</term>
+<listitem>
+<simpara>
+        Limit the commits output to ones with log message that do not
+        match the pattern specified with <literal>--grep=&lt;pattern&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-i
+</term>
+<term>
+--regexp-ignore-case
+</term>
+<listitem>
+<simpara>
+        Match the regular expression limiting patterns without regard to letter
+        case.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--basic-regexp
+</term>
+<listitem>
+<simpara>
+        Consider the limiting patterns to be basic regular expressions;
+        this is the default.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-E
+</term>
+<term>
+--extended-regexp
+</term>
+<listitem>
+<simpara>
+        Consider the limiting patterns to be extended regular expressions
+        instead of the default basic regular expressions.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-F
+</term>
+<term>
+--fixed-strings
+</term>
+<listitem>
+<simpara>
+        Consider the limiting patterns to be fixed strings (don&#8217;t interpret
+        pattern as a regular expression).
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-P
+</term>
+<term>
+--perl-regexp
+</term>
+<listitem>
+<simpara>
+        Consider the limiting patterns to be Perl-compatible regular
+        expressions.
+</simpara>
+<simpara>Support for these types of regular expressions is an optional
+compile-time dependency. If Git wasn&#8217;t compiled with support for them
+providing this option will cause it to die.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--remove-empty
+</term>
+<listitem>
+<simpara>
+        Stop when a given path disappears from the tree.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--merges
+</term>
+<listitem>
+<simpara>
+        Print only merge commits. This is exactly the same as <literal>--min-parents=2</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-merges
+</term>
+<listitem>
+<simpara>
+        Do not print commits with more than one parent. This is
+        exactly the same as <literal>--max-parents=1</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--min-parents=&lt;number&gt;
+</term>
+<term>
+--max-parents=&lt;number&gt;
+</term>
+<term>
+--no-min-parents
+</term>
+<term>
+--no-max-parents
+</term>
+<listitem>
+<simpara>
+        Show only commits which have at least (or at most) that many parent
+        commits. In particular, <literal>--max-parents=1</literal> is the same as <literal>--no-merges</literal>,
+        <literal>--min-parents=2</literal> is the same as <literal>--merges</literal>.  <literal>--max-parents=0</literal>
+        gives all root commits and <literal>--min-parents=3</literal> all octopus merges.
+</simpara>
+<simpara><literal>--no-min-parents</literal> and <literal>--no-max-parents</literal> reset these limits (to no limit)
+again.  Equivalent forms are <literal>--min-parents=0</literal> (any commit has 0 or more
+parents) and <literal>--max-parents=-1</literal> (negative numbers denote no upper limit).</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--first-parent
+</term>
+<listitem>
+<simpara>
+        Follow only the first parent commit upon seeing a merge
+        commit.  This option can give a better overview when
+        viewing the evolution of a particular topic branch,
+        because merges into a topic branch tend to be only about
+        adjusting to updated upstream from time to time, and
+        this option allows you to ignore the individual commits
+        brought in to your history by such a merge.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--not
+</term>
+<listitem>
+<simpara>
+        Reverses the meaning of the <emphasis>&#94;</emphasis> prefix (or lack thereof)
+        for all following revision specifiers, up to the next <literal>--not</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--all
+</term>
+<listitem>
+<simpara>
+        Pretend as if all the refs in <literal>refs/</literal>, along with <literal>HEAD</literal>, are
+        listed on the command line as <emphasis>&lt;commit&gt;</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--branches[=&lt;pattern&gt;]
+</term>
+<listitem>
+<simpara>
+        Pretend as if all the refs in <literal>refs/heads</literal> are listed
+        on the command line as <emphasis>&lt;commit&gt;</emphasis>. If <emphasis>&lt;pattern&gt;</emphasis> is given, limit
+        branches to ones matching given shell glob. If pattern lacks <emphasis>?</emphasis>,
+        <emphasis>&#42;</emphasis>, or <emphasis>[</emphasis>, <emphasis>/&#42;</emphasis> at the end is implied.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--tags[=&lt;pattern&gt;]
+</term>
+<listitem>
+<simpara>
+        Pretend as if all the refs in <literal>refs/tags</literal> are listed
+        on the command line as <emphasis>&lt;commit&gt;</emphasis>. If <emphasis>&lt;pattern&gt;</emphasis> is given, limit
+        tags to ones matching given shell glob. If pattern lacks <emphasis>?</emphasis>, <emphasis>&#42;</emphasis>,
+        or <emphasis>[</emphasis>, <emphasis>/&#42;</emphasis> at the end is implied.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--remotes[=&lt;pattern&gt;]
+</term>
+<listitem>
+<simpara>
+        Pretend as if all the refs in <literal>refs/remotes</literal> are listed
+        on the command line as <emphasis>&lt;commit&gt;</emphasis>. If <emphasis>&lt;pattern&gt;</emphasis> is given, limit
+        remote-tracking branches to ones matching given shell glob.
+        If pattern lacks <emphasis>?</emphasis>, <emphasis>&#42;</emphasis>, or <emphasis>[</emphasis>, <emphasis>/&#42;</emphasis> at the end is implied.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--glob=&lt;glob-pattern&gt;
+</term>
+<listitem>
+<simpara>
+        Pretend as if all the refs matching shell glob <emphasis>&lt;glob-pattern&gt;</emphasis>
+        are listed on the command line as <emphasis>&lt;commit&gt;</emphasis>. Leading <emphasis>refs/</emphasis>,
+        is automatically prepended if missing. If pattern lacks <emphasis>?</emphasis>, <emphasis>&#42;</emphasis>,
+        or <emphasis>[</emphasis>, <emphasis>/&#42;</emphasis> at the end is implied.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--exclude=&lt;glob-pattern&gt;
+</term>
+<listitem>
+<simpara>
+        Do not include refs matching <emphasis>&lt;glob-pattern&gt;</emphasis> that the next <literal>--all</literal>,
+        <literal>--branches</literal>, <literal>--tags</literal>, <literal>--remotes</literal>, or <literal>--glob</literal> would otherwise
+        consider. Repetitions of this option accumulate exclusion patterns
+        up to the next <literal>--all</literal>, <literal>--branches</literal>, <literal>--tags</literal>, <literal>--remotes</literal>, or
+        <literal>--glob</literal> option (other options or arguments do not clear
+        accumulated patterns).
+</simpara>
+<simpara>The patterns given should not begin with <literal>refs/heads</literal>, <literal>refs/tags</literal>, or
+<literal>refs/remotes</literal> when applied to <literal>--branches</literal>, <literal>--tags</literal>, or <literal>--remotes</literal>,
+respectively, and they must begin with <literal>refs/</literal> when applied to <literal>--glob</literal>
+or <literal>--all</literal>. If a trailing <emphasis>/&#42;</emphasis> is intended, it must be given
+explicitly.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--reflog
+</term>
+<listitem>
+<simpara>
+        Pretend as if all objects mentioned by reflogs are listed on the
+        command line as <literal>&lt;commit&gt;</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--alternate-refs
+</term>
+<listitem>
+<simpara>
+        Pretend as if all objects mentioned as ref tips of alternate
+        repositories were listed on the command line. An alternate
+        repository is any repository whose object directory is specified
+        in <literal>objects/info/alternates</literal>.  The set of included objects may
+        be modified by <literal>core.alternateRefsCommand</literal>, etc. See
+        <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--single-worktree
+</term>
+<listitem>
+<simpara>
+        By default, all working trees will be examined by the
+        following options when there are more than one (see
+        <citerefentry>
+<refentrytitle>git-worktree</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>): <literal>--all</literal>, <literal>--reflog</literal> and
+        <literal>--indexed-objects</literal>.
+        This option forces them to examine the current working tree
+        only.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-missing
+</term>
+<listitem>
+<simpara>
+        Upon seeing an invalid object name in the input, pretend as if
+        the bad input was not given.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--bisect
+</term>
+<listitem>
+<simpara>
+        Pretend as if the bad bisection ref <literal>refs/bisect/bad</literal>
+        was listed and as if it was followed by <literal>--not</literal> and the good
+        bisection refs <literal>refs/bisect/good-*</literal> on the command
+        line.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin
+</term>
+<listitem>
+<simpara>
+        In addition to the <emphasis>&lt;commit&gt;</emphasis> listed on the command
+        line, read them from the standard input. If a <literal>--</literal> separator is
+        seen, stop reading commits and start reading paths to limit the
+        result.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--cherry-mark
+</term>
+<listitem>
+<simpara>
+        Like <literal>--cherry-pick</literal> (see below) but mark equivalent commits
+        with <literal>=</literal> rather than omitting them, and inequivalent ones with <literal>+</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--cherry-pick
+</term>
+<listitem>
+<simpara>
+        Omit any commit that introduces the same change as
+        another commit on the &#8220;other side&#8221; when the set of
+        commits are limited with symmetric difference.
+</simpara>
+<simpara>For example, if you have two branches, <literal>A</literal> and <literal>B</literal>, a usual way
+to list all commits on only one side of them is with
+<literal>--left-right</literal> (see the example below in the description of
+the <literal>--left-right</literal> option). However, it shows the commits that were
+cherry-picked from the other branch (for example, &#8220;3rd on b&#8221; may be
+cherry-picked from branch A). With this option, such pairs of commits are
+excluded from the output.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--left-only
+</term>
+<term>
+--right-only
+</term>
+<listitem>
+<simpara>
+        List only commits on the respective side of a symmetric difference,
+        i.e. only those which would be marked <literal>&lt;</literal> resp. <literal>&gt;</literal> by
+        <literal>--left-right</literal>.
+</simpara>
+<simpara>For example, <literal>--cherry-pick --right-only A...B</literal> omits those
+commits from <literal>B</literal> which are in <literal>A</literal> or are patch-equivalent to a commit in
+<literal>A</literal>. In other words, this lists the <literal>+</literal> commits from <literal>git cherry A B</literal>.
+More precisely, <literal>--cherry-pick --right-only --no-merges</literal> gives the exact
+list.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--cherry
+</term>
+<listitem>
+<simpara>
+        A synonym for <literal>--right-only --cherry-mark --no-merges</literal>; useful to
+        limit the output to the commits on our side and mark those that
+        have been applied to the other side of a forked history with
+        <literal>git log --cherry upstream...mybranch</literal>, similar to
+        <literal>git cherry upstream mybranch</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-g
+</term>
+<term>
+--walk-reflogs
+</term>
+<listitem>
+<simpara>
+        Instead of walking the commit ancestry chain, walk
+        reflog entries from the most recent one to older ones.
+        When this option is used you cannot specify commits to
+        exclude (that is, <emphasis>&#94;commit</emphasis>, <emphasis>commit1..commit2</emphasis>,
+        and <emphasis>commit1...commit2</emphasis> notations cannot be used).
+</simpara>
+<simpara>With <literal>--pretty</literal> format other than <literal>oneline</literal> and <literal>reference</literal> (for obvious reasons),
+this causes the output to have two extra lines of information
+taken from the reflog.  The reflog designator in the output may be shown
+as <literal>ref@{Nth}</literal> (where <literal>Nth</literal> is the reverse-chronological index in the
+reflog) or as <literal>ref@{timestamp}</literal> (with the timestamp for that entry),
+depending on a few rules:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+If the starting point is specified as <literal>ref@{Nth}</literal>, show the index
+   format.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+If the starting point was specified as <literal>ref@{now}</literal>, show the
+   timestamp format.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+If neither was used, but <literal>--date</literal> was given on the command line, show
+   the timestamp in the format requested by <literal>--date</literal>.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Otherwise, show the index format.
+</simpara>
+</listitem>
+</orderedlist>
+<simpara>Under <literal>--pretty=oneline</literal>, the commit message is
+prefixed with this information on the same line.
+This option cannot be combined with <literal>--reverse</literal>.
+See also <citerefentry>
+<refentrytitle>git-reflog</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+<simpara>Under <literal>--pretty=reference</literal>, this information will not be shown at all.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--merge
+</term>
+<listitem>
+<simpara>
+        After a failed merge, show refs that touch files having a
+        conflict and don&#8217;t exist on all heads to merge.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--boundary
+</term>
+<listitem>
+<simpara>
+        Output excluded boundary commits. Boundary commits are
+        prefixed with <literal>-</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect2>
+<refsect2 id="_history_simplification">
+<title>History Simplification</title>
+<simpara>Sometimes you are only interested in parts of the history, for example the
+commits modifying a particular &lt;path&gt;. But there are two parts of
+<emphasis>History Simplification</emphasis>, one part is selecting the commits and the other
+is how to do it, as there are various strategies to simplify the history.</simpara>
+<simpara>The following options select the commits to be shown:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+&lt;paths&gt;
+</term>
+<listitem>
+<simpara>
+        Commits modifying the given &lt;paths&gt; are selected.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--simplify-by-decoration
+</term>
+<listitem>
+<simpara>
+        Commits that are referred by some branch or tag are selected.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Note that extra commits can be shown to give a meaningful history.</simpara>
+<simpara>The following options affect the way the simplification is performed:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+Default mode
+</term>
+<listitem>
+<simpara>
+        Simplifies the history to the simplest history explaining the
+        final state of the tree. Simplest because it prunes some side
+        branches if the end result is the same (i.e. merging branches
+        with the same content)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--show-pulls
+</term>
+<listitem>
+<simpara>
+        Include all commits from the default mode, but also any merge
+        commits that are not TREESAME to the first parent but are
+        TREESAME to a later parent. This mode is helpful for showing
+        the merge commits that "first introduced" a change to a branch.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--full-history
+</term>
+<listitem>
+<simpara>
+        Same as the default mode, but does not prune some history.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--dense
+</term>
+<listitem>
+<simpara>
+        Only the selected commits are shown, plus some to have a
+        meaningful history.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--sparse
+</term>
+<listitem>
+<simpara>
+        All commits in the simplified history are shown.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--simplify-merges
+</term>
+<listitem>
+<simpara>
+        Additional option to <literal>--full-history</literal> to remove some needless
+        merges from the resulting history, as there are no selected
+        commits contributing to this merge.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ancestry-path
+</term>
+<listitem>
+<simpara>
+        When given a range of commits to display (e.g. <emphasis>commit1..commit2</emphasis>
+        or <emphasis>commit2 &#94;commit1</emphasis>), only display commits that exist
+        directly on the ancestry chain between the <emphasis>commit1</emphasis> and
+        <emphasis>commit2</emphasis>, i.e. commits that are both descendants of <emphasis>commit1</emphasis>,
+        and ancestors of <emphasis>commit2</emphasis>.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>A more detailed explanation follows.</simpara>
+<simpara>Suppose you specified <literal>foo</literal> as the &lt;paths&gt;.  We shall call commits
+that modify <literal>foo</literal> !TREESAME, and the rest TREESAME.  (In a diff
+filtered for <literal>foo</literal>, they look different and equal, respectively.)</simpara>
+<simpara>In the following, we will always refer to the same example history to
+illustrate the differences between simplification settings.  We assume
+that you are filtering for a file <literal>foo</literal> in this commit graph:</simpara>
+<literallayout class="monospaced">          .-A---M---N---O---P---Q
+         /     /   /   /   /   /
+        I     B   C   D   E   Y
+         \   /   /   /   /   /
+          `-------------'   X</literallayout><simpara></simpara>
+<simpara>The horizontal line of history A---Q is taken to be the first parent of
+each merge.  The commits are:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+<literal>I</literal> is the initial commit, in which <literal>foo</literal> exists with contents
+  &#8220;asdf&#8221;, and a file <literal>quux</literal> exists with contents &#8220;quux&#8221;. Initial
+  commits are compared to an empty tree, so <literal>I</literal> is !TREESAME.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+In <literal>A</literal>, <literal>foo</literal> contains just &#8220;foo&#8221;.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>B</literal> contains the same change as <literal>A</literal>.  Its merge <literal>M</literal> is trivial and
+  hence TREESAME to all parents.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>C</literal> does not change <literal>foo</literal>, but its merge <literal>N</literal> changes it to &#8220;foobar&#8221;,
+  so it is not TREESAME to any parent.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>D</literal> sets <literal>foo</literal> to &#8220;baz&#8221;. Its merge <literal>O</literal> combines the strings from
+  <literal>N</literal> and <literal>D</literal> to &#8220;foobarbaz&#8221;; i.e., it is not TREESAME to any parent.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>E</literal> changes <literal>quux</literal> to &#8220;xyzzy&#8221;, and its merge <literal>P</literal> combines the
+  strings to &#8220;quux xyzzy&#8221;. <literal>P</literal> is TREESAME to <literal>O</literal>, but not to <literal>E</literal>.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>X</literal> is an independent root commit that added a new file <literal>side</literal>, and <literal>Y</literal>
+  modified it. <literal>Y</literal> is TREESAME to <literal>X</literal>. Its merge <literal>Q</literal> added <literal>side</literal> to <literal>P</literal>, and
+  <literal>Q</literal> is TREESAME to <literal>P</literal>, but not to <literal>Y</literal>.
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara><literal>rev-list</literal> walks backwards through history, including or excluding
+commits based on whether <literal>--full-history</literal> and/or parent rewriting
+(via <literal>--parents</literal> or <literal>--children</literal>) are used. The following settings
+are available.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+Default mode
+</term>
+<listitem>
+<simpara>
+        Commits are included if they are not TREESAME to any parent
+        (though this can be changed, see <literal>--sparse</literal> below).  If the
+        commit was a merge, and it was TREESAME to one parent, follow
+        only that parent.  (Even if there are several TREESAME
+        parents, follow only one of them.)  Otherwise, follow all
+        parents.
+</simpara>
+<simpara>This results in:</simpara>
+<literallayout class="monospaced">          .-A---N---O
+         /     /   /
+        I---------D</literallayout><simpara></simpara>
+<simpara>Note how the rule to only follow the TREESAME parent, if one is
+available, removed <literal>B</literal> from consideration entirely.  <literal>C</literal> was
+considered via <literal>N</literal>, but is TREESAME.  Root commits are compared to an
+empty tree, so <literal>I</literal> is !TREESAME.</simpara>
+<simpara>Parent/child relations are only visible with <literal>--parents</literal>, but that does
+not affect the commits selected in default mode, so we have shown the
+parent lines.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--full-history without parent rewriting
+</term>
+<listitem>
+<simpara>
+        This mode differs from the default in one point: always follow
+        all parents of a merge, even if it is TREESAME to one of them.
+        Even if more than one side of the merge has commits that are
+        included, this does not imply that the merge itself is!  In
+        the example, we get
+</simpara>
+<literallayout class="monospaced">        I  A  B  N  D  O  P  Q</literallayout><simpara></simpara>
+<simpara><literal>M</literal> was excluded because it is TREESAME to both parents.  <literal>E</literal>,
+<literal>C</literal> and <literal>B</literal> were all walked, but only <literal>B</literal> was !TREESAME, so the others
+do not appear.</simpara>
+<simpara>Note that without parent rewriting, it is not really possible to talk
+about the parent/child relationships between the commits, so we show
+them disconnected.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--full-history with parent rewriting
+</term>
+<listitem>
+<simpara>
+        Ordinary commits are only included if they are !TREESAME
+        (though this can be changed, see <literal>--sparse</literal> below).
+</simpara>
+<simpara>Merges are always included.  However, their parent list is rewritten:
+Along each parent, prune away commits that are not included
+themselves.  This results in</simpara>
+<literallayout class="monospaced">          .-A---M---N---O---P---Q
+         /     /   /   /   /
+        I     B   /   D   /
+         \   /   /   /   /
+          `-------------'</literallayout><simpara></simpara>
+<simpara>Compare to <literal>--full-history</literal> without rewriting above.  Note that <literal>E</literal>
+was pruned away because it is TREESAME, but the parent list of P was
+rewritten to contain <literal>E</literal>'s parent <literal>I</literal>.  The same happened for <literal>C</literal> and
+<literal>N</literal>, and <literal>X</literal>, <literal>Y</literal> and <literal>Q</literal>.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>In addition to the above settings, you can change whether TREESAME
+affects inclusion:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+--dense
+</term>
+<listitem>
+<simpara>
+        Commits that are walked are included if they are not TREESAME
+        to any parent.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--sparse
+</term>
+<listitem>
+<simpara>
+        All commits that are walked are included.
+</simpara>
+<simpara>Note that without <literal>--full-history</literal>, this still simplifies merges: if
+one of the parents is TREESAME, we follow only that one, so the other
+sides of the merge are never walked.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--simplify-merges
+</term>
+<listitem>
+<simpara>
+        First, build a history graph in the same way that
+        <literal>--full-history</literal> with parent rewriting does (see above).
+</simpara>
+<simpara>Then simplify each commit <literal>C</literal> to its replacement <literal>C'</literal> in the final
+history according to the following rules:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+Set <literal>C'</literal> to <literal>C</literal>.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Replace each parent <literal>P</literal> of <literal>C'</literal> with its simplification <literal>P'</literal>.  In
+  the process, drop parents that are ancestors of other parents or that are
+  root commits TREESAME to an empty tree, and remove duplicates, but take care
+  to never drop all parents that we are TREESAME to.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+If after this parent rewriting, <literal>C'</literal> is a root or merge commit (has
+  zero or &gt;1 parents), a boundary commit, or !TREESAME, it remains.
+  Otherwise, it is replaced with its only parent.
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>The effect of this is best shown by way of comparing to
+<literal>--full-history</literal> with parent rewriting.  The example turns into:</simpara>
+<literallayout class="monospaced">          .-A---M---N---O
+         /     /       /
+        I     B       D
+         \   /       /
+          `---------'</literallayout><simpara></simpara>
+<simpara>Note the major differences in <literal>N</literal>, <literal>P</literal>, and <literal>Q</literal> over <literal>--full-history</literal>:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+<literal>N</literal>'s parent list had <literal>I</literal> removed, because it is an ancestor of the
+  other parent <literal>M</literal>.  Still, <literal>N</literal> remained because it is !TREESAME.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>P</literal>'s parent list similarly had <literal>I</literal> removed.  <literal>P</literal> was then
+  removed completely, because it had one parent and is TREESAME.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>Q</literal>'s parent list had <literal>Y</literal> simplified to <literal>X</literal>. <literal>X</literal> was then removed, because it
+  was a TREESAME root. <literal>Q</literal> was then removed completely, because it had one
+  parent and is TREESAME.
+</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>There is another simplification mode available:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+--ancestry-path
+</term>
+<listitem>
+<simpara>
+        Limit the displayed commits to those directly on the ancestry
+        chain between the &#8220;from&#8221; and &#8220;to&#8221; commits in the given commit
+        range. I.e. only display commits that are ancestor of the &#8220;to&#8221;
+        commit and descendants of the &#8220;from&#8221; commit.
+</simpara>
+<simpara>As an example use case, consider the following commit history:</simpara>
+<literallayout class="monospaced">            D---E-------F
+           /     \       \
+          B---C---G---H---I---J
+         /                     \
+        A-------K---------------L--M</literallayout><simpara></simpara>
+<simpara>A regular <emphasis>D..M</emphasis> computes the set of commits that are ancestors of <literal>M</literal>,
+but excludes the ones that are ancestors of <literal>D</literal>. This is useful to see
+what happened to the history leading to <literal>M</literal> since <literal>D</literal>, in the sense
+that &#8220;what does <literal>M</literal> have that did not exist in <literal>D</literal>&#8221;. The result in this
+example would be all the commits, except <literal>A</literal> and <literal>B</literal> (and <literal>D</literal> itself,
+of course).</simpara>
+<simpara>When we want to find out what commits in <literal>M</literal> are contaminated with the
+bug introduced by <literal>D</literal> and need fixing, however, we might want to view
+only the subset of <emphasis>D..M</emphasis> that are actually descendants of <literal>D</literal>, i.e.
+excluding <literal>C</literal> and <literal>K</literal>. This is exactly what the <literal>--ancestry-path</literal>
+option does. Applied to the <emphasis>D..M</emphasis> range, it results in:</simpara>
+<literallayout class="monospaced">                E-------F
+                 \       \
+                  G---H---I---J
+                               \
+                                L--M</literallayout><simpara></simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>Before discussing another option, <literal>--show-pulls</literal>, we need to
+create a new example history.</simpara>
+<simpara>A common problem users face when looking at simplified history is that a
+commit they know changed a file somehow does not appear in the file&#8217;s
+simplified history. Let&#8217;s demonstrate a new example and show how options
+such as <literal>--full-history</literal> and <literal>--simplify-merges</literal> works in that case:</simpara>
+<literallayout class="monospaced">          .-A---M-----C--N---O---P
+         /     / \  \  \/   /   /
+        I     B   \  R-'`-Z'   /
+         \   /     \/         /
+          \ /      /\        /
+           `---X--'  `---Y--'</literallayout><simpara></simpara>
+<simpara>For this example, suppose <literal>I</literal> created <literal>file.txt</literal> which was modified by
+<literal>A</literal>, <literal>B</literal>, and <literal>X</literal> in different ways. The single-parent commits <literal>C</literal>, <literal>Z</literal>,
+and <literal>Y</literal> do not change <literal>file.txt</literal>. The merge commit <literal>M</literal> was created by
+resolving the merge conflict to include both changes from <literal>A</literal> and <literal>B</literal>
+and hence is not TREESAME to either. The merge commit <literal>R</literal>, however, was
+created by ignoring the contents of <literal>file.txt</literal> at <literal>M</literal> and taking only
+the contents of <literal>file.txt</literal> at <literal>X</literal>. Hence, <literal>R</literal> is TREESAME to <literal>X</literal> but not
+<literal>M</literal>. Finally, the natural merge resolution to create <literal>N</literal> is to take the
+contents of <literal>file.txt</literal> at <literal>R</literal>, so <literal>N</literal> is TREESAME to <literal>R</literal> but not <literal>C</literal>.
+The merge commits <literal>O</literal> and <literal>P</literal> are TREESAME to their first parents, but
+not to their second parents, <literal>Z</literal> and <literal>Y</literal> respectively.</simpara>
+<simpara>When using the default mode, <literal>N</literal> and <literal>R</literal> both have a TREESAME parent, so
+those edges are walked and the others are ignored. The resulting history
+graph is:</simpara>
+<literallayout class="monospaced">        I---X</literallayout><simpara></simpara>
+<simpara>When using <literal>--full-history</literal>, Git walks every edge. This will discover
+the commits <literal>A</literal> and <literal>B</literal> and the merge <literal>M</literal>, but also will reveal the
+merge commits <literal>O</literal> and <literal>P</literal>. With parent rewriting, the resulting graph is:</simpara>
+<literallayout class="monospaced">          .-A---M--------N---O---P
+         /     / \  \  \/   /   /
+        I     B   \  R-'`--'   /
+         \   /     \/         /
+          \ /      /\        /
+           `---X--'  `------'</literallayout><simpara></simpara>
+<simpara>Here, the merge commits <literal>O</literal> and <literal>P</literal> contribute extra noise, as they did
+not actually contribute a change to <literal>file.txt</literal>. They only merged a topic
+that was based on an older version of <literal>file.txt</literal>. This is a common
+issue in repositories using a workflow where many contributors work in
+parallel and merge their topic branches along a single trunk: manu
+unrelated merges appear in the <literal>--full-history</literal> results.</simpara>
+<simpara>When using the <literal>--simplify-merges</literal> option, the commits <literal>O</literal> and <literal>P</literal>
+disappear from the results. This is because the rewritten second parents
+of <literal>O</literal> and <literal>P</literal> are reachable from their first parents. Those edges are
+removed and then the commits look like single-parent commits that are
+TREESAME to their parent. This also happens to the commit <literal>N</literal>, resulting
+in a history view as follows:</simpara>
+<literallayout class="monospaced">          .-A---M--.
+         /     /    \
+        I     B      R
+         \   /      /
+          \ /      /
+           `---X--'</literallayout><simpara></simpara>
+<simpara>In this view, we see all of the important single-parent changes from
+<literal>A</literal>, <literal>B</literal>, and <literal>X</literal>. We also see the carefully-resolved merge <literal>M</literal> and the
+not-so-carefully-resolved merge <literal>R</literal>. This is usually enough information
+to determine why the commits <literal>A</literal> and <literal>B</literal> "disappeared" from history in
+the default view. However, there are a few issues with this approach.</simpara>
+<simpara>The first issue is performance. Unlike any previous option, the
+<literal>--simplify-merges</literal> option requires walking the entire commit history
+before returning a single result. This can make the option difficult to
+use for very large repositories.</simpara>
+<simpara>The second issue is one of auditing. When many contributors are working
+on the same repository, it is important which merge commits introduced
+a change into an important branch. The problematic merge <literal>R</literal> above is
+not likely to be the merge commit that was used to merge into an
+important branch. Instead, the merge <literal>N</literal> was used to merge <literal>R</literal> and <literal>X</literal>
+into the important branch. This commit may have information about why
+the change <literal>X</literal> came to override the changes from <literal>A</literal> and <literal>B</literal> in its
+commit message.</simpara>
+<variablelist>
+<varlistentry>
+<term>
+--show-pulls
+</term>
+<listitem>
+<simpara>
+        In addition to the commits shown in the default history, show
+        each merge commit that is not TREESAME to its first parent but
+        is TREESAME to a later parent.
+</simpara>
+<simpara>When a merge commit is included by <literal>--show-pulls</literal>, the merge is
+treated as if it "pulled" the change from another branch. When using
+<literal>--show-pulls</literal> on this example (and no other options) the resulting
+graph is:</simpara>
+<literallayout class="monospaced">        I---X---R---N</literallayout><simpara></simpara>
+<simpara>Here, the merge commits <literal>R</literal> and <literal>N</literal> are included because they pulled
+the commits <literal>X</literal> and <literal>R</literal> into the base branch, respectively. These
+merges are the reason the commits <literal>A</literal> and <literal>B</literal> do not appear in the
+default history.</simpara>
+<simpara>When <literal>--show-pulls</literal> is paired with <literal>--simplify-merges</literal>, the
+graph includes all of the necessary information:</simpara>
+<literallayout class="monospaced">          .-A---M--.   N
+         /     /    \ /
+        I     B      R
+         \   /      /
+          \ /      /
+           `---X--'</literallayout><simpara></simpara>
+<simpara>Notice that since <literal>M</literal> is reachable from <literal>R</literal>, the edge from <literal>N</literal> to <literal>M</literal>
+was simplified away. However, <literal>N</literal> still appears in the history as an
+important commit because it "pulled" the change <literal>R</literal> into the main
+branch.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>The <literal>--simplify-by-decoration</literal> option allows you to view only the
+big picture of the topology of the history, by omitting commits
+that are not referenced by tags.  Commits are marked as !TREESAME
+(in other words, kept after history simplification rules described
+above) if (1) they are referenced by tags, or (2) they change the
+contents of the paths given on the command line.  All other
+commits are marked as TREESAME (subject to be simplified away).</simpara>
+</refsect2>
+</refsect1>
+<refsect1 id="_mapping_authors">
+<title>MAPPING AUTHORS</title>
+<simpara>See <citerefentry>
+<refentrytitle>gitmailmap</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>.</simpara>
+<simpara>Note that if <literal>git shortlog</literal> is run outside of a repository (to process
+log contents on standard input), it will look for a <literal>.mailmap</literal> file in
+the current directory.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

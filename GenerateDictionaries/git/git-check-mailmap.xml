@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-check-mailmap</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-check-mailmap</refname>
+  <refpurpose>Show canonical names and email addresses of contacts</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git check-mailmap</emphasis> [&lt;options&gt;] &lt;contact&gt;&#8230;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>For each &#8220;Name &lt;user@host&gt;&#8221; or &#8220;&lt;user@host&gt;&#8221; from the command-line
+or standard input (when using <literal>--stdin</literal>), look up the person&#8217;s canonical name
+and email address (see "Mapping Authors" below). If found, print them;
+otherwise print the input as-is.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--stdin
+</term>
+<listitem>
+<simpara>
+        Read contacts, one per line, from the standard input after exhausting
+        contacts provided on the command-line.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_output">
+<title>OUTPUT</title>
+<simpara>For each contact, a single line is output, terminated by a newline.  If the
+name is provided or known to the <emphasis>mailmap</emphasis>, &#8220;Name &lt;user@host&gt;&#8221; is
+printed; otherwise only &#8220;&lt;user@host&gt;&#8221; is printed.</simpara>
+</refsect1>
+<refsect1 id="_configuration">
+<title>CONFIGURATION</title>
+<simpara>See <literal>mailmap.file</literal> and <literal>mailmap.blob</literal> in <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for how
+to specify a custom <literal>.mailmap</literal> target file or object.</simpara>
+</refsect1>
+<refsect1 id="_mapping_authors">
+<title>MAPPING AUTHORS</title>
+<simpara>See <citerefentry>
+<refentrytitle>gitmailmap</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

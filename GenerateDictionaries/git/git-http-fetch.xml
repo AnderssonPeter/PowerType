@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-http-fetch</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-http-fetch</refname>
+  <refpurpose>Download from a remote Git repository via HTTP</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git http-fetch</emphasis> [-c] [-t] [-a] [-d] [-v] [-w filename] [--recover] [--stdin | --packfile=&lt;hash&gt; | &lt;commit&gt;] &lt;url&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Downloads a remote Git repository via HTTP.</simpara>
+<simpara>This command always gets all objects. Historically, there were three options
+<literal>-a</literal>, <literal>-c</literal> and <literal>-t</literal> for choosing which objects to download. They are now
+silently ignored.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+commit-id
+</term>
+<listitem>
+<simpara>
+        Either the hash or the filename under [URL]/refs/ to
+        pull.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-a, -c, -t
+</term>
+<listitem>
+<simpara>
+        These options are ignored for historical reasons.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-v
+</term>
+<listitem>
+<simpara>
+        Report what is downloaded.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-w &lt;filename&gt;
+</term>
+<listitem>
+<simpara>
+        Writes the commit-id into the filename under $GIT_DIR/refs/&lt;filename&gt; on
+        the local end after the transfer is complete.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin
+</term>
+<listitem>
+<simpara>
+        Instead of a commit id on the command line (which is not expected in this
+        case), <emphasis>git http-fetch</emphasis> expects lines on stdin in the format
+</simpara>
+<literallayout class="monospaced">&lt;commit-id&gt;['\t'&lt;filename-as-in--w&gt;]</literallayout>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--packfile=&lt;hash&gt;
+</term>
+<listitem>
+<simpara>
+        For internal use only. Instead of a commit id on the command
+        line (which is not expected in
+        this case), <emphasis>git http-fetch</emphasis> fetches the packfile directly at the given
+        URL and uses index-pack to generate corresponding .idx and .keep files.
+        The hash is used to determine the name of the temporary file and is
+        arbitrary. The output of index-pack is printed to stdout. Requires
+        --index-pack-args.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--index-pack-args=&lt;args&gt;
+</term>
+<listitem>
+<simpara>
+        For internal use only. The command to run on the contents of the
+        downloaded pack. Arguments are URL-encoded separated by spaces.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--recover
+</term>
+<listitem>
+<simpara>
+        Verify that everything reachable from target is fetched.  Used after
+        an earlier fetch is interrupted.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

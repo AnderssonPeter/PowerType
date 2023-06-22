@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-hash-object</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-hash-object</refname>
+  <refpurpose>Compute object ID and optionally creates a blob from a file</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git hash-object</emphasis> [-t &lt;type&gt;] [-w] [--path=&lt;file&gt;|--no-filters] [--stdin [--literally]] [--] &lt;file&gt;&#8230;
+<emphasis>git hash-object</emphasis> [-t &lt;type&gt;] [-w] --stdin-paths [--no-filters]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Computes the object ID value for an object with specified type
+with the contents of the named file (which can be outside of the
+work tree), and optionally writes the resulting object into the
+object database.  Reports its object ID to its standard output.
+When &lt;type&gt; is not specified, it defaults to "blob".</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-t &lt;type&gt;
+</term>
+<listitem>
+<simpara>
+        Specify the type (default: "blob").
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-w
+</term>
+<listitem>
+<simpara>
+        Actually write the object into the object database.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin
+</term>
+<listitem>
+<simpara>
+        Read the object from standard input instead of from a file.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin-paths
+</term>
+<listitem>
+<simpara>
+        Read file names from the standard input, one per line, instead
+        of from the command-line.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--path
+</term>
+<listitem>
+<simpara>
+        Hash object as it were located at the given path. The location of
+        file does not directly influence on the hash value, but path is
+        used to determine what Git filters should be applied to the object
+        before it can be placed to the object database, and, as result of
+        applying filters, the actual blob put into the object database may
+        differ from the given file. This option is mainly useful for hashing
+        temporary files located outside of the working directory or files
+        read from stdin.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-filters
+</term>
+<listitem>
+<simpara>
+        Hash the contents as is, ignoring any input filter that would
+        have been chosen by the attributes mechanism, including the end-of-line
+        conversion. If the file is read from standard input then this
+        is always implied, unless the <literal>--path</literal> option is given.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--literally
+</term>
+<listitem>
+<simpara>
+        Allow <literal>--stdin</literal> to hash any garbage into a loose object which might not
+        otherwise pass standard object parsing or git-fsck checks. Useful for
+        stress-testing Git itself or reproducing characteristics of corrupt or
+        bogus objects encountered in the wild.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

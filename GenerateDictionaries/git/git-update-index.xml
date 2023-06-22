@@ -1,0 +1,829 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-update-index</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-update-index</refname>
+  <refpurpose>Register file contents in the working tree to the index</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git update-index</emphasis>
+             [--add] [--remove | --force-remove] [--replace]
+             [--refresh] [-q] [--unmerged] [--ignore-missing]
+             [(--cacheinfo &lt;mode&gt;,&lt;object&gt;,&lt;file&gt;)&#8230;]
+             [--chmod=(+|-)x]
+             [--[no-]assume-unchanged]
+             [--[no-]skip-worktree]
+             [--[no-]ignore-skip-worktree-entries]
+             [--[no-]fsmonitor-valid]
+             [--ignore-submodules]
+             [--[no-]split-index]
+             [--[no-|test-|force-]untracked-cache]
+             [--[no-]fsmonitor]
+             [--really-refresh] [--unresolve] [--again | -g]
+             [--info-only] [--index-info]
+             [-z] [--stdin] [--index-version &lt;n&gt;]
+             [--verbose]
+             [--] [&lt;file&gt;&#8230;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Modifies the index. Each file mentioned is updated into the index and
+any <emphasis>unmerged</emphasis> or <emphasis>needs updating</emphasis> state is cleared.</simpara>
+<simpara>See also <citerefentry>
+<refentrytitle>git-add</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> for a more user-friendly way to do some of
+the most common operations on the index.</simpara>
+<simpara>The way <emphasis>git update-index</emphasis> handles files it is told about can be modified
+using the various options:</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--add
+</term>
+<listitem>
+<simpara>
+        If a specified file isn&#8217;t in the index already then it&#8217;s
+        added.
+        Default behaviour is to ignore new files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--remove
+</term>
+<listitem>
+<simpara>
+        If a specified file is in the index but is missing then it&#8217;s
+        removed.
+        Default behavior is to ignore removed file.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--refresh
+</term>
+<listitem>
+<simpara>
+        Looks at the current index and checks to see if merges or
+        updates are needed by checking stat() information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-q
+</term>
+<listitem>
+<simpara>
+        Quiet.  If --refresh finds that the index needs an update, the
+        default behavior is to error out.  This option makes
+        <emphasis>git update-index</emphasis> continue anyway.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-submodules
+</term>
+<listitem>
+<simpara>
+        Do not try to update submodules.  This option is only respected
+        when passed before --refresh.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--unmerged
+</term>
+<listitem>
+<simpara>
+        If --refresh finds unmerged changes in the index, the default
+        behavior is to error out.  This option makes <emphasis>git update-index</emphasis>
+        continue anyway.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--ignore-missing
+</term>
+<listitem>
+<simpara>
+        Ignores missing files during a --refresh
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--cacheinfo &lt;mode&gt;,&lt;object&gt;,&lt;path&gt;
+</term>
+<term>
+--cacheinfo &lt;mode&gt; &lt;object&gt; &lt;path&gt;
+</term>
+<listitem>
+<simpara>
+        Directly insert the specified info into the index.  For
+        backward compatibility, you can also give these three
+        arguments as three separate parameters, but new users are
+        encouraged to use a single-parameter form.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--index-info
+</term>
+<listitem>
+<simpara>
+        Read index information from stdin.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--chmod=(+|-)x
+</term>
+<listitem>
+<simpara>
+        Set the execute permissions on the updated files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]assume-unchanged
+</term>
+<listitem>
+<simpara>
+        When this flag is specified, the object names recorded
+        for the paths are not updated.  Instead, this option
+        sets/unsets the "assume unchanged" bit for the
+        paths.  When the "assume unchanged" bit is on, the user
+        promises not to change the file and allows Git to assume
+        that the working tree file matches what is recorded in
+        the index.  If you want to change the working tree file,
+        you need to unset the bit to tell Git.  This is
+        sometimes helpful when working with a big project on a
+        filesystem that has very slow lstat(2) system call
+        (e.g. cifs).
+</simpara>
+<simpara>Git will fail (gracefully) in case it needs to modify this file
+in the index e.g. when merging in a commit;
+thus, in case the assumed-untracked file is changed upstream,
+you will need to handle the situation manually.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--really-refresh
+</term>
+<listitem>
+<simpara>
+        Like <literal>--refresh</literal>, but checks stat information unconditionally,
+        without regard to the "assume unchanged" setting.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]skip-worktree
+</term>
+<listitem>
+<simpara>
+        When one of these flags is specified, the object name recorded
+        for the paths are not updated. Instead, these options
+        set and unset the "skip-worktree" bit for the paths. See
+        section "Skip-worktree bit" below for more information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]ignore-skip-worktree-entries
+</term>
+<listitem>
+<simpara>
+        Do not remove skip-worktree (AKA "index-only") entries even when
+        the <literal>--remove</literal> option was specified.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]fsmonitor-valid
+</term>
+<listitem>
+<simpara>
+        When one of these flags is specified, the object name recorded
+        for the paths are not updated. Instead, these options
+        set and unset the "fsmonitor valid" bit for the paths. See
+        section "File System Monitor" below for more information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-g
+</term>
+<term>
+--again
+</term>
+<listitem>
+<simpara>
+        Runs <emphasis>git update-index</emphasis> itself on the paths whose index
+        entries are different from those from the <literal>HEAD</literal> commit.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--unresolve
+</term>
+<listitem>
+<simpara>
+        Restores the <emphasis>unmerged</emphasis> or <emphasis>needs updating</emphasis> state of a
+        file during a merge if it was cleared by accident.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--info-only
+</term>
+<listitem>
+<simpara>
+        Do not create objects in the object database for all
+        &lt;file&gt; arguments that follow this flag; just insert
+        their object IDs into the index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--force-remove
+</term>
+<listitem>
+<simpara>
+        Remove the file from the index even when the working directory
+        still has such a file. (Implies --remove.)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--replace
+</term>
+<listitem>
+<simpara>
+        By default, when a file <literal>path</literal> exists in the index,
+        <emphasis>git update-index</emphasis> refuses an attempt to add <literal>path/file</literal>.
+        Similarly if a file <literal>path/file</literal> exists, a file <literal>path</literal>
+        cannot be added.  With --replace flag, existing entries
+        that conflict with the entry being added are
+        automatically removed with warning messages.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin
+</term>
+<listitem>
+<simpara>
+        Instead of taking list of paths from the command line,
+        read list of paths from the standard input.  Paths are
+        separated by LF (i.e. one path per line) by default.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--verbose
+</term>
+<listitem>
+<simpara>
+        Report what is being added and removed from index.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--index-version &lt;n&gt;
+</term>
+<listitem>
+<simpara>
+        Write the resulting index out in the named on-disk format version.
+        Supported versions are 2, 3 and 4. The current default version is 2
+        or 3, depending on whether extra features are used, such as
+        <literal>git add -N</literal>.
+</simpara>
+<simpara>Version 4 performs a simple pathname compression that reduces index
+size by 30%-50% on large repositories, which results in faster load
+time. Version 4 is relatively young (first released in 1.8.0 in
+October 2012). Other Git implementations such as JGit and libgit2
+may not support it yet.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-z
+</term>
+<listitem>
+<simpara>
+        Only meaningful with <literal>--stdin</literal> or <literal>--index-info</literal>; paths are
+        separated with NUL character instead of LF.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--split-index
+</term>
+<term>
+--no-split-index
+</term>
+<listitem>
+<simpara>
+        Enable or disable split index mode. If split-index mode is
+        already enabled and <literal>--split-index</literal> is given again, all
+        changes in $GIT_DIR/index are pushed back to the shared index
+        file.
+</simpara>
+<simpara>These options take effect whatever the value of the <literal>core.splitIndex</literal>
+configuration variable (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>). But a warning is
+emitted when the change goes against the configured value, as the
+configured value will take effect next time the index is read and this
+will remove the intended effect of the option.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--untracked-cache
+</term>
+<term>
+--no-untracked-cache
+</term>
+<listitem>
+<simpara>
+        Enable or disable untracked cache feature. Please use
+        <literal>--test-untracked-cache</literal> before enabling it.
+</simpara>
+<simpara>These options take effect whatever the value of the <literal>core.untrackedCache</literal>
+configuration variable (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>). But a warning is
+emitted when the change goes against the configured value, as the
+configured value will take effect next time the index is read and this
+will remove the intended effect of the option.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--test-untracked-cache
+</term>
+<listitem>
+<simpara>
+        Only perform tests on the working directory to make sure
+        untracked cache can be used. You have to manually enable
+        untracked cache using <literal>--untracked-cache</literal> or
+        <literal>--force-untracked-cache</literal> or the <literal>core.untrackedCache</literal>
+        configuration variable afterwards if you really want to use
+        it. If a test fails the exit code is 1 and a message
+        explains what is not working as needed, otherwise the exit
+        code is 0 and OK is printed.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--force-untracked-cache
+</term>
+<listitem>
+<simpara>
+        Same as <literal>--untracked-cache</literal>. Provided for backwards
+        compatibility with older versions of Git where
+        <literal>--untracked-cache</literal> used to imply <literal>--test-untracked-cache</literal> but
+        this option would enable the extension unconditionally.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--fsmonitor
+</term>
+<term>
+--no-fsmonitor
+</term>
+<listitem>
+<simpara>
+        Enable or disable files system monitor feature. These options
+        take effect whatever the value of the <literal>core.fsmonitor</literal>
+        configuration variable (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>). But a warning
+        is emitted when the change goes against the configured value, as
+        the configured value will take effect next time the index is
+        read and this will remove the intended effect of the option.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--
+</term>
+<listitem>
+<simpara>
+        Do not interpret any more arguments as options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        Files to act on.
+        Note that files beginning with <emphasis>.</emphasis> are discarded. This includes
+        <literal>./file</literal> and <literal>dir/./file</literal>. If you don&#8217;t want this, then use
+        cleaner names.
+        The same applies to directories ending <emphasis>/</emphasis> and paths with <emphasis>//</emphasis>
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_using_refresh">
+<title>USING --REFRESH</title>
+<simpara><literal>--refresh</literal> does not calculate a new sha1 file or bring the index
+up to date for mode/content changes. But what it <emphasis role="strong">does</emphasis> do is to
+"re-match" the stat information of a file with the index, so that you
+can refresh the index for a file that hasn&#8217;t been changed but where
+the stat entry is out of date.</simpara>
+<simpara>For example, you&#8217;d want to do this after doing a <emphasis>git read-tree</emphasis>, to link
+up the stat index details with the proper files.</simpara>
+</refsect1>
+<refsect1 id="_using_cacheinfo_or_info_only">
+<title>USING --CACHEINFO OR --INFO-ONLY</title>
+<simpara><literal>--cacheinfo</literal> is used to register a file that is not in the
+current working directory.  This is useful for minimum-checkout
+merging.</simpara>
+<simpara>To pretend you have a file at path with mode and sha1, say:</simpara>
+<literallayout class="monospaced">$ git update-index --add --cacheinfo &lt;mode&gt;,&lt;sha1&gt;,&lt;path&gt;</literallayout><simpara></simpara>
+<simpara><literal>--info-only</literal> is used to register files without placing them in the object
+database.  This is useful for status-only repositories.</simpara>
+<simpara>Both <literal>--cacheinfo</literal> and <literal>--info-only</literal> behave similarly: the index is updated
+but the object database isn&#8217;t.  <literal>--cacheinfo</literal> is useful when the object is
+in the database but the file isn&#8217;t available locally.  <literal>--info-only</literal> is
+useful when the file is available, but you do not wish to update the
+object database.</simpara>
+</refsect1>
+<refsect1 id="_using_index_info">
+<title>USING --INDEX-INFO</title>
+<simpara><literal>--index-info</literal> is a more powerful mechanism that lets you feed
+multiple entry definitions from the standard input, and designed
+specifically for scripts.  It can take inputs of three formats:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>
+mode SP type SP sha1          TAB path
+</simpara>
+<simpara>This format is to stuff <literal>git ls-tree</literal> output into the index.</simpara>
+</listitem>
+<listitem>
+<simpara>
+mode         SP sha1 SP stage TAB path
+</simpara>
+<simpara>This format is to put higher order stages into the
+index file and matches <emphasis>git ls-files --stage</emphasis> output.</simpara>
+</listitem>
+<listitem>
+<simpara>
+mode         SP sha1          TAB path
+</simpara>
+<simpara>This format is no longer produced by any Git command, but is
+and will continue to be supported by <literal>update-index --index-info</literal>.</simpara>
+</listitem>
+</orderedlist>
+<simpara>To place a higher stage entry to the index, the path should
+first be removed by feeding a mode=0 entry for the path, and
+then feeding necessary input lines in the third format.</simpara>
+<simpara>For example, starting with this index:</simpara>
+<literallayout class="monospaced">$ git ls-files -s
+100644 8a1218a1024a212bb3db30becd860315f9f3ac52 0       frotz</literallayout><simpara></simpara>
+<simpara>you can feed the following input to <literal>--index-info</literal>:</simpara>
+<literallayout class="monospaced">$ git update-index --index-info
+0 0000000000000000000000000000000000000000      frotz
+100644 8a1218a1024a212bb3db30becd860315f9f3ac52 1       frotz
+100755 8a1218a1024a212bb3db30becd860315f9f3ac52 2       frotz</literallayout><simpara></simpara>
+<simpara>The first line of the input feeds 0 as the mode to remove the
+path; the SHA-1 does not matter as long as it is well formatted.
+Then the second and third line feeds stage 1 and stage 2 entries
+for that path.  After the above, we would end up with this:</simpara>
+<literallayout class="monospaced">$ git ls-files -s
+100644 8a1218a1024a212bb3db30becd860315f9f3ac52 1       frotz
+100755 8a1218a1024a212bb3db30becd860315f9f3ac52 2       frotz</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_using_8220_assume_unchanged_8221_bit">
+<title>USING &#8220;ASSUME UNCHANGED&#8221; BIT</title>
+<simpara>Many operations in Git depend on your filesystem to have an
+efficient <literal>lstat(2)</literal> implementation, so that <literal>st_mtime</literal>
+information for working tree files can be cheaply checked to see
+if the file contents have changed from the version recorded in
+the index file.  Unfortunately, some filesystems have
+inefficient <literal>lstat(2)</literal>.  If your filesystem is one of them, you
+can set "assume unchanged" bit to paths you have not changed to
+cause Git not to do this check.  Note that setting this bit on a
+path does not mean Git will check the contents of the file to
+see if it has changed&#8201;&#8212;&#8201;it makes Git to omit any checking and
+assume it has <emphasis role="strong">not</emphasis> changed.  When you make changes to working
+tree files, you have to explicitly tell Git about it by dropping
+"assume unchanged" bit, either before or after you modify them.</simpara>
+<simpara>In order to set "assume unchanged" bit, use <literal>--assume-unchanged</literal>
+option.  To unset, use <literal>--no-assume-unchanged</literal>. To see which files
+have the "assume unchanged" bit set, use <literal>git ls-files -v</literal>
+(see <citerefentry>
+<refentrytitle>git-ls-files</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).</simpara>
+<simpara>The command looks at <literal>core.ignorestat</literal> configuration variable.  When
+this is true, paths updated with <literal>git update-index paths...</literal> and
+paths updated with other Git commands that update both index and
+working tree (e.g. <emphasis>git apply --index</emphasis>, <emphasis>git checkout-index -u</emphasis>,
+and <emphasis>git read-tree -u</emphasis>) are automatically marked as "assume
+unchanged".  Note that "assume unchanged" bit is <emphasis role="strong">not</emphasis> set if
+<literal>git update-index --refresh</literal> finds the working tree file matches
+the index (use <literal>git update-index --really-refresh</literal> if you want
+to mark them as "assume unchanged").</simpara>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<simpara>To update and refresh only the files already checked out:</simpara>
+<literallayout class="monospaced">$ git checkout-index -n -f -a &amp;&amp; git update-index --ignore-missing --refresh</literallayout><simpara></simpara>
+<variablelist>
+<varlistentry>
+<term>
+On an inefficient filesystem with <literal>core.ignorestat</literal> set
+</term>
+<listitem>
+<literallayout class="monospaced">$ git update-index --really-refresh              <co id="CO1-1"/>
+$ git update-index --no-assume-unchanged foo.c   <co id="CO1-2"/>
+$ git diff --name-only                           <co id="CO1-3"/>
+$ edit foo.c
+$ git diff --name-only                           <co id="CO1-4"/>
+M foo.c
+$ git update-index foo.c                         <co id="CO1-5"/>
+$ git diff --name-only                           <co id="CO1-6"/>
+$ edit foo.c
+$ git diff --name-only                           <co id="CO1-7"/>
+$ git update-index --no-assume-unchanged foo.c   <co id="CO1-8"/>
+$ git diff --name-only                           <co id="CO1-9"/>
+M foo.c</literallayout><simpara></simpara>
+<calloutlist>
+<callout arearefs="CO1-1">
+<para>
+forces lstat(2) to set "assume unchanged" bits for paths that match index.
+</para>
+</callout>
+<callout arearefs="CO1-2">
+<para>
+mark the path to be edited.
+</para>
+</callout>
+<callout arearefs="CO1-3">
+<para>
+this does lstat(2) and finds index matches the path.
+</para>
+</callout>
+<callout arearefs="CO1-4">
+<para>
+this does lstat(2) and finds index does <emphasis role="strong">not</emphasis> match the path.
+</para>
+</callout>
+<callout arearefs="CO1-5">
+<para>
+registering the new version to index sets "assume unchanged" bit.
+</para>
+</callout>
+<callout arearefs="CO1-6">
+<para>
+and it is assumed unchanged.
+</para>
+</callout>
+<callout arearefs="CO1-7">
+<para>
+even after you edit it.
+</para>
+</callout>
+<callout arearefs="CO1-8">
+<para>
+you can tell about the change after the fact.
+</para>
+</callout>
+<callout arearefs="CO1-9">
+<para>
+now it checks with lstat(2) and finds it has been changed.
+</para>
+</callout>
+</calloutlist>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_skip_worktree_bit">
+<title>SKIP-WORKTREE BIT</title>
+<simpara>Skip-worktree bit can be defined in one (long) sentence: When reading
+an entry, if it is marked as skip-worktree, then Git pretends its
+working directory version is up to date and read the index version
+instead.</simpara>
+<simpara>To elaborate, "reading" means checking for file existence, reading
+file attributes or file content. The working directory version may be
+present or absent. If present, its content may match against the index
+version or not. Writing is not affected by this bit, content safety
+is still first priority. Note that Git <emphasis>can</emphasis> update working directory
+file, that is marked skip-worktree, if it is safe to do so (i.e.
+working directory version matches index version)</simpara>
+<simpara>Although this bit looks similar to assume-unchanged bit, its goal is
+different from assume-unchanged bit&#8217;s. Skip-worktree also takes
+precedence over assume-unchanged bit when both are set.</simpara>
+</refsect1>
+<refsect1 id="_split_index">
+<title>SPLIT INDEX</title>
+<simpara>This mode is designed for repositories with very large indexes, and
+aims at reducing the time it takes to repeatedly write these indexes.</simpara>
+<simpara>In this mode, the index is split into two files, $GIT_DIR/index and
+$GIT_DIR/sharedindex.&lt;SHA-1&gt;. Changes are accumulated in
+$GIT_DIR/index, the split index, while the shared index file contains
+all index entries and stays unchanged.</simpara>
+<simpara>All changes in the split index are pushed back to the shared index
+file when the number of entries in the split index reaches a level
+specified by the splitIndex.maxPercentChange config variable (see
+<citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).</simpara>
+<simpara>Each time a new shared index file is created, the old shared index
+files are deleted if their modification time is older than what is
+specified by the splitIndex.sharedIndexExpire config variable (see
+<citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).</simpara>
+<simpara>To avoid deleting a shared index file that is still used, its
+modification time is updated to the current time every time a new split
+index based on the shared index file is either created or read from.</simpara>
+</refsect1>
+<refsect1 id="_untracked_cache">
+<title>UNTRACKED CACHE</title>
+<simpara>This cache is meant to speed up commands that involve determining
+untracked files such as <literal>git status</literal>.</simpara>
+<simpara>This feature works by recording the mtime of the working tree
+directories and then omitting reading directories and stat calls
+against files in those directories whose mtime hasn&#8217;t changed. For
+this to work the underlying operating system and file system must
+change the <literal>st_mtime</literal> field of directories if files in the directory
+are added, modified or deleted.</simpara>
+<simpara>You can test whether the filesystem supports that with the
+<literal>--test-untracked-cache</literal> option. The <literal>--untracked-cache</literal> option used
+to implicitly perform that test in older versions of Git, but that&#8217;s
+no longer the case.</simpara>
+<simpara>If you want to enable (or disable) this feature, it is easier to use
+the <literal>core.untrackedCache</literal> configuration variable (see
+<citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>) than using the <literal>--untracked-cache</literal> option to
+<literal>git update-index</literal> in each repository, especially if you want to do so
+across all repositories you use, because you can set the configuration
+variable to <literal>true</literal> (or <literal>false</literal>) in your <literal>$HOME/.gitconfig</literal> just once
+and have it affect all repositories you touch.</simpara>
+<simpara>When the <literal>core.untrackedCache</literal> configuration variable is changed, the
+untracked cache is added to or removed from the index the next time a
+command reads the index; while when <literal>--[no-|force-]untracked-cache</literal>
+are used, the untracked cache is immediately added to or removed from
+the index.</simpara>
+<simpara>Before 2.17, the untracked cache had a bug where replacing a directory
+with a symlink to another directory could cause it to incorrectly show
+files tracked by git as untracked. See the "status: add a failing test
+showing a core.untrackedCache bug" commit to git.git. A workaround for
+that is (and this might work for other undiscovered bugs in the
+future):</simpara>
+<literallayout class="monospaced">$ git -c core.untrackedCache=false status</literallayout><simpara></simpara>
+<simpara>This bug has also been shown to affect non-symlink cases of replacing
+a directory with a file when it comes to the internal structures of
+the untracked cache, but no case has been reported where this resulted in
+wrong "git status" output.</simpara>
+<simpara>There are also cases where existing indexes written by git versions
+before 2.17 will reference directories that don&#8217;t exist anymore,
+potentially causing many "could not open directory" warnings to be
+printed on "git status". These are new warnings for existing issues
+that were previously silently discarded.</simpara>
+<simpara>As with the bug described above the solution is to one-off do a "git
+status" run with <literal>core.untrackedCache=false</literal> to flush out the leftover
+bad data.</simpara>
+</refsect1>
+<refsect1 id="_file_system_monitor">
+<title>FILE SYSTEM MONITOR</title>
+<simpara>This feature is intended to speed up git operations for repos that have
+large working directories.</simpara>
+<simpara>It enables git to work together with a file system monitor (see the
+"fsmonitor-watchman" section of <citerefentry>
+<refentrytitle>githooks</refentrytitle><manvolnum>5</manvolnum>
+</citerefentry>) that can
+inform it as to what files have been modified. This enables git to avoid
+having to lstat() every file to find modified files.</simpara>
+<simpara>When used in conjunction with the untracked cache, it can further improve
+performance by avoiding the cost of scanning the entire working directory
+looking for new files.</simpara>
+<simpara>If you want to enable (or disable) this feature, it is easier to use
+the <literal>core.fsmonitor</literal> configuration variable (see
+<citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>) than using the <literal>--fsmonitor</literal> option to
+<literal>git update-index</literal> in each repository, especially if you want to do so
+across all repositories you use, because you can set the configuration
+variable in your <literal>$HOME/.gitconfig</literal> just once and have it affect all
+repositories you touch.</simpara>
+<simpara>When the <literal>core.fsmonitor</literal> configuration variable is changed, the
+file system monitor is added to or removed from the index the next time
+a command reads the index. When <literal>--[no-]fsmonitor</literal> are used, the file
+system monitor is immediately added to or removed from the index.</simpara>
+</refsect1>
+<refsect1 id="_configuration">
+<title>CONFIGURATION</title>
+<simpara>The command honors <literal>core.filemode</literal> configuration variable.  If
+your repository is on a filesystem whose executable bits are
+unreliable, this should be set to <emphasis>false</emphasis> (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+This causes the command to ignore differences in file modes recorded
+in the index and the file mode on the filesystem if they differ only on
+executable bit.   On such an unfortunate filesystem, you may
+need to use <emphasis>git update-index --chmod=</emphasis>.</simpara>
+<simpara>Quite similarly, if <literal>core.symlinks</literal> configuration variable is set
+to <emphasis>false</emphasis> (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>), symbolic links are checked out
+as plain files, and this command does not modify a recorded file mode
+from symbolic link to regular file.</simpara>
+<simpara>The command looks at <literal>core.ignorestat</literal> configuration variable.  See
+<emphasis>Using "assume unchanged" bit</emphasis> section above.</simpara>
+<simpara>The command also looks at <literal>core.trustctime</literal> configuration variable.
+It can be useful when the inode change time is regularly modified by
+something outside Git (file system crawlers and backup systems use
+ctime for marking files processed) (see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).</simpara>
+<simpara>The untracked cache extension can be enabled by the
+<literal>core.untrackedCache</literal> configuration variable (see
+<citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).</simpara>
+</refsect1>
+<refsect1 id="_notes">
+<title>NOTES</title>
+<simpara>Users often try to use the assume-unchanged and skip-worktree bits
+to tell Git to ignore changes to files that are tracked.  This does not
+work as expected, since Git may still check working tree files against
+the index when performing certain operations.  In general, Git does not
+provide a way to ignore changes to tracked files, so alternate solutions
+are recommended.</simpara>
+<simpara>For example, if the file you want to change is some sort of config file,
+the repository can include a sample config file that can then be copied
+into the ignored name and modified.  The repository can even include a
+script to treat the sample file as a template, modifying and copying it
+automatically.</simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-add</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-ls-files</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-mailinfo</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-mailinfo</refname>
+  <refpurpose>Extracts patch and authorship from a single e-mail message</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git mailinfo</emphasis> [-k|-b] [-u | --encoding=&lt;encoding&gt; | -n]
+               [--[no-]scissors] [--quoted-cr=&lt;action&gt;]
+               &lt;msg&gt; &lt;patch&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Reads a single e-mail message from the standard input, and
+writes the commit log message in &lt;msg&gt; file, and the patches in
+&lt;patch&gt; file.  The author name, e-mail and e-mail subject are
+written out to the standard output to be used by <emphasis>git am</emphasis>
+to create a commit.  It is usually not necessary to use this
+command directly.  See <citerefentry>
+<refentrytitle>git-am</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> instead.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-k
+</term>
+<listitem>
+<simpara>
+        Usually the program removes email cruft from the Subject:
+        header line to extract the title line for the commit log
+        message.  This option prevents this munging, and is most
+        useful when used to read back <emphasis>git format-patch -k</emphasis> output.
+</simpara>
+<simpara>Specifically, the following are removed until none of them remain:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+Leading and trailing whitespace.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Leading <literal>Re:</literal>, <literal>re:</literal>, and <literal>:</literal>.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Leading bracketed strings (between <literal>[</literal> and <literal>]</literal>, usually
+        <literal>[PATCH]</literal>).
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>Finally, runs of whitespace are normalized to a single ASCII space
+character.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-b
+</term>
+<listitem>
+<simpara>
+        When -k is not in effect, all leading strings bracketed with <emphasis>[</emphasis>
+        and <emphasis>]</emphasis> pairs are stripped.  This option limits the stripping to
+        only the pairs whose bracketed string contains the word "PATCH".
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-u
+</term>
+<listitem>
+<simpara>
+        The commit log message, author name and author email are
+        taken from the e-mail, and after minimally decoding MIME
+        transfer encoding, re-coded in the charset specified by
+        <literal>i18n.commitEncoding</literal> (defaulting to UTF-8) by transliterating
+        them.  This used to be optional but now it is the default.
+</simpara>
+<simpara>Note that the patch is always used as-is without charset
+conversion, even with this flag.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--encoding=&lt;encoding&gt;
+</term>
+<listitem>
+<simpara>
+        Similar to -u.  But when re-coding, the charset specified here is
+        used instead of the one specified by <literal>i18n.commitEncoding</literal> or UTF-8.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-n
+</term>
+<listitem>
+<simpara>
+        Disable all charset re-coding of the metadata.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-m
+</term>
+<term>
+--message-id
+</term>
+<listitem>
+<simpara>
+        Copy the Message-ID header at the end of the commit message.  This
+        is useful in order to associate commits with mailing list discussions.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--scissors
+</term>
+<listitem>
+<simpara>
+        Remove everything in body before a scissors line (e.g. "-- &gt;8 --").
+        The line represents scissors and perforation marks, and is used to
+        request the reader to cut the message at that line.  If that line
+        appears in the body of the message before the patch, everything
+        before it (including the scissors line itself) is ignored when
+        this option is used.
+</simpara>
+<simpara>This is useful if you want to begin your message in a discussion thread
+with comments and suggestions on the message you are responding to, and to
+conclude it with a patch submission, separating the discussion and the
+beginning of the proposed commit log message with a scissors line.</simpara>
+<simpara>This can be enabled by default with the configuration option mailinfo.scissors.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-scissors
+</term>
+<listitem>
+<simpara>
+        Ignore scissors lines. Useful for overriding mailinfo.scissors settings.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--quoted-cr=&lt;action&gt;
+</term>
+<listitem>
+<simpara>
+        Action when processes email messages sent with base64 or
+        quoted-printable encoding, and the decoded lines end with a CRLF
+        instead of a simple LF.
+</simpara>
+<simpara>The valid actions are:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+<literal>nowarn</literal>: Git will do nothing when such a CRLF is found.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>warn</literal>: Git will issue a warning for each message if such a CRLF is
+        found.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+<literal>strip</literal>: Git will convert those CRLF to LF.
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>The default action could be set by configuration option <literal>mailinfo.quotedCR</literal>.
+If no such configuration option has been set, <literal>warn</literal> will be used.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;msg&gt;
+</term>
+<listitem>
+<simpara>
+        The commit log message extracted from e-mail, usually
+        except the title line which comes from e-mail Subject.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;patch&gt;
+</term>
+<listitem>
+<simpara>
+        The patch extracted from e-mail.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-fsck</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-fsck</refname>
+  <refpurpose>Verifies the connectivity and validity of the objects in the database</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git fsck</emphasis> [--tags] [--root] [--unreachable] [--cache] [--no-reflogs]
+         [--[no-]full] [--strict] [--verbose] [--lost-found]
+         [--[no-]dangling] [--[no-]progress] [--connectivity-only]
+         [--[no-]name-objects] [&lt;object&gt;*]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Verifies the connectivity and validity of the objects in the database.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+&lt;object&gt;
+</term>
+<listitem>
+<simpara>
+        An object to treat as the head of an unreachability trace.
+</simpara>
+<simpara>If no objects are given, <emphasis>git fsck</emphasis> defaults to using the
+index file, all SHA-1 references in <literal>refs</literal> namespace, and all reflogs
+(unless --no-reflogs is given) as heads.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--unreachable
+</term>
+<listitem>
+<simpara>
+        Print out objects that exist but that aren&#8217;t reachable from any
+        of the reference nodes.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]dangling
+</term>
+<listitem>
+<simpara>
+        Print objects that exist but that are never <emphasis>directly</emphasis> used (default).
+        <literal>--no-dangling</literal> can be used to omit this information from the output.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--root
+</term>
+<listitem>
+<simpara>
+        Report root nodes.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--tags
+</term>
+<listitem>
+<simpara>
+        Report tags.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--cache
+</term>
+<listitem>
+<simpara>
+        Consider any object recorded in the index also as a head node for
+        an unreachability trace.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--no-reflogs
+</term>
+<listitem>
+<simpara>
+        Do not consider commits that are referenced only by an
+        entry in a reflog to be reachable.  This option is meant
+        only to search for commits that used to be in a ref, but
+        now aren&#8217;t, but are still in that corresponding reflog.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--full
+</term>
+<listitem>
+<simpara>
+        Check not just objects in GIT_OBJECT_DIRECTORY
+        ($GIT_DIR/objects), but also the ones found in alternate
+        object pools listed in GIT_ALTERNATE_OBJECT_DIRECTORIES
+        or $GIT_DIR/objects/info/alternates,
+        and in packed Git archives found in $GIT_DIR/objects/pack
+        and corresponding pack subdirectories in alternate
+        object pools.  This is now default; you can turn it off
+        with --no-full.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--connectivity-only
+</term>
+<listitem>
+<simpara>
+        Check only the connectivity of reachable objects, making sure
+        that any objects referenced by a reachable tag, commit, or tree
+        is present. This speeds up the operation by avoiding reading
+        blobs entirely (though it does still check that referenced blobs
+        exist). This will detect corruption in commits and trees, but
+        not do any semantic checks (e.g., for format errors). Corruption
+        in blob objects will not be detected at all.
+</simpara>
+<simpara>Unreachable tags, commits, and trees will also be accessed to find the
+tips of dangling segments of history. Use <literal>--no-dangling</literal> if you don&#8217;t
+care about this output and want to speed it up further.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--strict
+</term>
+<listitem>
+<simpara>
+        Enable more strict checking, namely to catch a file mode
+        recorded with g+w bit set, which was created by older
+        versions of Git.  Existing repositories, including the
+        Linux kernel, Git itself, and sparse repository have old
+        objects that triggers this check, but it is recommended
+        to check new projects with this flag.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--verbose
+</term>
+<listitem>
+<simpara>
+        Be chatty.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--lost-found
+</term>
+<listitem>
+<simpara>
+        Write dangling objects into .git/lost-found/commit/ or
+        .git/lost-found/other/, depending on type.  If the object is
+        a blob, the contents are written into the file, rather than
+        its object name.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--name-objects
+</term>
+<listitem>
+<simpara>
+        When displaying names of reachable objects, in addition to the
+        SHA-1 also display a name that describes <emphasis role="strong">how</emphasis> they are reachable,
+        compatible with <citerefentry>
+<refentrytitle>git-rev-parse</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>, e.g.
+        <literal>HEAD@{1234567890}~25^2:src/</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]progress
+</term>
+<listitem>
+<simpara>
+        Progress status is reported on the standard error stream by
+        default when it is attached to a terminal, unless
+        --no-progress or --verbose is specified. --progress forces
+        progress status even if the standard error stream is not
+        directed to a terminal.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_configuration">
+<title>CONFIGURATION</title>
+<variablelist>
+<varlistentry>
+<term>
+fsck.&lt;msg-id&gt;
+</term>
+<listitem>
+<simpara>
+        During fsck git may find issues with legacy data which
+        wouldn&#8217;t be generated by current versions of git, and which
+        wouldn&#8217;t be sent over the wire if <literal>transfer.fsckObjects</literal> was
+        set. This feature is intended to support working with legacy
+        repositories containing such data.
+</simpara>
+<simpara>Setting <literal>fsck.&lt;msg-id&gt;</literal> will be picked up by <citerefentry>
+<refentrytitle>git-fsck</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>, but
+to accept pushes of such data set <literal>receive.fsck.&lt;msg-id&gt;</literal> instead, or
+to clone or fetch it set <literal>fetch.fsck.&lt;msg-id&gt;</literal>.</simpara>
+<simpara>The rest of the documentation discusses <literal>fsck.*</literal> for brevity, but the
+same applies for the corresponding <literal>receive.fsck.*</literal> and
+<literal>fetch.&lt;msg-id&gt;.*</literal>. variables.</simpara>
+<simpara>Unlike variables like <literal>color.ui</literal> and <literal>core.editor</literal> the
+<literal>receive.fsck.&lt;msg-id&gt;</literal> and <literal>fetch.fsck.&lt;msg-id&gt;</literal> variables will not
+fall back on the <literal>fsck.&lt;msg-id&gt;</literal> configuration if they aren&#8217;t set. To
+uniformly configure the same fsck settings in different circumstances
+all three of them they must all set to the same values.</simpara>
+<simpara>When <literal>fsck.&lt;msg-id&gt;</literal> is set, errors can be switched to warnings and
+vice versa by configuring the <literal>fsck.&lt;msg-id&gt;</literal> setting where the
+<literal>&lt;msg-id&gt;</literal> is the fsck message ID and the value is one of <literal>error</literal>,
+<literal>warn</literal> or <literal>ignore</literal>. For convenience, fsck prefixes the error/warning
+with the message ID, e.g. "missingEmail: invalid author/committer
+line - missing email" means that setting <literal>fsck.missingEmail = ignore</literal>
+will hide that issue.</simpara>
+<simpara>In general, it is better to enumerate existing objects with problems
+with <literal>fsck.skipList</literal>, instead of listing the kind of breakages these
+problematic objects share to be ignored, as doing the latter will
+allow new instances of the same breakages go unnoticed.</simpara>
+<simpara>Setting an unknown <literal>fsck.&lt;msg-id&gt;</literal> value will cause fsck to die, but
+doing the same for <literal>receive.fsck.&lt;msg-id&gt;</literal> and <literal>fetch.fsck.&lt;msg-id&gt;</literal>
+will only cause git to warn.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+fsck.skipList
+</term>
+<listitem>
+<simpara>
+        The path to a list of object names (i.e. one unabbreviated SHA-1 per
+        line) that are known to be broken in a non-fatal way and should
+        be ignored. On versions of Git 2.20 and later comments (<emphasis>#</emphasis>), empty
+        lines, and any leading and trailing whitespace is ignored. Everything
+        but a SHA-1 per line will error out on older versions.
+</simpara>
+<simpara>This feature is useful when an established project should be accepted
+despite early commits containing errors that can be safely ignored
+such as invalid committer email addresses.  Note: corrupt objects
+cannot be skipped with this setting.</simpara>
+<simpara>Like <literal>fsck.&lt;msg-id&gt;</literal> this variable has corresponding
+<literal>receive.fsck.skipList</literal> and <literal>fetch.fsck.skipList</literal> variants.</simpara>
+<simpara>Unlike variables like <literal>color.ui</literal> and <literal>core.editor</literal> the
+<literal>receive.fsck.skipList</literal> and <literal>fetch.fsck.skipList</literal> variables will not
+fall back on the <literal>fsck.skipList</literal> configuration if they aren&#8217;t set. To
+uniformly configure the same fsck settings in different circumstances
+all three of them they must all set to the same values.</simpara>
+<simpara>Older versions of Git (before 2.20) documented that the object names
+list should be sorted. This was never a requirement, the object names
+could appear in any order, but when reading the list we tracked whether
+the list was sorted for the purposes of an internal binary search
+implementation, which could save itself some work with an already sorted
+list. Unless you had a humongous list there was no reason to go out of
+your way to pre-sort the list. After Git version 2.20 a hash implementation
+is used instead, so there&#8217;s now no reason to pre-sort the list.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_discussion">
+<title>DISCUSSION</title>
+<simpara>git-fsck tests SHA-1 and general object sanity, and it does full tracking
+of the resulting reachability and everything else. It prints out any
+corruption it finds (missing or bad objects), and if you use the
+<literal>--unreachable</literal> flag it will also print out objects that exist but that
+aren&#8217;t reachable from any of the specified head nodes (or the default
+set, as mentioned above).</simpara>
+<simpara>Any corrupt objects you will have to find in backups or other archives
+(i.e., you can just remove them and do an <emphasis>rsync</emphasis> with some other site in
+the hopes that somebody else has the object you have corrupted).</simpara>
+<simpara>If core.commitGraph is true, the commit-graph file will also be inspected
+using <emphasis>git commit-graph verify</emphasis>. See <citerefentry>
+<refentrytitle>git-commit-graph</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+</refsect1>
+<refsect1 id="_extracted_diagnostics">
+<title>Extracted Diagnostics</title>
+<variablelist>
+<varlistentry>
+<term>
+unreachable &lt;type&gt; &lt;object&gt;
+</term>
+<listitem>
+<simpara>
+        The &lt;type&gt; object &lt;object&gt;, isn&#8217;t actually referred to directly
+        or indirectly in any of the trees or commits seen. This can
+        mean that there&#8217;s another root node that you&#8217;re not specifying
+        or that the tree is corrupt. If you haven&#8217;t missed a root node
+        then you might as well delete unreachable nodes since they
+        can&#8217;t be used.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+missing &lt;type&gt; &lt;object&gt;
+</term>
+<listitem>
+<simpara>
+        The &lt;type&gt; object &lt;object&gt;, is referred to but isn&#8217;t present in
+        the database.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+dangling &lt;type&gt; &lt;object&gt;
+</term>
+<listitem>
+<simpara>
+        The &lt;type&gt; object &lt;object&gt;, is present in the database but never
+        <emphasis>directly</emphasis> used. A dangling commit could be a root node.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+hash mismatch &lt;object&gt;
+</term>
+<listitem>
+<simpara>
+        The database has an object whose hash doesn&#8217;t match the
+        object database value.
+        This indicates a serious data integrity problem.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_environment_variables">
+<title>Environment Variables</title>
+<variablelist>
+<varlistentry>
+<term>
+GIT_OBJECT_DIRECTORY
+</term>
+<listitem>
+<simpara>
+        used to specify the object database root (usually $GIT_DIR/objects)
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+GIT_INDEX_FILE
+</term>
+<listitem>
+<simpara>
+        used to specify the index file of the index
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+GIT_ALTERNATE_OBJECT_DIRECTORIES
+</term>
+<listitem>
+<simpara>
+        used to specify additional object database roots (usually unset)
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

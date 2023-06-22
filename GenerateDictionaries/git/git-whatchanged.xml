@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-whatchanged</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-whatchanged</refname>
+  <refpurpose>Show logs with difference each commit introduces</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git whatchanged</emphasis> &lt;option&gt;&#8230;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Shows commit logs and diff output each commit introduces.</simpara>
+<simpara>New users are encouraged to use <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> instead.  The
+<literal>whatchanged</literal> command is essentially the same as <citerefentry>
+<refentrytitle>git-log</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+but defaults to show the raw format diff output and to skip merges.</simpara>
+<simpara>The command is kept primarily for historical reasons; fingers of
+many people who learned Git long before <literal>git log</literal> was invented by
+reading Linux kernel mailing list are trained to type it.</simpara>
+</refsect1>
+<refsect1 id="_examples">
+<title>Examples</title>
+<variablelist>
+<varlistentry>
+<term>
+<literal>git whatchanged -p v2.6.12.. include/scsi drivers/scsi</literal>
+</term>
+<listitem>
+<simpara>
+        Show as patches the commits since version <emphasis>v2.6.12</emphasis> that changed
+        any file in the include/scsi or drivers/scsi subdirectories
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+<literal>git whatchanged --since="2 weeks ago" -- gitk</literal>
+</term>
+<listitem>
+<simpara>
+        Show the changes during the last two weeks to the file <emphasis>gitk</emphasis>.
+        The "--" is necessary to avoid confusion with the <emphasis role="strong">branch</emphasis> named
+        <emphasis>gitk</emphasis>
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

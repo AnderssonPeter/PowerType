@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-quiltimport</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-quiltimport</refname>
+  <refpurpose>Applies a quilt patchset onto the current branch</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git quiltimport</emphasis> [--dry-run | -n] [--author &lt;author&gt;] [--patches &lt;dir&gt;]
+                [--series &lt;file&gt;] [--keep-non-patch]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Applies a quilt patchset onto the current Git branch, preserving
+the patch boundaries, patch order, and patch descriptions present
+in the quilt patchset.</simpara>
+<simpara>For each patch the code attempts to extract the author from the
+patch description.  If that fails it falls back to the author
+specified with --author.  If the --author flag was not given
+the patch description is displayed and the user is asked to
+interactively enter the author of the patch.</simpara>
+<simpara>If a subject is not found in the patch description the patch name is
+preserved as the 1 line subject in the Git description.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-n
+</term>
+<term>
+--dry-run
+</term>
+<listitem>
+<simpara>
+        Walk through the patches in the series and warn
+        if we cannot find all of the necessary information to commit
+        a patch.  At the time of this writing only missing author
+        information is warned about.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--author Author Name &lt;Author Email&gt;
+</term>
+<listitem>
+<simpara>
+        The author name and email address to use when no author
+        information can be found in the patch description.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--patches &lt;dir&gt;
+</term>
+<listitem>
+<simpara>
+        The directory to find the quilt patches.
+</simpara>
+<simpara>The default for the patch directory is patches
+or the value of the <literal>$QUILT_PATCHES</literal> environment
+variable.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--series &lt;file&gt;
+</term>
+<listitem>
+<simpara>
+        The quilt series file.
+</simpara>
+<simpara>The default for the series file is &lt;patches&gt;/series
+or the value of the <literal>$QUILT_SERIES</literal> environment
+variable.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--keep-non-patch
+</term>
+<listitem>
+<simpara>
+        Pass <literal>-b</literal> flag to <emphasis>git mailinfo</emphasis> (see <citerefentry>
+<refentrytitle>git-mailinfo</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-ls-tree</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-ls-tree</refname>
+  <refpurpose>List the contents of a tree object</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git ls-tree</emphasis> [-d] [-r] [-t] [-l] [-z]
+            [--name-only] [--name-status] [--full-name] [--full-tree] [--abbrev[=&lt;n&gt;]]
+            &lt;tree-ish&gt; [&lt;path&gt;&#8230;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Lists the contents of a given tree object, like what "/bin/ls -a" does
+in the current working directory.  Note that:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+the behaviour is slightly different from that of "/bin/ls" in that the
+   <emphasis>&lt;path&gt;</emphasis> denotes just a list of patterns to match, e.g. so specifying
+   directory name (without <literal>-r</literal>) will behave differently, and order of the
+   arguments does not matter.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+the behaviour is similar to that of "/bin/ls" in that the <emphasis>&lt;path&gt;</emphasis> is
+   taken as relative to the current working directory.  E.g. when you are
+   in a directory <emphasis>sub</emphasis> that has a directory <emphasis>dir</emphasis>, you can run <emphasis>git
+   ls-tree -r HEAD dir</emphasis> to list the contents of the tree (that is
+   <literal>sub/dir</literal> in <literal>HEAD</literal>).  You don&#8217;t want to give a tree that is not at the
+   root level (e.g. <literal>git ls-tree -r HEAD:sub dir</literal>) in this case, as that
+   would result in asking for <literal>sub/sub/dir</literal> in the <literal>HEAD</literal> commit.
+   However, the current working directory can be ignored by passing
+   --full-tree option.
+</simpara>
+</listitem>
+</itemizedlist>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+&lt;tree-ish&gt;
+</term>
+<listitem>
+<simpara>
+        Id of a tree-ish.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-d
+</term>
+<listitem>
+<simpara>
+        Show only the named tree entry itself, not its children.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-r
+</term>
+<listitem>
+<simpara>
+        Recurse into sub-trees.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-t
+</term>
+<listitem>
+<simpara>
+        Show tree entries even when going to recurse them. Has no effect
+        if <literal>-r</literal> was not passed. <literal>-d</literal> implies <literal>-t</literal>.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-l
+</term>
+<term>
+--long
+</term>
+<listitem>
+<simpara>
+        Show object size of blob (file) entries.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-z
+</term>
+<listitem>
+<simpara>
+        \0 line termination on output and do not quote filenames.
+        See OUTPUT FORMAT below for more information.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--name-only
+</term>
+<term>
+--name-status
+</term>
+<listitem>
+<simpara>
+        List only filenames (instead of the "long" output), one per line.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--abbrev[=&lt;n&gt;]
+</term>
+<listitem>
+<simpara>
+        Instead of showing the full 40-byte hexadecimal object
+        lines, show the shortest prefix that is at least <emphasis>&lt;n&gt;</emphasis>
+        hexdigits long that uniquely refers the object.
+        Non default number of digits can be specified with --abbrev=&lt;n&gt;.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--full-name
+</term>
+<listitem>
+<simpara>
+        Instead of showing the path names relative to the current working
+        directory, show the full path names.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--full-tree
+</term>
+<listitem>
+<simpara>
+        Do not limit the listing to the current working directory.
+        Implies --full-name.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+[&lt;path&gt;&#8230;]
+</term>
+<listitem>
+<simpara>
+        When paths are given, show them (note that this isn&#8217;t really raw
+        pathnames, but rather a list of patterns to match).  Otherwise
+        implicitly uses the root level of the tree as the sole path argument.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_output_format">
+<title>Output Format</title>
+<literallayout class="monospaced">&lt;mode&gt; SP &lt;type&gt; SP &lt;object&gt; TAB &lt;file&gt;</literallayout>
+<simpara>This output format is compatible with what <literal>--index-info --stdin</literal> of
+<emphasis>git update-index</emphasis> expects.</simpara>
+<simpara>When the <literal>-l</literal> option is used, format changes to</simpara>
+<literallayout class="monospaced">&lt;mode&gt; SP &lt;type&gt; SP &lt;object&gt; SP &lt;object size&gt; TAB &lt;file&gt;</literallayout>
+<simpara>Object size identified by &lt;object&gt; is given in bytes, and right-justified
+with minimum width of 7 characters.  Object size is given only for blobs
+(file) entries; for other entries <literal>-</literal> character is used in place of size.</simpara>
+<simpara>Without the <literal>-z</literal> option, pathnames with "unusual" characters are
+quoted as explained for the configuration variable <literal>core.quotePath</literal>
+(see <citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>).  Using <literal>-z</literal> the filename is output
+verbatim and the line is terminated by a NUL byte.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

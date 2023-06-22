@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-pack-redundant</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-pack-redundant</refname>
+  <refpurpose>Find redundant pack files</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git pack-redundant</emphasis> [ --verbose ] [ --alt-odb ] &lt; --all | .pack filename &#8230; &gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>This program computes which packs in your repository
+are redundant. The output is suitable for piping to
+<literal>xargs rm</literal> if you are in the root of the repository.</simpara>
+<simpara><emphasis>git pack-redundant</emphasis> accepts a list of objects on standard input. Any objects
+given will be ignored when checking which packs are required. This makes the
+following command useful when wanting to remove packs which contain unreachable
+objects.</simpara>
+<simpara>git fsck --full --unreachable | cut -d ' ' -f3 | \
+git pack-redundant --all | xargs rm</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--all
+</term>
+<listitem>
+<simpara>
+        Processes all packs. Any filenames on the command line are ignored.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--alt-odb
+</term>
+<listitem>
+<simpara>
+        Don&#8217;t require objects present in packs from alternate object
+        directories to be present in local packs.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--verbose
+</term>
+<listitem>
+<simpara>
+        Outputs some statistics to stderr. Has a small performance penalty.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-pack-objects</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+<citerefentry>
+<refentrytitle>git-repack</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>
+<citerefentry>
+<refentrytitle>git-prune-packed</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

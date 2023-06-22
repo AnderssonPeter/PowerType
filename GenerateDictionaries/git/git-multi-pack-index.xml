@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-multi-pack-index</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-multi-pack-index</refname>
+  <refpurpose>Write and verify multi-pack-indexes</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git multi-pack-index</emphasis> [--object-dir=&lt;dir&gt;] [--[no-]bitmap] &lt;sub-command&gt;</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<simpara>Write or verify a multi-pack-index (MIDX) file.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+--object-dir=&lt;dir&gt;
+</term>
+<listitem>
+<simpara>
+        Use given directory for the location of Git objects. We check
+        <literal>&lt;dir&gt;/packs/multi-pack-index</literal> for the current MIDX file, and
+        <literal>&lt;dir&gt;/packs</literal> for the pack-files to index.
+</simpara>
+<simpara><literal>&lt;dir&gt;</literal> must be an alternate of the current repository.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]progress
+</term>
+<listitem>
+<simpara>
+        Turn progress on/off explicitly. If neither is specified, progress is
+        shown if standard error is connected to a terminal. Supported by
+        sub-commands <literal>write</literal>, <literal>verify</literal>, <literal>expire</literal>, and `repack.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+<simpara>The following subcommands are available:</simpara>
+<variablelist>
+<varlistentry>
+<term>
+write
+</term>
+<listitem>
+<simpara>
+        Write a new MIDX file. The following options are available for
+        the <literal>write</literal> sub-command:
+</simpara>
+<variablelist>
+<varlistentry>
+<term>
+--preferred-pack=&lt;pack&gt;
+</term>
+<listitem>
+<simpara>
+                Optionally specify the tie-breaking pack used when
+                multiple packs contain the same object. <literal>&lt;pack&gt;</literal> must
+                contain at least one object. If not given, ties are
+                broken in favor of the pack with the lowest mtime.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--[no-]bitmap
+</term>
+<listitem>
+<simpara>
+                Control whether or not a multi-pack bitmap is written.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--stdin-packs
+</term>
+<listitem>
+<simpara>
+                Write a multi-pack index containing only the set of
+                line-delimited pack index basenames provided over stdin.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--refs-snapshot=&lt;path&gt;
+</term>
+<listitem>
+<simpara>
+                With <literal>--bitmap</literal>, optionally specify a file which
+                contains a "refs snapshot" taken prior to repacking.
+</simpara>
+<simpara>A reference snapshot is composed of line-delimited OIDs corresponding to
+the reference tips, usually taken by <literal>git repack</literal> prior to generating a
+new pack. A line may optionally start with a <literal>+</literal> character to indicate
+that the reference which corresponds to that OID is "preferred" (see
+<citerefentry>
+<refentrytitle>git-config</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>'s <literal>pack.preferBitmapTips</literal>.)</simpara>
+<simpara>The file given at <literal>&lt;path&gt;</literal> is expected to be readable, and can contain
+duplicates. (If a given OID is given more than once, it is marked as
+preferred if at least one instance of it begins with the special <literal>+</literal>
+marker).</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+verify
+</term>
+<listitem>
+<simpara>
+        Verify the contents of the MIDX file.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+expire
+</term>
+<listitem>
+<simpara>
+        Delete the pack-files that are tracked  by the MIDX file, but
+        have no objects referenced by the MIDX. Rewrite the MIDX file
+        afterward to remove all references to these pack-files.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+repack
+</term>
+<listitem>
+<simpara>
+        Create a new pack-file containing objects in small pack-files
+        referenced by the multi-pack-index. If the size given by the
+        <literal>--batch-size=&lt;size&gt;</literal> argument is zero, then create a pack
+        containing all objects referenced by the multi-pack-index. For
+        a non-zero batch size, Select the pack-files by examining packs
+        from oldest-to-newest, computing the "expected size" by counting
+        the number of objects in the pack referenced by the
+        multi-pack-index, then divide by the total number of objects in
+        the pack and multiply by the pack size. We select packs with
+        expected size below the batch size until the set of packs have
+        total expected size at least the batch size, or all pack-files
+        are considered. If only one pack-file is selected, then do
+        nothing. If a new pack-file is created, rewrite the
+        multi-pack-index to reference the new pack-file. A later run of
+        <emphasis>git multi-pack-index expire</emphasis> will delete the pack-files that
+        were part of this batch.
+</simpara>
+<simpara>If <literal>repack.packKeptObjects</literal> is <literal>false</literal>, then any pack-files with an
+associated <literal>.keep</literal> file will not be selected for the batch to repack.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<itemizedlist>
+<listitem>
+<simpara>
+Write a MIDX file for the packfiles in the current <literal>.git</literal> directory.
+</simpara>
+<literallayout class="monospaced">$ git multi-pack-index write</literallayout><simpara></simpara>
+</listitem>
+<listitem>
+<simpara>
+Write a MIDX file for the packfiles in the current <literal>.git</literal> directory with a
+corresponding bitmap.
+</simpara>
+<literallayout class="monospaced">$ git multi-pack-index write --preferred-pack=&lt;pack&gt; --bitmap</literallayout><simpara></simpara>
+</listitem>
+<listitem>
+<simpara>
+Write a MIDX file for the packfiles in an alternate object store.
+</simpara>
+<literallayout class="monospaced">$ git multi-pack-index --object-dir &lt;alt&gt; write</literallayout><simpara></simpara>
+</listitem>
+<listitem>
+<simpara>
+Verify the MIDX file for the packfiles in the current <literal>.git</literal> directory.
+</simpara>
+<literallayout class="monospaced">$ git multi-pack-index verify</literallayout><simpara></simpara>
+</listitem>
+</itemizedlist>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara>See <ulink url="technical/multi-pack-index.html">The Multi-Pack-Index Design
+Document</ulink> and <ulink url="technical/pack-format.html">The Multi-Pack-Index
+Format</ulink> for more information on the multi-pack-index feature.</simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>

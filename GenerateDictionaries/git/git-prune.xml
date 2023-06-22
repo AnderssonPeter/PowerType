@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<refentry>
+<refmeta>
+<refentrytitle>git-prune</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo class="source">Git</refmiscinfo>
+<refmiscinfo class="version"></refmiscinfo>
+<refmiscinfo class="manual">Git Manual</refmiscinfo>
+</refmeta>
+<refnamediv>
+  <refname>git-prune</refname>
+  <refpurpose>Prune all unreachable objects from the object database</refpurpose>
+</refnamediv>
+<refsynopsisdiv id="_synopsis">
+<literallayout><emphasis>git prune</emphasis> [-n] [-v] [--progress] [--expire &lt;time&gt;] [--] [&lt;head&gt;&#8230;]</literallayout>
+<simpara></simpara>
+</refsynopsisdiv>
+<refsect1 id="_description">
+<title>DESCRIPTION</title>
+<note><simpara>In most cases, users should run <emphasis>git gc</emphasis>, which calls
+<emphasis>git prune</emphasis>. See the section "NOTES", below.</simpara></note>
+<simpara>This runs <emphasis>git fsck --unreachable</emphasis> using all the refs
+available in <literal>refs/</literal>, optionally with additional set of
+objects specified on the command line, and prunes all unpacked
+objects unreachable from any of these head objects from the object database.
+In addition, it
+prunes the unpacked objects that are also found in packs by
+running <emphasis>git prune-packed</emphasis>.
+It also removes entries from .git/shallow that are not reachable by
+any ref.</simpara>
+<simpara>Note that unreachable, packed objects will remain.  If this is
+not desired, see <citerefentry>
+<refentrytitle>git-repack</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>.</simpara>
+</refsect1>
+<refsect1 id="_options">
+<title>OPTIONS</title>
+<variablelist>
+<varlistentry>
+<term>
+-n
+</term>
+<term>
+--dry-run
+</term>
+<listitem>
+<simpara>
+        Do not remove anything; just report what it would
+        remove.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+-v
+</term>
+<term>
+--verbose
+</term>
+<listitem>
+<simpara>
+        Report all removed objects.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--progress
+</term>
+<listitem>
+<simpara>
+        Show progress.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--expire &lt;time&gt;
+</term>
+<listitem>
+<simpara>
+        Only expire loose objects older than &lt;time&gt;.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+--
+</term>
+<listitem>
+<simpara>
+        Do not interpret any more arguments as options.
+</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+&lt;head&gt;&#8230;
+</term>
+<listitem>
+<simpara>
+        In addition to objects
+        reachable from any of our references, keep objects
+        reachable from listed &lt;head&gt;s.
+</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+<refsect1 id="_examples">
+<title>EXAMPLES</title>
+<simpara>To prune objects not used by your repository or another that
+borrows from your repository via its
+<literal>.git/objects/info/alternates</literal>:</simpara>
+<literallayout class="monospaced">$ git prune $(cd ../another &amp;&amp; git rev-parse --all)</literallayout><simpara></simpara>
+</refsect1>
+<refsect1 id="_notes">
+<title>NOTES</title>
+<simpara>In most cases, users will not need to call <emphasis>git prune</emphasis> directly, but
+should instead call <emphasis>git gc</emphasis>, which handles pruning along with
+many other housekeeping tasks.</simpara>
+<simpara>For a description of which objects are considered for pruning, see
+<emphasis>git fsck</emphasis>'s --unreachable option.</simpara>
+</refsect1>
+<refsect1 id="_see_also">
+<title>SEE ALSO</title>
+<simpara><citerefentry>
+<refentrytitle>git-fsck</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-gc</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry>,
+<citerefentry>
+<refentrytitle>git-reflog</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry></simpara>
+</refsect1>
+<refsect1 id="_git">
+<title>GIT</title>
+<simpara>Part of the <citerefentry>
+<refentrytitle>git</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> suite</simpara>
+</refsect1>
+</refentry>
