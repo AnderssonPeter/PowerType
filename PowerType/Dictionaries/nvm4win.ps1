@@ -27,7 +27,7 @@ $versionsToInstall = [StaticSource]@{
 }
 
 $architecture = [StaticSource]@{
-    Name = "Proxies";
+    Name = "architecture";
     Description = "";
     Items = @(
         [SourceItem]@{
