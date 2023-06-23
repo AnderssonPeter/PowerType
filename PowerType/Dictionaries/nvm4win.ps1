@@ -1,6 +1,6 @@
 ﻿$installedVersions = [DynamicSource]@{
     Name = "versions";
-    Description = "A all installed node versions";
+    Description = "All installed node versions";
     CommandExpression = {
         $hardcoded = @("latest", "lts")
         $list = nvm list | % { [regex]::match($_, '(\d+\.\d+\.\d+)').Groups[1].Value } | ? {$_.trim() -ne "" }
