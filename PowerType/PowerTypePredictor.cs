@@ -35,7 +35,7 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
         this.currentWorkingDirectoryProvider = currentWorkingDirectoryProvider;
     }
 
-    public bool CanAcceptFeedback(PredictionClient client, PredictorFeedbackKind feedback) => false;
+    public bool CanAcceptFeedback(PredictionClient client, PredictorFeedbackKind feedback) => feedback == PredictorFeedbackKind.CommandLineExecuted;
 
     private static string ConstructCommandPrefix(CommandAst commandAst)
     {
@@ -105,46 +105,46 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
                 yield return result;
             }
         }
-        if (TryGetSuggestor(commandName, out var key, out var suggestor))
+        if (TryGetSuggester(commandName, out var key, out var suggester))
         {
-            dictionaryParsingContext.Command = new Parsing.Command(key, suggestor.Dictionary);
-            ExecutionEngine.Cache(suggestor.Dictionary, currentWorkingDirectoryProvider.CurrentWorkingDirectory);
-            foreach (var result in suggestor.GetPredictions(dictionaryParsingContext))
+            dictionaryParsingContext.Command = new Parsing.Command(key, suggester.Dictionary);
+            ExecutionEngine.Cache(suggester.Dictionary, currentWorkingDirectoryProvider.CurrentWorkingDirectory);
+            foreach (var result in suggester.GetPredictions(dictionaryParsingContext))
             {
                 yield return result;
             }
         }
     }
 
-    private bool TryGetSuggestor(PowerShellString command, out string key, out DictionarySuggestor suggestor)
+    private bool TryGetSuggester(PowerShellString command, out string key, out DictionarySuggester suggester)
     {
-        var suggestors = ExecutionEngine.GetSuggestors();
-        foreach (var innerSuggestor in suggestors)
+        var suggesters = ExecutionEngine.GetSuggesters();
+        foreach (var innerSuggester in suggesters)
         {
-            foreach (var suggestorKey in innerSuggestor.Keys)
+            foreach (var suggesterKey in innerSuggester.Keys)
             {
-                if (suggestorKey.Equals(command.RawValue, StringComparison.OrdinalIgnoreCase))
+                if (suggesterKey.Equals(command.RawValue, StringComparison.OrdinalIgnoreCase))
                 {
-                    key = suggestorKey;
-                    suggestor = innerSuggestor;
+                    key = suggesterKey;
+                    suggester = innerSuggester;
                     return true;
                 }
             }
         }
         key = null!;
-        suggestor = null!;
+        suggester = null!;
         return false;
     }
 
     private IEnumerable<PredictiveSuggestion> GetDictrionaryPredictons(PowerShellString commandName)
     {
-        var suggestors = ExecutionEngine.GetSuggestors();
-        foreach (var suggestor in suggestors)
+        var suggesters = ExecutionEngine.GetSuggesters();
+        foreach (var suggester in suggesters)
         {
-            var key = suggestor.Keys.FirstOrDefault(x => x.Contains(commandName.RawValue, StringComparison.OrdinalIgnoreCase));
+            var key = suggester.Keys.FirstOrDefault(x => x.Contains(commandName.RawValue, StringComparison.OrdinalIgnoreCase));
             if (key != null)
             {
-                yield return new PredictiveSuggestion(key, suggestor.Description);
+                yield return new PredictiveSuggestion(key, suggester.Description);
             }
         }
     }
@@ -157,6 +157,20 @@ public sealed class PowerTypePredictor : ICommandPredictor, IDisposable
     public void OnCommandLineExecuted(PredictionClient client, string commandLine, bool success)
     {
         //This input is not needed
+        //We should use this to update sources!
+        if (success)
+        {
+            var parts = commandLine.Split(' ', 2);
+            if (parts.Length == 2)
+            {
+                var dictinaryIdentifer = PowerShellString.FromRawSmart(parts[0]);
+                var command = parts[1];
+                if (TryGetSuggester(dictinaryIdentifer, out string _, out var suggester))
+                {
+                    ExecutionEngine.CommandExecuted(suggester.Dictionary, currentWorkingDirectoryProvider.CurrentWorkingDirectory, command);
+                }
+            }
+        }
     }
 
     public void OnSuggestionAccepted(PredictionClient client, uint session, string acceptedSuggestion)

@@ -1,4 +1,6 @@
-﻿namespace PowerType.Model;
+﻿using PowerType.BackgroundProcessing;
+
+namespace PowerType.Model;
 
 public interface ISystemTime
 {
@@ -9,6 +11,7 @@ public class Cache
 {
     private ISystemTime systemTime = default!;
     public TimeSpan? ByTime { get; set; }
+    public string[] ByCommand { get; set; } = new string[0];
     public bool ByCurrentWorkingDirectory { get; set; }
 
     internal void Initialize(ISystemTime systemTime)
@@ -33,13 +36,14 @@ public class Cache
     private DateTime lastUpdate = DateTime.MinValue;
     private string lastWokringDirectory = string.Empty;
 
-    internal bool ShouldUpdate(string currentWorkingDirectory)
+    internal bool ShouldUpdate(string currentWorkingDirectory, string? commandExecuted = null)
     {
         lock (locker)
         {
             var diff = systemTime.UtcNow.Subtract(lastUpdate);
             return (ByTime.HasValue && diff > ByTime.Value) ||
-                   (ByCurrentWorkingDirectory && lastWokringDirectory != currentWorkingDirectory);
+                   (ByCurrentWorkingDirectory && lastWokringDirectory != currentWorkingDirectory) ||
+                   (commandExecuted != null && ByCommand.Any(x => commandExecuted.StartsWith(x, StringComparison.OrdinalIgnoreCase)));
         }
     }
 

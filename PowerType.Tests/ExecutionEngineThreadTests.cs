@@ -38,7 +38,7 @@ public class ExecutionEngineThreadTests
         using var executionEngineThread = new ExecutionEngineThread(queue);
         SendAndWaitForCommand(new InitializeDictionaryCommand(Path.Combine(Environment.CurrentDirectory, "Dictionaries", "test.ps1")), queue, executionEngineThread);
         var dictionary = executionEngineThread.GetDictionaries().Single();
-        SendAndWaitForCommand(new CacheDictionaryDynamicSources(dictionary, Environment.CurrentDirectory), queue, executionEngineThread);
+        SendAndWaitForCommand(new CacheDictionaryDynamicSourcesCommand(dictionary, Environment.CurrentDirectory), queue, executionEngineThread);
         if (!executionEngineThread.IsHealthy(out var exception))
         {
             throw new Exception("execution engine thread was not healthy", exception);
@@ -51,7 +51,7 @@ public class ExecutionEngineThreadTests
         var queue = new ThreadQueue<Command>();
         using var executionEngineThread = new ExecutionEngineThread(queue);
         SendAndWaitForCommand(new InitializeDictionaryCommand(Path.Combine(Environment.CurrentDirectory, "Dictionaries", "test.ps1")), queue, executionEngineThread);
-        executionEngineThread.GetSuggestors().Count.Should().Be(1);
+        executionEngineThread.GetSuggesters().Count.Should().Be(1);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class ExecutionEngineThreadTests
         SendAndWaitForCommand(new InitializeDictionaryCommand(Path.Combine(Environment.CurrentDirectory, "Dictionaries", "test.ps1")), queue, executionEngineThread);
 
         var dictionary = executionEngineThread.GetDictionaries().Single();
-        SendAndWaitForCommand(new CacheDictionaryDynamicSources(dictionary, @"X:\DoesNotExist"), queue, executionEngineThread);
+        SendAndWaitForCommand(new CacheDictionaryDynamicSourcesCommand(dictionary, @"X:\DoesNotExist"), queue, executionEngineThread);
         if (!executionEngineThread.IsHealthy(out var exception))
         {
             throw new Exception("execution engine thread was not healthy", exception);

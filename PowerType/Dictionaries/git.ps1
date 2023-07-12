@@ -73,7 +73,8 @@ $remotes = [DynamicSource]@{
     };
     Cache = [Cache]@{
         ByCurrentWorkingDirectory = $true;
-        ByTime = New-TimeSpan -Seconds 30
+        ByTime = New-TimeSpan -Seconds 30;
+        ByCommand = @("remote")
     }
 }
 
@@ -85,7 +86,8 @@ $allBranches = [DynamicSource]@{
     };
     Cache = [Cache]@{
         ByCurrentWorkingDirectory = $true;
-        ByTime = New-TimeSpan -Seconds 10
+        ByTime = New-TimeSpan -Seconds 10;
+        ByCommand = @("checkout", "fetch", "pull", "switch")
     }
 }
 
@@ -97,7 +99,8 @@ $localBranches = [DynamicSource]@{
     };
     Cache = [Cache]@{
         ByCurrentWorkingDirectory = $true;
-        ByTime = New-TimeSpan -Seconds 10
+        ByTime = New-TimeSpan -Seconds 10;
+        ByCommand = @("checkout", "fetch", "pull", "switch")
     }
 }
 
@@ -109,7 +112,8 @@ $stashes = [DynamicSource]@{
     };
     Cache = [Cache]@{
         ByCurrentWorkingDirectory = $true;
-        ByTime = New-TimeSpan -Seconds 10
+        ByTime = New-TimeSpan -Seconds 10;
+        ByCommand = @("stash")
     }
 }
 

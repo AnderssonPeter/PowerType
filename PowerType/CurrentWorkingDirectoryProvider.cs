@@ -1,8 +1,9 @@
 ﻿using System.Management.Automation;
+using PowerType.BackgroundProcessing;
 
 namespace PowerType;
 
-public class CurrentWorkingDirectoryProvider : ICurrentWorkingDirectoryProvider
+internal class CurrentWorkingDirectoryProvider : ICurrentWorkingDirectoryProvider
 {
     private bool disposed;
     private volatile string currentWorkingDirectory;
@@ -13,6 +14,7 @@ public class CurrentWorkingDirectoryProvider : ICurrentWorkingDirectoryProvider
         this.sessionState = sessionState;
         currentWorkingDirectory = sessionState.Path.CurrentFileSystemLocation.ProviderPath;
         sessionState.InvokeCommand.LocationChangedAction += LocationChanged;
+        
     }
 
     private void LocationChanged(object? sender, LocationChangedEventArgs e)

@@ -8,5 +8,5 @@ internal abstract record Command
     public volatile bool IsDone;
 }
 internal record InitializeDictionaryCommand(string File) : Command;
-internal record CacheDictionaryDynamicSources(PowerTypeDictionary Dictionary, string CurrentWorkingDirectory) : Command;
-
+internal record CacheDictionaryDynamicSourcesCommand(PowerTypeDictionary Dictionary, string CurrentWorkingDirectory) : Command;
+internal record CommandExecutedCommand(PowerTypeDictionary Dictionary, string CurrentWorkingDirectory, string Command) : Command;

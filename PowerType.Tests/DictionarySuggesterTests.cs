@@ -5,10 +5,10 @@ using PowerType.Parsing;
 using Xunit;
 
 namespace PowerType.Tests;
-public class DictionarySuggestorTests
+public class DictionarySuggesterTests
 {
-    private readonly DictionarySuggestor dictionarySuggestor;
-    public DictionarySuggestorTests()
+    private readonly DictionarySuggester dictionarySuggester;
+    public DictionarySuggesterTests()
     {
         var allRepositories = new DynamicSource
         {
@@ -135,7 +135,7 @@ public class DictionarySuggestorTests
         {
             SourceItem.FromName("First"), SourceItem.FromName("Second"), SourceItem.FromName("With space"), SourceItem.FromName("release/v1.16.26")
         }, "");
-        dictionarySuggestor = new DictionarySuggestor(dictionary);
+        dictionarySuggester = new DictionarySuggester(dictionary);
     }
     
     [Theory]
@@ -178,7 +178,7 @@ public class DictionarySuggestorTests
     {
         var context = new DictionaryParsingContext("", input.Select(x => PowerShellString.FromEscapedSmart(x)));
         context.Command = new Command("git", null!);
-        var result = dictionarySuggestor.GetPredictions(context).Select(x => x.SuggestionText);
+        var result = dictionarySuggester.GetPredictions(context).Select(x => x.SuggestionText);
         result.Should().BeEquivalentTo(expectedOutput);
     }
 }

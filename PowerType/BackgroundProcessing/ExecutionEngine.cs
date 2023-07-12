@@ -7,7 +7,7 @@ internal partial class ExecutionEngine
     private ExecutionEngineThread? executionEngineThread;
     private readonly ThreadQueue<Command> threadQueue = new();
 
-    public List<DictionarySuggestor> GetSuggestors() => executionEngineThread?.GetSuggestors() ?? new List<DictionarySuggestor>();
+    public List<DictionarySuggester> GetSuggesters() => executionEngineThread?.GetSuggesters() ?? new List<DictionarySuggester>();
 
     public bool IsHealthy(out Exception? exception)
     {
@@ -43,5 +43,8 @@ internal partial class ExecutionEngine
         threadQueue.Enqueue(new InitializeDictionaryCommand(dictionaryPath));
 
     public void Cache(PowerTypeDictionary dictionary, string currentWorkingDirectory) =>
-        threadQueue.Enqueue(new CacheDictionaryDynamicSources(dictionary, currentWorkingDirectory));
+        threadQueue.Enqueue(new CacheDictionaryDynamicSourcesCommand(dictionary, currentWorkingDirectory));
+
+    public void CommandExecuted(PowerTypeDictionary dictionary, string currentWorkingDirectory, string command) => 
+        threadQueue.Enqueue(new CommandExecutedCommand(dictionary, currentWorkingDirectory, command));
 }

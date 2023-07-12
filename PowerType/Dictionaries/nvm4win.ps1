@@ -7,7 +7,8 @@
         $hardcoded + $list
     };
     Cache = [Cache]@{
-        ByTime = New-TimeSpan -Seconds 10
+        ByTime = New-TimeSpan -Seconds 10;
+        ByCommand = @("install", "uninstall")
     }
 }
 

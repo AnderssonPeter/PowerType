@@ -10,7 +10,7 @@ namespace PowerType.BackgroundProcessing;
 internal class ExecutionEngineThread : IDisposable
 {
     private bool disposed;
-    record DictionaryInformation(string File, DictionarySuggestor Suggestor);
+    record DictionaryInformation(string File, DictionarySuggester Suggester);
     private readonly object dictionariesLocker = new();
     private readonly List<DictionaryInformation> dictionaries = new();
     private readonly ThreadQueue<Command> queue;
@@ -39,11 +39,11 @@ internal class ExecutionEngineThread : IDisposable
     }
 
     /// <summary>This method is thread safe</summary>
-    public List<DictionarySuggestor> GetSuggestors()
+    public List<DictionarySuggester> GetSuggesters()
     {
         lock (dictionariesLocker)
         {
-            return dictionaries.ConvertAll(x => x.Suggestor);
+            return dictionaries.ConvertAll(x => x.Suggester);
         }
     }
 
@@ -52,7 +52,7 @@ internal class ExecutionEngineThread : IDisposable
     {
         lock (dictionariesLocker)
         {
-            return dictionaries.ConvertAll(x => x.Suggestor.Dictionary);
+            return dictionaries.ConvertAll(x => x.Suggester.Dictionary);
         }
     }
 
@@ -67,9 +67,13 @@ internal class ExecutionEngineThread : IDisposable
                 {
                     Handle(initializeCommand);
                 }
-                else if (command is CacheDictionaryDynamicSources cacheDictionaryCommand)
+                else if (command is CacheDictionaryDynamicSourcesCommand cacheDictionaryCommand)
                 {
                     Handle(cacheDictionaryCommand);
+                }
+                else if (command is CommandExecutedCommand commandExecutedCommand)
+                {
+                    Handle(commandExecutedCommand);
                 }
                 else
                 {
@@ -125,7 +129,7 @@ internal class ExecutionEngineThread : IDisposable
             throw new Exception("Failed to initialize dictionary, errors: " + errors);
         }
 
-        DictionarySuggestor suggestor;
+        DictionarySuggester suggester;
         var resultObject = result.Single().BaseObject;
         if (resultObject is PowerTypeDictionary dictionary)
         {
@@ -136,27 +140,27 @@ internal class ExecutionEngineThread : IDisposable
             }
             dictionary.Initialize(SystemTime.Instance);
             dictionary.Validate();
-            suggestor = new DictionarySuggestor(dictionary);
+            suggester = new DictionarySuggester(dictionary);
         }
-        else if (resultObject is DictionarySuggestor suggestorTmp)
+        else if (resultObject is DictionarySuggester suggesterTemp)
         {
-            suggestor = suggestorTmp;
+            suggester = suggesterTemp;
         }
         else
         {
-            throw new InvalidOperationException("Didn't receive a PowerTypeDictionary or ISuggestor");
+            throw new InvalidOperationException("Didn't receive a PowerTypeDictionary or ISuggester");
         }
         lock (dictionariesLocker)
         {
-            dictionaries.Add(new DictionaryInformation(command.File, suggestor));
+            dictionaries.Add(new DictionaryInformation(command.File, suggester));
         }
     }
 
-    private void Handle(CacheDictionaryDynamicSources command)
+    private void Handle(CacheDictionaryDynamicSourcesCommand command)
     {
         var dictionaryInformation = GetDictionaryInformation(command.Dictionary);
 
-        foreach (var dynamicSource in dictionaryInformation.Suggestor.GetDynamicSources())
+        foreach (var dynamicSource in dictionaryInformation.Suggester.GetDynamicSources())
         {
             if (dynamicSource.Cache.ShouldUpdate(command.CurrentWorkingDirectory))
             {
@@ -177,11 +181,36 @@ internal class ExecutionEngineThread : IDisposable
         }
     }
 
+    private void Handle(CommandExecutedCommand command)
+    {
+        var dictionaryInformation = GetDictionaryInformation(command.Dictionary);
+
+        foreach (var dynamicSource in dictionaryInformation.Suggester.GetDynamicSources())
+        {
+            if (dynamicSource.Cache.ShouldUpdate(command.CurrentWorkingDirectory, command.Command))
+            {
+                try
+                {
+                    runspace.SessionStateProxy.Path.SetLocation(command.CurrentWorkingDirectory);
+                    var result = dynamicSource.CommandExpression.Invoke();
+                    var items = result.Select(x => x.BaseObject is string value ?
+                        new SourceItem { Name = value } :
+                        (SourceItem)x.BaseObject).ToList();
+                    dynamicSource.Cache.UpdateCache(items, command.CurrentWorkingDirectory);
+                }
+                catch (System.Management.Automation.DriveNotFoundException)
+                {
+                    //todo: log exception
+                }
+            }
+        }
+    }
+
     private DictionaryInformation GetDictionaryInformation(PowerTypeDictionary dictionary)
     {
         lock (dictionariesLocker)
         {
-            return this.dictionaries.Single(x => x.Suggestor is DictionarySuggestor suggestor && suggestor.Dictionary == dictionary);
+            return this.dictionaries.Single(x => x.Suggester is DictionarySuggester suggestor && suggestor.Dictionary == dictionary);
         }
     }
 

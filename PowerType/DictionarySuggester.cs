@@ -5,7 +5,7 @@ using System.Management.Automation.Subsystem.Prediction;
 
 namespace PowerType;
 
-internal class DictionarySuggestor
+internal class DictionarySuggester
 {
     private readonly List<DynamicSource> dynamicSources;
     public PowerTypeDictionary Dictionary { get; }
@@ -18,7 +18,7 @@ internal class DictionarySuggestor
 
     public bool HasKey(string key) => Keys.Contains(key, StringComparer.OrdinalIgnoreCase);
 
-    public DictionarySuggestor(PowerTypeDictionary dictionary)
+    public DictionarySuggester(PowerTypeDictionary dictionary)
     {
         this.Dictionary = dictionary;
         dynamicSources = dictionary.Parameters.SelectMany(p => RecursiveGet(p)).ToList();

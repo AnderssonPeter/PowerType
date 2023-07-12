@@ -100,4 +100,26 @@ public class CacheTests
             result.Should().Be(shouldUpdate);
         }
     }
+
+    [InlineData("install", true)]
+    [InlineData("Install", true)]
+    [InlineData("Install package", true)]
+    [InlineData("reinstall", false)]
+    [InlineData("uninstall", true)]
+    [Theory]
+    public void ShouldUpdateByCommand(string command, bool expected)
+    {
+        var cache = new Cache
+        {
+            ByCommand = new string[]
+            {
+                "install",
+                "uninstall"
+            }
+        };
+        var systemTime = new SystemTimeMock(DateTime.Today);
+        cache.Initialize(systemTime);
+        cache.UpdateCache(new List<SourceItem> { }, string.Empty);
+        cache.ShouldUpdate(string.Empty, command).Should().Be(expected);
+    }
 }
